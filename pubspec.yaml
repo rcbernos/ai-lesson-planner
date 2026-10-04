@@ -1,0 +1,58 @@
+name: ai_lesson_planner
+description: Offline AI Lesson Plan Assistant for DepEd teachers
+publish_to: "none" # This is a private project
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.4.0
+  riverpod: ^2.4.0
+  flutter_hooks: ^0.20.1
+  
+  # Database & Local Storage
+  drift: ^2.13.0
+  drift_dev: ^2.13.0
+  sqlite3_flutter_libs: ^0.5.10
+  path_provider: ^2.1.0
+  path: ^1.8.0
+  
+  # AI Model Integration
+  llama_cpp_dart: ^0.2.2
+  
+  # File Operations & Export
+  archive: ^4.0.2
+  pdf: ^3.13.1
+  docs_gee: ^1.5.0
+  
+  # Utilities
+  uuid: ^4.5.1
+  intl: ^0.20.3
+  json_annotation: ^4.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.0
+  drift_dev: ^2.13.0
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Bold.ttf
+
+  assets:
+    - assets/

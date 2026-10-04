@@ -1,0 +1,43 @@
+# Flutter specific
+build/
+/.dart_tool/
+/.packages
+/.plugin_overrides
+.dart_tool
+.fuvre
+packages.yaml
+
+# Files and directories created by packages
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+
+# Conventional
+*.class
+*.log
+*.tmp
+*.swp
+
+# IDE specific
+.idea/
+.vscode/
+*.iml
+
+# Flutter build output
+*.aot
+*.so
+*.app
+*.exe
+*.dll
+*.pdb
+
+# Android / iOS specific
+/**/ios/
+/**/android/
+
+# Model files (large binary files)
+models/*.gguf
+
+# Generated files
+*.g.dart
