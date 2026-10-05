@@ -38,6 +38,3 @@ packages.yaml
 
 # Model files (large binary files)
 models/*.gguf
-
-# Generated files
-*.g.dart
