@@ -9,7 +9,7 @@
 * **Tasks:**
 * Initialize the Git repository, establish the root `/lib` architecture (`/core`, `/features`, `/services`), and create the `/working_docs/` directory.
 * Add the foundational markdown tracking templates inside `/working_docs/`.
-* Add required dependencies to `pubspec.yaml` (Drift, Riverpod, `llama_cpp_dart` ^0.2.2, `archive` ^4.0.2, `pdf` ^3.13.1, `docs_gee` ^1.5.0, `uuid` ^4.5.1, etc.) so all devs share exact package versions.
+* Add required dependencies to `pubspec.yaml` (Drift, Riverpod, `llama_cpp_dart` ^0.2.2, `archive` ^4.0.2, `pdf` ^3.13.1, `docs_gee` ^1.5.0, `uuid` ^4.5.1, `http` ^1.1.0, `crypto` ^3.0.0, etc.) so all devs share exact package versions.
 * Push the initial commit to `main` and notify Devs 2 and 3 that they can clone, branch, and fill out their respective commit plans as their very first action.
 
 
@@ -31,11 +31,13 @@
 * **Tasks:**
 * Hardcode the official DepEd **ILAW Format** (Intentions, Learning Experiences, Assessing Learning, Ways Forward) with an AI Use Declaration footer as a string constant.
 * Write the absolute file-path resolver using `path_provider` to ensure `llama_cpp_dart` can locate the SEA-LION GGUF weights safely across Windows/Linux sandboxes.
+* Implement automatic model download from remote URL if GGUF file doesn't exist locally, with checksum verification.
 * Integrate `llama_cpp_dart` running inside a background `compute` isolate for non-blocking token generation.
 
 
 * **✅ Human Verification Checklist:**
 * [ ] The app successfully resolves the absolute path of the local GGUF model file on startup without throwing path-not-found exceptions.
+* [ ] If model is missing, the app downloads the GGUF file from the configured URL and verifies checksum.
 * [ ] A test token generation call fires in a background isolate and returns text to the console without freezing the UI thread.
 
 
