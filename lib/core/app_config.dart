@@ -30,7 +30,7 @@ W - Ways Forward:
 AI Use Declaration:
 This lesson plan was generated with the assistance of an AI language model.
 Content has been reviewed and refined by the teacher.
-EOF;
+''';
 
   /// Model file path (relative to application data directory)
   static const String modelFileName = 'sea-liongguf-q4_0.gguf';
