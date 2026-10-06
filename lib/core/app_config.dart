@@ -119,18 +119,45 @@ This lesson plan was generated with the assistance of an AI language model.
 Content has been reviewed and refined by the teacher.
 ''';
 
-  /// Model file path (relative to application data directory)
+  /// Model file name
   static const String modelFileName = 'sea-liongguf-q4_0.gguf';
   
   /// Model download URL (HuggingFace/primary source)
   static const String modelDownloadUrl = 'https://huggingface.co/codellama/sea-lion-7b-gguf/resolve/main/sealion-7b-q4_0.gguf';
   
   /// Expected model file size in bytes (for verification)
+  /// TODO: Update with actual model file size once downloaded
   static const int modelFileSize = 4000000000; // Example: 4GB
   
   /// SHA256 checksum of the model file for integrity verification
-  static const String modelChecksum = 'your-sha256-checksum-here';
+  /// TODO: Update with actual SHA256 checksum after first download
+  static const String modelChecksum = 'placeholder-sha256-checksum-not-yet-verified';
   
   /// Default export directory
   static const String defaultExportDir = '/LMS_Data/Exports/';
+  
+  /// Download chunk size for streaming downloads (in bytes)
+  static const int downloadChunkSize = 1048576; // 1MB chunks
+  
+  /// Timeout for model download (in seconds)
+  static const int downloadTimeoutSeconds = 300; // 5 minutes
+  
+  /// Get the model download URL (can be overridden for testing)
+  static String getModelDownloadUrl() => modelDownloadUrl;
+  
+  /// Check if the configuration has valid checksum
+  static bool isChecksumVerified() {
+    return !modelChecksum.startsWith('placeholder') && 
+           modelChecksum.isNotEmpty &&
+           modelChecksum.length == 64; // SHA256 is 64 hex chars
+  }
+  
+  /// Get the expected model file size in MB
+  static String getModelSizeFormatted() {
+    final mb = modelFileSize / (1024 * 1024);
+    if (mb >= 1024) {
+      return '${(mb / 1024).toStringAsFixed(1)} GB';
+    }
+    return '${mb.toStringAsFixed(0)} MB';
+  }
 }
