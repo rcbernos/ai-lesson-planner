@@ -1,10 +1,16 @@
 /// AI Service for LLM model operations and inference
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
+import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 
 import '../core/app_config.dart';
 import 'downloads.dart'; // Same directory - no path needed
+
+/// Type aliases for callbacks
+typedef ProgressCallback = void Function(int received, int total);
+typedef ErrorCallback = void Function(String error);
 
 /// AI Service for managing LLM operations
 class AIService {
