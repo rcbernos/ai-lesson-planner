@@ -14,6 +14,10 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  /// Test-only constructor that opens the database at an explicit file path.
+  AppDatabase.forTesting(File file)
+      : super(_openConnectionForFile(file));
+
   @override
   int get schemaVersion => 1;
 
@@ -23,6 +27,14 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
         await seed();
+      },
+      beforeOpen: (details) async {
+        // Safety check: if tables exist but are empty (e.g., the db file
+        // existed but seeding never ran), seed once.
+        final existingNotes = await referenceNotes.select().get();
+        if (existingNotes.isEmpty) {
+          await seed();
+        }
       },
     );
   }
@@ -105,6 +117,13 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, 'ai_lesson_planner.db'));
+    return NativeDatabase.createInBackground(file);
+  });
+}
+
+/// Opens the SQLite database at an explicit file path (used for testing).
+LazyDatabase _openConnectionForFile(File file) {
+  return LazyDatabase(() async {
     return NativeDatabase.createInBackground(file);
   });
 }
