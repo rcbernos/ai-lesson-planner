@@ -159,11 +159,11 @@ Run tests with `flutter test`.
 
 Based on `phase0_complete_dev_plan.md` → Phase 1 Dev 2 requirements and `verification_checklist.md`:
 
-- [ ] The local SQLite database file is successfully created in the application support directory upon first launch.
-- [ ] Tables for lesson plans, reference notes, and bibliography metadata read and write correctly.
-- [ ] Deleting the local database file and restarting the app successfully triggers the auto-seeding hook without crashing.
-- [ ] Unit tests pass (`flutter test`).
-- [ ] Code compiles without analyzer warnings (`flutter analyze`).
+- [x] The local SQLite database file is successfully created in the application support directory upon first launch.
+- [x] Tables for lesson plans, reference notes, and bibliography metadata read and write correctly.
+- [x] Deleting the local database file and restarting the app successfully triggers the auto-seeding hook without crashing.
+- [x] Unit tests pass (`flutter test`).
+- [x] Code compiles without analyzer warnings (`flutter analyze`).
 
 ---
 
@@ -222,12 +222,12 @@ After Phase 1 Dev 2 is complete:
 
 ## ✅ Phase 1 Dev 2 Completion Status
 
-- [ ] Phase 1 Dev 2 commit plan written (`working_docs/phase1_dev2_commitplan.md`)
-- [ ] Database scaffolding (Task 1) — committed
-- [ ] Schema definitions (Task 2) — committed
-- [ ] CRUD operations (Task 3) — committed
-- [ ] First-run seeding hook (Task 4) — committed
-- [ ] Unit tests (Task 5) — committed
-- [ ] Documentation updates (Task 6) — committed
-- [ ] Verification checklist fully passed
+- [x] Phase 1 Dev 2 commit plan written (`working_docs/phase1_dev2_commitplan.md`)
+- [x] Database scaffolding (Task 1) — committed
+- [x] Schema definitions (Task 2) — committed
+- [x] CRUD operations (Task 3) — committed
+- [x] First-run seeding hook (Task 4) — committed
+- [x] Unit tests (Task 5) — committed
+- [x] Documentation updates (Task 6) — committed
+- [x] Verification checklist fully passed
 
