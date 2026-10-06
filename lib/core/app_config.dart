@@ -31,9 +31,19 @@ AI Use Declaration:
 This lesson plan was generated with the assistance of an AI language model.
 Content has been reviewed and refined by the teacher.
 EOF;
+''';
 
   /// Model file path (relative to application data directory)
   static const String modelFileName = 'sea-liongguf-q4_0.gguf';
+  
+  /// Model download URL (HuggingFace/primary source)
+  static const String modelDownloadUrl = 'https://huggingface.co/codellama/sea-lion-7b-gguf/resolve/main/sealion-7b-q4_0.gguf';
+  
+  /// Expected model file size in bytes (for verification)
+  static const int modelFileSize = 4000000000; // Example: 4GB
+  
+  /// SHA256 checksum of the model file for integrity verification
+  static const String modelChecksum = 'your-sha256-checksum-here';
   
   /// Default export directory
   static const String defaultExportDir = '/LMS_Data/Exports/';

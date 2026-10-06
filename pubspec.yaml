@@ -33,6 +33,10 @@ dependencies:
   pdf: ^3.13.1
   docs_gee: ^1.5.0
   
+  # Model Download & Verification
+  http: ^1.1.0
+  crypto: ^3.0.0
+  
   # Utilities
   uuid: ^4.5.1
   intl: ^0.20.3
