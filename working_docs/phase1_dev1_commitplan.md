@@ -42,13 +42,45 @@ This document outlines the step-by-step plan for Dev 1 to implement the LLM Asse
 
 ## 📋 Tasks to Execute
 
-### Task 1: Update ILAW Format Constant
+### Task 1: Create Comprehensive ILAW Template for AI Generation
 
 1. **Update the ILAW format in `app_config.dart`:**
-   - Ensure the hardcoded ILAW format (Intentions, Learning Experiences, Assessing Learning, Ways Forward) is complete
-   - Verify the AI Use Declaration footer is present
+   - Create a complete ILAW template following official DepEd Daily Lesson Plan format
+   - Include all four sections: I INTENTIONS, L LEARNING EXPERIENCES, A ASSESSMENT, W WAYS FORWARD
+   - Add placeholders for: Grade level, Learning Area, Theme, Content Standards, Performance Standards, Learning Competencies, Learning Objectives, Learner Context, Instructional Materials, Flow of Lesson (with time/activity table), Formative Assessment, Exit Task, Success Criteria, Reflection Questions, Remediation, Enrichment
+   
+2. **ILAW Template Structure (based on temp_seed_docs DepEd format):**
+   ```
+   I INTENTIONS:
+   - Shared Sub-theme
+   - Pamantayang Pangnilaluman (Content Standard)
+   - Pamantayan sa Pagganap (Performance Standard)
+   - Mga Kasanayan at Layuning Pampagkatuto (Learning Competencies)
+   - Learning Objectives
+   
+   L LEARNING EXPERIENCES:
+   - Learner Context
+   - Instructional Materials and Resources
+   - Flow of Lesson (Time | Stage | Activities table)
+   - Activity Details for each stage
+   
+   A ASSESSMENT:
+   - Formative Assessment
+   - Exit Task
+   - Success Criteria
+   
+   W WAYS FORWARD:
+   - Reflection Questions
+   - Remediation and Enrichment
+   - Notes for Next Session
+   
+   Footer: Prepared by / Checked by fields
+   ```
 
-**Commit Message:** `feat: complete ILAW format constant with AI declaration`
+3. **Add helper method for template interpolation:**
+   - Create `interpolateTemplate(Map<String, String> values)` method to fill placeholders
+
+**Commit Message:** `feat: implement comprehensive ILAW template with official DepEd DLP format for AI lesson plan generation`
 
 ---
 
@@ -159,7 +191,7 @@ Dev 1 completes the AI Engine feature, establishing:
 **Date:** 2026-10-05
 
 ### Completed Tasks
-- [ ] Update ILAW format constant in `app_config.dart`
+- [x] Update ILAW format constant in `app_config.dart` - Added comprehensive DepEd ILAW template with all sections (I INTENTIONS, L LEARNING EXPERIENCES, A ASSESSMENT, W WAYS FORWARD), placeholders, and proper formatting
 - [ ] Create `ai_service.dart` with path resolution and download capability
 - [ ] Implement model download with checksum verification
 - [ ] Implement background isolate for token generation

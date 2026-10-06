@@ -33,4 +33,30 @@ class AppUtils {
       await exportDir.create(recursive: true);
     }
   }
+  
+  /// Interpolate template placeholders with actual values
+  /// 
+  /// [template] is the ILAW template string with placeholders like ____,
+  /// [values] is a map of placeholder names to their replacement values
+  /// 
+  /// Example:
+  /// ```dart
+  /// final lessonPlan = AppUtils.interpolateTemplate(
+  ///   AppConfig.ilawFormat,
+  ///   {
+  ///     'GRADE LEVEL': 'Grade 3',
+  ///     'LEARNING AREA': 'FILIPINO',
+  ///     'Time': '5 min',
+  ///   },
+  /// );
+  /// ```
+  static String interpolateTemplate(String template, Map<String, String> values) {
+    var result = template;
+    for (final entry in values.entries) {
+      final placeholder = entry.key;
+      final value = entry.value;
+      result = result.replaceAll(placeholder, value);
+    }
+    return result;
+  }
 }

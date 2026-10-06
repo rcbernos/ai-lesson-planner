@@ -3,34 +3,120 @@ class AppConfig {
   static const String appName = 'AI Lesson Plan Assistant';
   static const String version = '1.0.0';
   
-  /// ILAW Format - Intentions, Learning Experiences, Assessing Learning, Ways Forward
+  /// ILAW Format - Official DepEd Daily Lesson Plan Template
+  /// Based on official DepEd DLP format for Grades 1-4
   static const String ilawFormat = '''
-ILAW FORMAT - Offline AI Lesson Plan Assistant
+ILAW FORMAT - OFFICIAL DEPED LESSON PLAN TEMPLATE
 
-I - Intentions: 
-- What is the overall purpose of this learning sequence?
-- What should students know, understand, or be able to do by the end?
+I INTENTIONS
+=============
+PHASE: Term ____, Quarter ____
+GRADE LEVEL: ____
+LEARNING AREA: ____
+SHARED SUB-THEME: 
 
-L - Learning Experiences:
-- What activities will help students achieve the intentions?
-- What resources and materials are needed?
-- What differentiation strategies will be used?
+Pamantayang Pangnilalamaan:
+__________________________________________________________
+What should learners know, understand, or be able to do?
+(e.g., Natutuhan, Naipamamalas, Natutukoy ang ...)
 
-A - Assessing Learning:
-- How will you know if students have achieved the intentions?
-- What evidence will you collect?
-- What formative and summative assessments will you use?
+Pamantayan sa Pagganap:
+__________________________________________________________
+What should learners be able to do at the end of the lesson?
+(e.g., Nagagamit, Nakagagawa, Nakapagpapahayag ng ...)
 
-W - Ways Forward:
-- What steps will you take based on assessment results?
-- How will you remediate or extend learning?
-- What next steps are needed for continued progress?
+Mga Kasanayan at Layuning Pampagkatuto:
+__________________________________________________________
+List the specific learning competencies (with codes if available):
+- ________________________________
+- ________________________________
+
+LEARNING OBJECTIVES:
+__________________________________________________________
+By the end of the lesson, learners will be able to:
+- Natutukoy ang...
+- Nakapagpapahayag ng...
+- Makapagbabahagi ng...
+
+L LEARNING EXPERIENCES
+=====================
+LEARNER CONTEXT:
+__________________________________________________________
+Describe the learners and their relevant background:
+(e.g., Ang mga mag-aaral ay may iba't ibang karanasan...)
+
+INSTRUCTIONAL MATERIALS:
+__________________________________________________________
+- ________________________________
+- ________________________________
+- ________________________________
+
+FLOW OF LESSON:
+| Time | Stage | Activities |
+|------|-------|------------|
+| ____ | Whole-Class Motivation | _______ |
+| ____ | Direct Teaching | _______ |
+| ____ | Guided/Collaborative Practice | _______ |
+| ____ | Independent Practice | _______ |
+| ____ | Whole-Class Wrap-Up | _______ |
+
+ACTIVITY DETAILS:
+- Motivation: ________________________________________________
+- Direct Instruction: ________________________________________
+- Guided Practice: ___________________________________________
+- Independent Practice: ______________________________________
+- Wrap-Up: _________________________________________________
+
+A ASSESSMENT
+============
+FORMATIVE ASSESSMENT:
+__________________________________________________________
+How will the teacher check understanding during the lesson?
+(e.g., Obserbahan, Tanong-Tanong, Oplan, ...)
+- ________________________________________________
+
+EXIT TASK:
+__________________________________________________________
+A short task at the end of the lesson to assess learning:
+(e.g., Isulat, Sabihin, Magbigay, Tukuyin...)
+- ________________________________________________
+
+SUCCESS CRITERIA:
+__________________________________________________________
+How will we know if learners succeeded?
+- Nailarawan/Natutukoy ang...
+- Nakagagamit ang...
+- Nakapagpapahayag ng...
+
+W WAYS FORWARD
+==============
+REFLECTION QUESTIONS:
+__________________________________________________________
+- Ano ang natutuhan ngayon?
+- Paano ko ito gagamitin sa susunod?
+- Ano ang naging mahirap?
+
+REMEDIATION (For learners who need more help):
+__________________________________________________________
+(e.g., Pangingil, Masusing magbahagi,...)
+- ________________________________________________
+
+ENRICHMENT (For learners who need extension):
+__________________________________________________________
+(e.e., Pagpapalawak, Pagpapakita,...)
+- ________________________________________________
+
+NOTES FOR NEXT SESSION:
+__________________________________________________________
+__________________________________________________________
+
+PREPARED BY: _________________________
+CHECKED BY: _________________________
 
 ---
 AI Use Declaration:
 This lesson plan was generated with the assistance of an AI language model.
 Content has been reviewed and refined by the teacher.
-EOF;
 ''';
 
   /// Model file path (relative to application data directory)
