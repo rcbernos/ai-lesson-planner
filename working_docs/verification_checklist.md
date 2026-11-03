@@ -17,8 +17,12 @@ Before completing Phase 0, verify:
 ---
 
 ## Phase 1 Verification (Dev 2 - Database)
-- [ ] Local SQLite database created on first launch
-- [ ] Tables for lesson plans, notes, bibliography work correctly
+- [x] Local SQLite database created on first launch
+- [x] Tables for lesson plans, notes, bibliography work correctly
+- [x] Auto-seeding hook runs on fresh database and survives delete/restart
+- [x] CRUD operations verified for all entities
+- [x] Unit tests pass (`flutter test test/database/database_test.dart`)
+- [x] Code compiles without analyzer warnings (`flutter analyze`)
 
 ---
 

@@ -5,7 +5,6 @@ import 'package:path_provider/path_provider.dart';
 
 import 'app_config.dart';
 
-
 class AppUtils {
   /// Get the application support directory for storing model files and data
   static Future<String> getAppSupportDir() async {
