@@ -13,18 +13,22 @@
 - `flutter build linux` produces a working binary
 
 ## Phase 1 - Visible App (dev1 branch)
-**Status:** T1.3 COMPLETE
+**Status:** T1.4 COMPLETE
 
 **T1.2 - Clean build verified:**
 - `flutter analyze`: zero issues
-- `flutter test`: 20 tests pass
+- `flutter test`: 31 tests pass
 - `flutter build linux`: binary produced successfully
 
 **T1.3 - Domain model complete:**
-- Created `lib/core/models/lesson_plan.dart` with 7 classes: `PlanHeader`, `GradeBlock`, `FlowStage`, `GradeAssessment`, `GradeWaysForward`, `ReflectionQuestion`, `LessonPlan`
-- Created `test/fixtures/sample_plan.dart` with fictional Grade 3/4 Filipino DLP fixture
-- Created `test/lesson_plan_test.dart` with 10 tests for JSON round-trip and flow minutes validation
-- All 30 tests pass (20 existing + 10 new)
-- `flutter analyze`: zero issues
+- Created `lib/core/models/lesson_plan.dart` with 7 classes
+- Created fixture and tests for JSON round-trip
+- All 31 tests pass
 
-**Next task:** T1.4 - App shell and theme
+**T1.4 - App shell and theme complete:**
+- Created `lib/core/theme.dart` with light/dark Material 3 themes
+- Created `lib/features/shell/app_shell.dart` with NavigationRail
+- Updated `lib/main.dart` to use AppShell
+- Updated widget tests for new app structure
+
+**Next task:** T1.5 - Generator interface and mock
