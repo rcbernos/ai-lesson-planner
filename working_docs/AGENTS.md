@@ -14,6 +14,7 @@ Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for mul
 - Branch: work on `dev1`. Never commit to `main`.
 - Before every commit: `dart format .`, `flutter analyze` (zero issues), `flutter test`.
 - Conventional commits: `feat(scope): …`, `fix`, `docs`, `refactor`, `test`, `chore`.
+- Never commit automatically. The human will commit manually after each task.
 - Keep every file under about 250 lines. Split rather than grow.
 - UI code depends on the `LessonGenerator` interface only, never on a concrete generator.
 - Paths: use `package:path` and `path_provider`. Never hard-code `/` or `\`. Don't depend on file-name case. No shelling out to Linux-only tools from app code. (The app is tested on Linux now but must run on Windows later.)
