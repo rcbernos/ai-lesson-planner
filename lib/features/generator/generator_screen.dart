@@ -6,7 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'generator_form_state.dart';
 import 'grade_input_card.dart';
+import 'generation_controller.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
+import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
+import 'package:ai_lesson_planner/core/providers.dart';
 
 /// Default grade input with placeholder values.
 GradeInput emptyGradeInput() => GradeInput(
@@ -28,10 +31,107 @@ class GeneratorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(generatorFormProvider);
-    final notifier = ref.read(generatorFormProvider.notifier);
+    final formState = ref.watch(generatorFormProvider);
+    final formNotifier = ref.read(generatorFormProvider.notifier);
+    final genState = ref.watch(generationControllerProvider);
+    final genController = ref.read(generationControllerProvider.notifier);
+    final generatedPlan = ref.watch(generatedPlanProvider);
+
+    // If a plan was generated, show it in the IlawPlanView
+    if (generatedPlan != null) {
+      return IlawPlanView(plan: generatedPlan);
+    }
+
+    // If generation is in progress, show progress area
+    if (genState.isGenerating) {
+      return _buildGenerationInProgress(context, genState, genController);
+    }
+
+    // Show error message if there was an error
+    if (genState.errorMessage != null) {
+      return _buildErrorView(context, genState.errorMessage!, formNotifier);
+    }
+
+    // Show the form
+    return _buildFormView(context, formState, formNotifier, ref);
+  }
+
+  Widget _buildFormView(BuildContext context, GeneratorFormState formState,
+      GeneratorFormNotifier formNotifier, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
 
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Generator'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reset Form',
+            onPressed: () => formNotifier.reset(),
+          ),
+        ],
+      ),
+      body: SizedBox(
+        width: 1024,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderSection(textTheme, formState, formNotifier),
+              const SizedBox(height: 24),
+              _buildSessionDetails(textTheme, formState, formNotifier),
+              const SizedBox(height: 16),
+              _buildOutputOptions(textTheme, formState, formNotifier),
+              const SizedBox(height: 24),
+              _buildGradesSection(context, textTheme, formState, formNotifier),
+              const SizedBox(height: 16),
+              _buildGenerateButton(context, textTheme, formState, ref),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenerationInProgress(BuildContext context,
+      GenerationState genState, GenerationController genController) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Generator'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: genController.cancel,
+          tooltip: 'Cancel',
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 24),
+              Text(
+                genState.currentSection ?? 'Generating...',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: genController.cancel,
+                icon: const Icon(Icons.cancel),
+                label: const Text('Cancel'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorView(BuildContext context, String errorMessage,
+      GeneratorFormNotifier notifier) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Generator'),
@@ -43,22 +143,31 @@ class GeneratorScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SizedBox(
-        width: 1024,
-        child: SingleChildScrollView(
+      body: Center(
+        child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildHeaderSection(textTheme, state, notifier),
-              const SizedBox(height: 24),
-              _buildSessionDetails(textTheme, state, notifier),
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: Theme.of(context).colorScheme.error,
+              ),
               const SizedBox(height: 16),
-              _buildOutputOptions(textTheme, state, notifier),
+              Text(
+                errorMessage,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 24),
-              _buildGradesSection(context, textTheme, state, notifier),
-              const SizedBox(height: 16),
-              _buildGenerateButton(context, textTheme, state, notifier),
+              ElevatedButton.icon(
+                onPressed: () => notifier.reset(),
+                icon: const Icon(Icons.refresh),
+                label: const Text('Try Again'),
+              ),
             ],
           ),
         ),
@@ -66,23 +175,23 @@ class GeneratorScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderSection(
-      TextTheme textTheme, GeneratorFormState state, GeneratorFormNotifier notifier) {
+  Widget _buildHeaderSection(TextTheme textTheme, GeneratorFormState state,
+      GeneratorFormNotifier notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Lesson Plan Details', style: textTheme.headlineSmall),
         const SizedBox(height: 16),
         TextFormField(
-          decoration:
-              const InputDecoration(labelText: 'School', border: OutlineInputBorder()),
+          decoration: const InputDecoration(
+              labelText: 'School', border: OutlineInputBorder()),
           initialValue: state.school,
           onChanged: notifier.updateSchool,
         ),
         const SizedBox(height: 16),
         TextFormField(
-          decoration:
-              const InputDecoration(labelText: 'Teacher', border: OutlineInputBorder()),
+          decoration: const InputDecoration(
+              labelText: 'Teacher', border: OutlineInputBorder()),
           initialValue: state.teacher,
           onChanged: notifier.updateTeacher,
         ),
@@ -113,8 +222,8 @@ class GeneratorScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         TextFormField(
-          decoration:
-              const InputDecoration(labelText: 'Term', border: OutlineInputBorder()),
+          decoration: const InputDecoration(
+              labelText: 'Term', border: OutlineInputBorder()),
           initialValue: state.term,
           onChanged: notifier.updateTerm,
         ),
@@ -147,7 +256,8 @@ class GeneratorScreen extends ConsumerWidget {
             Expanded(
               child: TextFormField(
                 decoration: const InputDecoration(
-                    labelText: 'Minutes per Session', border: OutlineInputBorder()),
+                    labelText: 'Minutes per Session',
+                    border: OutlineInputBorder()),
                 initialValue: state.sessionMinutes.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) {
@@ -162,8 +272,8 @@ class GeneratorScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildOutputOptions(
-      TextTheme textTheme, GeneratorFormState state, GeneratorFormNotifier notifier) {
+  Widget _buildOutputOptions(TextTheme textTheme, GeneratorFormState state,
+      GeneratorFormNotifier notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -198,7 +308,9 @@ class GeneratorScreen extends ConsumerWidget {
           ),
           items: OutputLanguage.values
               .map((l) => DropdownMenuItem(
-                  value: l, child: Text(l == OutputLanguage.filipino ? 'Filipino' : 'English')))
+                  value: l,
+                  child: Text(
+                      l == OutputLanguage.filipino ? 'Filipino' : 'English')))
               .toList(),
           onChanged: (value) =>
               notifier.updateOutputLanguage(value ?? OutputLanguage.filipino),
@@ -212,7 +324,8 @@ class GeneratorScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Grades (${state.grades.length} of 2-6)', style: textTheme.titleMedium),
+        Text('Grades (${state.grades.length} of 2-6)',
+            style: textTheme.titleMedium),
         const SizedBox(height: 8),
         for (var i = 0; i < state.grades.length; i++)
           GradeInputCard(
@@ -222,8 +335,9 @@ class GeneratorScreen extends ConsumerWidget {
             onRemove: () => notifier.removeGrade(i),
           ),
         TextButton.icon(
-          onPressed:
-              state.grades.length >= 6 ? null : () => notifier.addGrade(emptyGradeInput()),
+          onPressed: state.grades.length >= 6
+              ? null
+              : () => notifier.addGrade(emptyGradeInput()),
           icon: const Icon(Icons.add),
           label: const Text('Add Grade'),
         ),
@@ -232,7 +346,7 @@ class GeneratorScreen extends ConsumerWidget {
   }
 
   Widget _buildGenerateButton(BuildContext context, TextTheme textTheme,
-      GeneratorFormState state, GeneratorFormNotifier notifier) {
+      GeneratorFormState state, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -249,11 +363,10 @@ class GeneratorScreen extends ConsumerWidget {
           child: FilledButton(
             onPressed: state.canGenerate
                 ? () {
-                    // TODO: Trigger generation
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Generate pressed! (not yet wired)')),
-                    );
+                    final request = state.buildGenerationRequest();
+                    ref
+                        .read(generationControllerProvider.notifier)
+                        .startGeneration(request);
                   }
                 : null,
             child: const Text('Generate'),

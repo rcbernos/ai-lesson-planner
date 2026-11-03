@@ -34,8 +34,10 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
   void initState() {
     super.initState();
     _maleController = TextEditingController(text: widget.grade.male.toString());
-    _femaleController = TextEditingController(text: widget.grade.female.toString());
-    _competencyController = TextEditingController(text: widget.grade.competency);
+    _femaleController =
+        TextEditingController(text: widget.grade.female.toString());
+    _competencyController =
+        TextEditingController(text: widget.grade.competency);
     _gradeLabel = widget.grade.gradeLabel;
   }
 
@@ -96,7 +98,13 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                       labelText: 'Grade',
                       border: OutlineInputBorder(),
                     ),
-                    items: ['Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6']
+                    items: [
+                      'Grade 2',
+                      'Grade 3',
+                      'Grade 4',
+                      'Grade 5',
+                      'Grade 6'
+                    ]
                         .map((g) => DropdownMenuItem(value: g, child: Text(g)))
                         .toList(),
                     onChanged: (value) {
