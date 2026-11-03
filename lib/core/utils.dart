@@ -1,3 +1,4 @@
+// ignore_for_file: dangling_library_doc_comments, prefer_const_declarations
 /// Utility functions for the application
 import 'dart:io';
 
@@ -11,33 +12,36 @@ class AppUtils {
     final dir = await getApplicationSupportDirectory();
     return dir.path;
   }
-  
+
   /// Get the absolute path for the GGUF model file
   static Future<String> getModelFilePath() async {
     final appDir = await getAppSupportDir();
     return '$appDir/models/${AppConfig.modelFileName}';
   }
-  
+
   /// Ensure required directories exist
   static Future<void> ensureDirectoriesExist() async {
     final appDir = await getAppSupportDir();
     final modelDir = Directory('$appDir/models');
-    final exportDir = Directory('/LMS_Data/Exports');
     
+    // Use path_provider to get the application documents directory
+    final docsDir = await getApplicationDocumentsDirectory();
+    final exportDir = Directory('$docsDir/LMS_Data/Exports');
+
     if (!await modelDir.exists()) {
       await modelDir.create(recursive: true);
     }
-    
+
     if (!await exportDir.exists()) {
       await exportDir.create(recursive: true);
     }
   }
-  
+
   /// Interpolate template placeholders with actual values
-  /// 
+  ///
   /// [template] is the ILAW template string with placeholders like ____,
   /// [values] is a map of placeholder names to their replacement values
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// final lessonPlan = AppUtils.interpolateTemplate(
@@ -49,7 +53,8 @@ class AppUtils {
   ///   },
   /// );
   /// ```
-  static String interpolateTemplate(String template, Map<String, String> values) {
+  static String interpolateTemplate(
+      String template, Map<String, String> values) {
     var result = template;
     for (final entry in values.entries) {
       final placeholder = entry.key;
