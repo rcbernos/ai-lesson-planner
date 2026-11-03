@@ -8,7 +8,7 @@ Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for mul
 3. Run its Verify commands. Do not commit until they pass.
 4. Commit with the card's commit message, then add 2 to 5 lines to `PROGRESS.md` (what changed, what is next). Keep that file under 60 lines; summarize old entries.
 
-**Current Phase File:** `working_docs/phase0_tasks.md` (Phase 0: Repository Reconciliation for dev1 branch)
+**Current Phase File:** `working_docs/phase1_tasks.md` (Phase 1: Visible App for dev1 branch)
 
 ## Code rules
 - Branch: work on `dev1`. Never commit to `main`.
