@@ -2,8 +2,6 @@
 
 ## Phase 0 - Repository Reconciliation (dev1 branch)
 **Status:** COMPLETED
-
-**Accomplishments:**
 - AI engine code moved to `lib/services/ai/legacy/`
 - Dependencies fixed: `llama_cpp_dart` removed, `file_picker` added
 - Noto Sans fonts added to `assets/fonts/` (Regular, Bold)
@@ -11,11 +9,11 @@
 - Drift/SQLite layer complete with tables, CRUD, first-run seeding
 
 ## Phase 1 - Visible App (dev1 branch)
-**Status:** T1.8 COMPLETE
+**Status:** T1.9 COMPLETE
 
 **T1.2 - Clean build verified:**
-- `flutter analyze`: zero issues
-- `flutter test`: 48 tests pass
+- `flutter analyze`: zero issues (pre-existing info-level style suggestions only)
+- `flutter test`: 49 tests pass (new library tests added)
 
 **T1.3 - Domain model complete:**
 - Created `lib/core/models/lesson_plan.dart` with 7 classes
@@ -30,30 +28,18 @@
 - Created `lib/core/generation/mock_lesson_generator.dart` with streaming
 
 **T1.7 - Plan renderer complete:**
-- Updated `IlawPlanView` with complete header (School, Teacher, Learning Area, Date, Term, Sessions, Minutes, Multigrade Model)
-- Added Intentions section showing shared sub-theme and objective
-- Added Assessment table per grade
-- Added Ways Forward table per grade
-- Added Reflection Questions section
+- Updated `IlawPlanView` with complete header and all sections
 
-**T1.8 - Wire generator to renderer complete (enhanced):**
-- Created `lib/core/providers.dart` with Riverpod providers
-- Created `lib/features/generator/generation_controller.dart` with StateNotifier
-- Updated `generator_screen.dart` to wire Generate to mock generation
-- Enhanced FlowTable to show per-grade activity columns
-- Full flow: form → GenerationRequest → stream events → IlawPlanView displays multi-column plan
-- Cancel button stops generation, error handling implemented
+**T1.8 - Wire generator to renderer complete:**
+- Created providers.dart and generation_controller.dart
+- Full generation flow implemented with cancel support
 
-**Bug fix - Hybrid Controller Pattern:**
-- Converted `generator_screen.dart` to `ConsumerStatefulWidget` with TextControllers for all header fields
-- Fixed date sync issue by calling `_syncControllersFromState` in build() instead of `didChangeDependencies`
-- Fixed other header fields (school, teacher, learning area, term, sessions, minutes, sharedSubTheme) by using controllers
-- Added required field indicators (*) for all required fields
-- Added errorText validation feedback on empty required fields
-- Updated `grade_input_card.dart` with TextController for subTheme field and asterisks for required grade fields
+**Bug fixes applied:**
+- Hybrid Controller Pattern for form state sync
+- Table column widths for Assessment, Ways Forward, FlowTable
 
-**Bug fix - Table column widths:**
-- Added `columnWidths` to Assessment table: Grade (FlexColumnWidth 1), Formative/Exit Task/Success Criteria (FlexColumnWidth 3)
-- Added `columnWidths` to Ways Forward table: Grade (FlexColumnWidth 1), Remediation/Enrichment (FlexColumnWidth 3)
-- Added `columnWidths` to FlowTable: Minutes (FixedColumnWidth 50), Stage + grades (FlexColumnWidth 1)
-- Fixed wholeClass activity display in FlowTable to show activity in all grade columns
+**T1.9 - Library backed by Drift:**
+- Created `plan_repository.dart` with save/load/delete operations
+- Created `library_screen.dart` with ListView of saved plans
+- Added Save button to generator_screen AppBar
+- Updated NavigationRail to show LibraryScreen

@@ -8,7 +8,9 @@ import 'grade_input_card.dart';
 import 'generation_controller.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
+import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
+import 'package:ai_lesson_planner/services/database/plan_repository.dart';
 
 GradeInput emptyGradeInput() => GradeInput(
     gradeLabel: 'Grade 2', male: 0, female: 0, subTheme: '', competency: '');
@@ -86,13 +88,47 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
 
     _syncControllers(formState);
 
-    if (generatedPlan != null) return IlawPlanView(plan: generatedPlan);
+    if (generatedPlan != null) {
+      return _buildPlanView(context, generatedPlan);
+    }
     if (genState.isGenerating)
       return _buildProgressView(context, genState, genController);
     if (genState.errorMessage != null)
       return _buildErrorView(context, genState.errorMessage!, formNotifier);
 
     return _buildFormView(context, formState, formNotifier);
+  }
+
+  Widget _buildPlanView(BuildContext context, LessonPlan plan) {
+    final repository = ref.read(planRepositoryProvider);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Generated Lesson Plan'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            tooltip: 'Save Plan',
+            onPressed: () => _savePlan(context, repository, plan),
+          ),
+        ],
+      ),
+      body: IlawPlanView(plan: plan),
+    );
+  }
+
+  void _savePlan(
+      BuildContext context, PlanRepository repository, LessonPlan plan) {
+    repository.savePlan(plan).then((id) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Plan saved successfully!')),
+      );
+    }).catchError((error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Save failed: $error')),
+      );
+    });
   }
 
   Widget _buildFormView(BuildContext context, GeneratorFormState formState,

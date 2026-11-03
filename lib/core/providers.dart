@@ -6,6 +6,7 @@ import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/core/generation/mock_lesson_generator.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/features/generator/generation_controller.dart';
+import 'package:ai_lesson_planner/services/database/plan_repository.dart';
 
 /// Provides the LessonGenerator implementation.
 /// During development, returns MockLessonGenerator.
@@ -22,4 +23,9 @@ final generatedPlanProvider = StateProvider<LessonPlan?>((ref) => null);
 final generationControllerProvider =
     StateNotifierProvider<GenerationController, GenerationState>((ref) {
   return GenerationController(ref);
+});
+
+/// Provides the PlanRepository for persisting lesson plans.
+final planRepositoryProvider = Provider<PlanRepository>((ref) {
+  return PlanRepository();
 });
