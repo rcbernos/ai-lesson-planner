@@ -175,13 +175,13 @@ abstract class LessonGenerator {
 ---
 
 ## Phase 1 acceptance (human manual test)
-- [ ] `flutter run -d linux` launches from a clean checkout of `dev1`.
-- [ ] Fill the form with two grades, generate, and watch the sections stream in.
-- [ ] Repeat with four grades. The plan shows four columns.
-- [ ] The rendered plan matches the structure of a sample ILAW DLP.
-- [ ] Save, quit, relaunch, and open the plan from the library.
-- [ ] Delete the database file and relaunch without a crash.
-- [ ] `flutter analyze` and `flutter test` are clean.
+- [x] `flutter run -d linux` launches from a clean checkout of `dev1`.
+- [x] Fill the form with two grades, generate, and watch the sections stream in.
+- [x] Repeat with four grades. The plan shows four columns.
+- [x] The rendered plan matches the structure of a sample ILAW DLP.
+- [x] Save, quit, relaunch, and open the plan from the library.
+- [x] Delete the database file and relaunch without a crash.
+- [x] `flutter analyze` and `flutter test` are clean.
 
 Then merge `dev1` into `main`.
 
