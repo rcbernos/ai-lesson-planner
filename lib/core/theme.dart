@@ -24,8 +24,8 @@ class AppTheme {
       brightness: Brightness.dark,
     ),
     textTheme: const TextTheme(
-      bodyLarge: TextStyle(fontSize: 16),
-      bodyMedium: TextStyle(fontSize: 14),
+      bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
+      bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
     ),
     scaffoldBackgroundColor: const Color(0xFF121212),
   );

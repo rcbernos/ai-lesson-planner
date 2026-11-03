@@ -71,7 +71,7 @@ class GeneratorFormState {
     if (sharedSubTheme.isEmpty) return false;
     if (sessionMinutes <= 0) return false;
     if (sessions <= 0) return false;
-    if (grades.length < 2) return false;
+    if (grades.isEmpty) return false;
 
     // Check all grades have required fields
     for (final grade in grades) {
@@ -150,7 +150,7 @@ class GeneratorFormNotifier extends StateNotifier<GeneratorFormState> {
   }
 
   void addGrade(GradeInput grade) {
-    if (state.grades.length >= 6) return;
+    if (state.grades.length >= 12) return;
     state = state.copyWith(grades: [...state.grades, grade]);
   }
 

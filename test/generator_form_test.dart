@@ -26,12 +26,12 @@ void main() {
       expect(notifier.state.canGenerate, isFalse);
     });
 
-    test('adding grades up to 6 works', () {
+    test('adding grades up to 12 works', () {
       expect(notifier.state.grades.length, equals(0));
 
-      for (var i = 0; i < 6; i++) {
+      for (var i = 0; i < 12; i++) {
         notifier.addGrade(GradeInput(
-          gradeLabel: 'Grade ${i + 2}',
+          gradeLabel: 'Grade ${i + 1}',
           male: 10,
           female: 10,
           subTheme: 'Test Theme',
@@ -39,13 +39,13 @@ void main() {
         ));
       }
 
-      expect(notifier.state.grades.length, equals(6));
+      expect(notifier.state.grades.length, equals(12));
     });
 
-    test('cannot add grade beyond 6', () {
-      for (var i = 0; i < 6; i++) {
+    test('cannot add grade beyond 12', () {
+      for (var i = 0; i < 12; i++) {
         notifier.addGrade(GradeInput(
-          gradeLabel: 'Grade ${i + 2}',
+          gradeLabel: 'Grade ${i + 1}',
           male: 10,
           female: 10,
           subTheme: 'Test Theme',
@@ -55,7 +55,7 @@ void main() {
 
       final initialLength = notifier.state.grades.length;
       notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 8',
+        gradeLabel: 'Grade 13',
         male: 10,
         female: 10,
         subTheme: 'Test',

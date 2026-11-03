@@ -3,7 +3,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai_lesson_planner/core/models/lesson_plan.dart' show LessonPlan;
 import 'package:ai_lesson_planner/core/providers.dart';
+import 'package:ai_lesson_planner/features/generator/generator_screen.dart'
+    show GeneratorScreen;
 import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
 import 'package:ai_lesson_planner/services/database/plan_repository.dart'
     show SavedPlanInfo;
@@ -26,6 +29,17 @@ class LibraryScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Library'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to the Generator screen to create a new plan
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const GeneratorScreen(),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
       body: asyncPlans.when(
         data: (plans) {
@@ -142,13 +156,34 @@ class _PlanListItem extends ConsumerWidget {
     if (!context.mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: const Text('Saved Plan'),
-          ),
-          body: IlawPlanView(plan: plan),
-        ),
+        builder: (context) => _SavedPlanViewScreen(plan: plan),
       ),
+    );
+  }
+}
+
+/// Full-screen view for a saved plan with navigation options.
+class _SavedPlanViewScreen extends StatelessWidget {
+  const _SavedPlanViewScreen({required this.plan});
+
+  final LessonPlan plan;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Saved Plan'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'New Plan',
+            onPressed: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+          ),
+        ],
+      ),
+      body: IlawPlanView(plan: plan),
     );
   }
 }

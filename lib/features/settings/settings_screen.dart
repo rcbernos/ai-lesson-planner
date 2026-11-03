@@ -7,27 +7,117 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
+import 'package:ai_lesson_planner/services/database/database_helper.dart';
 
 /// Settings screen displaying configuration options.
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  String? _databasePath;
+  bool _isDeleting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDatabasePath();
+  }
+
+  Future<void> _loadDatabasePath() async {
+    try {
+      final path = await DatabaseHelper.instance.getDatabasePath();
+      setState(() {
+        _databasePath = path;
+      });
+    } catch (e) {
+      setState(() {
+        _databasePath = 'Unable to determine';
+      });
+    }
+  }
+
+  Future<void> _deleteDatabase() async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Database'),
+        content: const Text(
+            'This will permanently delete all saved lesson plans and references. '
+            'This action cannot be undone. Are you sure?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    setState(() {
+      _isDeleting = true;
+    });
+
+    try {
+      final deleted = await DatabaseHelper.instance.deleteDatabase();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(deleted
+                ? 'Database deleted successfully'
+                : 'Database file not found or could not be deleted'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting database: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _LanguageSection(),
-            SizedBox(height: 24),
+            const _LanguageSection(),
+            const SizedBox(height: 24),
             _DataFolderSection(),
-            SizedBox(height: 24),
-            _AIStatusSection(),
+            const SizedBox(height: 24),
+            _DatabaseSection(
+              databasePath: _databasePath,
+              isDeleting: _isDeleting,
+              onDelete: _deleteDatabase,
+            ),
+            const SizedBox(height: 24),
+            const _AIStatusSection(),
           ],
         ),
       ),
@@ -157,6 +247,62 @@ class _AIStatusSection extends StatelessWidget {
           leading: Icon(Icons.data_object, color: Colors.orange),
           title: Text('AI Status'),
           subtitle: Text('Demo mode: no model installed'),
+        ),
+      ),
+    );
+  }
+}
+
+/// Section for database management.
+class _DatabaseSection extends StatelessWidget {
+  const _DatabaseSection({
+    required this.databasePath,
+    required this.isDeleting,
+    required this.onDelete,
+  });
+
+  final String? databasePath;
+  final bool isDeleting;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Theme.of(context).colorScheme.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Database',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 12),
+            if (databasePath != null)
+              SelectableText(
+                databasePath!,
+                style: const TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 12,
+                ),
+              ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: isDeleting ? null : onDelete,
+                icon: isDeleting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.delete, color: Colors.red),
+                label: Text(isDeleting ? 'Deleting...' : 'Delete Database'),
+              ),
+            ),
+          ],
         ),
       ),
     );

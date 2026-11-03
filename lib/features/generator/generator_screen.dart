@@ -13,7 +13,7 @@ import 'package:ai_lesson_planner/core/providers.dart';
 import 'package:ai_lesson_planner/services/database/plan_repository.dart';
 
 GradeInput emptyGradeInput() => GradeInput(
-    gradeLabel: 'Grade 2', male: 0, female: 0, subTheme: '', competency: '');
+    gradeLabel: 'Grade 1', male: 0, female: 0, subTheme: '', competency: '');
 
 class GeneratorScreen extends ConsumerStatefulWidget {
   const GeneratorScreen({super.key});
@@ -109,6 +109,16 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
             icon: const Icon(Icons.save),
             tooltip: 'Save Plan',
             onPressed: () => _savePlan(context, repository, plan),
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'New Plan',
+            onPressed: () {
+              // Reset the generated plan to show the form view
+              ref.read(generatedPlanProvider.notifier).state = null;
+              // Reset the form to defaults
+              ref.read(generatorFormProvider.notifier).reset();
+            },
           ),
         ],
       ),
