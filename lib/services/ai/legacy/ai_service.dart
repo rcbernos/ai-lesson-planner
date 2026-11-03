@@ -4,8 +4,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:llama_cpp_dart/llama_cpp_dart.dart';
-
 import '../../../core/app_config.dart';
 import 'downloads.dart'; // Same directory - no path needed
 
@@ -27,10 +25,11 @@ class _IsolateResult<T> {
 /// Runs a function in a separate isolate and returns the result
 Future<T> computeDart<Q, T>(FutureOr<T> Function(Q) function, Q message) async {
   final receivePort = ReceivePort();
-  await Isolate.spawn(_isolateEntryPoint, [receivePort.sendPort, message, function]);
+  await Isolate.spawn(
+      _isolateEntryPoint, [receivePort.sendPort, message, function]);
   final result = await receivePort.first as _IsolateResult<T>;
   receivePort.close();
-  
+
   if (result.error != null) {
     throw result.error!;
   }
@@ -42,7 +41,7 @@ void _isolateEntryPoint(List<dynamic> args) {
   final SendPort sendPort = args[0] as SendPort;
   final dynamic message = args[1];
   final Function function = args[2];
-  
+
   try {
     final result = function(message);
     sendPort.send(_IsolateResult.success(result));
@@ -77,7 +76,7 @@ class AIService {
     ErrorCallback? onError,
   }) async {
     final exists = await isModelAvailable();
-    
+
     if (exists) {
       final path = await getModelPath();
       return path;
@@ -102,7 +101,7 @@ class AIService {
   /// This function is designed to run in a separate isolate using computeDart().
   /// It loads the LLM model and generates text. The model is loaded fresh
   /// within the isolate because LLM models cannot be shared across isolates.
-  /// 
+  ///
   /// Parameters:
   /// - modelPath: Absolute path to the GGUF model file
   /// - topic: The learning topic for the lesson plan
@@ -115,7 +114,7 @@ class AIService {
       final topic = params['topic'] ?? 'General Lesson';
       final gradeLevel = params['gradeLevel'] ?? 'Grade 1';
       final learningArea = params['learningArea'] ?? 'Filipino';
-      
+
       // If no model path provided, return simulated response
       if (modelPath == null || modelPath.isEmpty) {
         log('LLM: No model path provided, returning simulated response');
@@ -125,7 +124,7 @@ class AIService {
           learningArea: learningArea,
         );
       }
-      
+
       // Check if model file exists
       final modelFile = File(modelPath);
       if (!modelFile.existsSync()) {
@@ -136,7 +135,7 @@ class AIService {
           learningArea: learningArea,
         );
       }
-      
+
       // Run actual LLM inference
       log('LLM: Running inference with model at: $modelPath');
       return _runLLMInference(modelPath, topic, gradeLevel, learningArea);
@@ -144,11 +143,11 @@ class AIService {
       // Log error and return fallback
       log('LLM Inference error in isolate: $e');
       log('Stack trace: $stackTrace');
-      
+
       final topic = params['topic'] ?? 'General Lesson';
       final gradeLevel = params['gradeLevel'] ?? 'Grade 1';
       final learningArea = params['learningArea'] ?? 'Filipino';
-      
+
       return generateSimulatedLessonPlan(
         topic: topic,
         gradeLevel: gradeLevel,
@@ -165,7 +164,7 @@ class AIService {
     required String learningArea,
   }) {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('I INTENTIONS');
     buffer.writeln('============');
     buffer.writeln('Topic: $topic');
@@ -183,113 +182,35 @@ class AIService {
     buffer.writeln('W WAYS FORWARD');
     buffer.writeln('==============');
     buffer.writeln('[Reflection and extension activities]');
-    
+
     return buffer.toString();
   }
 
-  /// Run LLM inference using llama_cpp_dart
-  /// This runs within the isolate and cannot be mocked
-  /// 
+  /// Run LLM inference - LEGACY STUB
+  /// This function is currently a stub since llama_cpp_dart has been removed from dependencies.
+  /// Phase 3 will re-implement the actual LLM inference integration.
+  ///
   /// Parameters:
   /// - modelPath: Absolute path to the GGUF model file
   /// - topic: The learning topic
   /// - gradeLevel: Grade level for the lesson plan
   /// - learningArea: Subject/area for the lesson plan
+  @Deprecated(
+      'This is legacy code; LLM integration will be re-added in Phase 3')
   static String _runLLMInference(
-    String modelPath, 
-    String topic, 
-    String gradeLevel, 
+    String modelPath,
+    String topic,
+    String gradeLevel,
     String learningArea,
   ) {
-    try {
-      // Build the prompt using ILAW format template
-      final prompt = buildLessonPlanPrompt(
-        topic: topic,
-        gradeLevel: gradeLevel,
-        learningArea: learningArea,
-      );
-      
-      // Configure model parameters
-      final modelParams = ModelParams()
-        ..vocabOnly = false
-        ..useMemorymap = true
-        ..useMemoryLock = false
-        ..checkTensors = false;
-      
-      // Configure context parameters
-      final contextParams = ContextParams()
-        ..nCtx = 2048 // Context window size
-        ..nBatch = 512
-        ..nThreads = Platform.isWindows ? 2 : 4
-        ..nPredict = 512; // Max tokens to generate
-      
-      final samplingParams = SamplerParams()
-        ..temp = 0.7
-        ..topK = 40
-        ..topP = 0.9
-        ..seed = 42; // For reproducibility
-      
-      // Initialize the Llama model
-      log('LLM: Loading model from: $modelPath');
-      final llama = Llama(
-        modelPath,
-        modelParams: modelParams,
-        contextParams: contextParams,
-        samplerParams: samplingParams,
-        verbose: false,
-      );
-      
-      log('LLM: Model loaded successfully');
-      
-      // Generate text
-      final generatedText = StringBuffer();
-      llama.setPrompt(prompt);
-      
-      log('LLM: Starting text generation...');
-      
-      while (true) {
-        final (token, done) = llama.getNext();
-        generatedText.write(token);
-        
-        if (done) break;
-        
-        // Safety limit to prevent infinite generation
-        if (generatedText.length > 8000) {
-          log('LLM: Generation limit reached');
-          break;
-        }
-      }
-      
-      // Clean up
-      llama.dispose();
-      log('LLM: Model disposed');
-      
-      if (generatedText.isEmpty) {
-        log('LLM: Generated empty response, using fallback');
-        return generateSimulatedLessonPlan(
-          topic: topic,
-          gradeLevel: gradeLevel,
-          learningArea: learningArea,
-        );
-      }
-      
-      log('LLM: Generation completed (${generatedText.length} chars)');
-      return generatedText.toString();
-    } on LlamaException catch (e) {
-      log('LlamaException during inference: ${e.message}');
-      return generateSimulatedLessonPlan(
-        topic: topic,
-        gradeLevel: gradeLevel,
-        learningArea: learningArea,
-      );
-    } catch (e) {
-      log('Error during LLM inference: $e');
-      return generateSimulatedLessonPlan(
-        topic: topic,
-        gradeLevel: gradeLevel,
-        learningArea: learningArea,
-      );
-    }
+    // Legacy function stub - actual LLM inference requires llama_cpp_dart
+    // which is not available in Phase 0. Return simulated response for now.
+    log('LLM: Inference stub - model at $modelPath, returning simulated response');
+    return generateSimulatedLessonPlan(
+      topic: topic,
+      gradeLevel: gradeLevel,
+      learningArea: learningArea,
+    );
   }
 
   /// Build a lesson plan prompt using the ILAW format
@@ -299,20 +220,26 @@ class AIService {
     required String learningArea,
   }) {
     final buffer = StringBuffer();
-    buffer.writeln('Generate a comprehensive lesson plan based on the ILAW format.');
+    buffer.writeln(
+        'Generate a comprehensive lesson plan based on the ILAW format.');
     buffer.writeln('');
     buffer.writeln('TOPIC: $topic');
     buffer.writeln('GRADE LEVEL: $gradeLevel');
     buffer.writeln('LEARNING AREA: $learningArea');
     buffer.writeln('');
     buffer.writeln('ILAW FORMAT INSTRUCTIONS:');
-    buffer.writeln('I INTENTIONS: Include Shared Sub-theme, Content Standard, Performance Standard, Learning Competencies, and Learning Objectives.');
-    buffer.writeln('L LEARNING EXPERIENCES: Include Learner Context, Instructional Materials, and Flow of Lesson with time-activity table.');
-    buffer.writeln('A ASSESSMENT: Include Formative Assessment, Exit Task, and Success Criteria.');
-    buffer.writeln('W WAYS FORWARD: Include Reflection Questions, Remediation, and Enrichment.');
+    buffer.writeln(
+        'I INTENTIONS: Include Shared Sub-theme, Content Standard, Performance Standard, Learning Competencies, and Learning Objectives.');
+    buffer.writeln(
+        'L LEARNING EXPERIENCES: Include Learner Context, Instructional Materials, and Flow of Lesson with time-activity table.');
+    buffer.writeln(
+        'A ASSESSMENT: Include Formative Assessment, Exit Task, and Success Criteria.');
+    buffer.writeln(
+        'W WAYS FORWARD: Include Reflection Questions, Remediation, and Enrichment.');
     buffer.writeln('');
-    buffer.writeln('Please generate a detailed lesson plan following this format.');
-    
+    buffer.writeln(
+        'Please generate a detailed lesson plan following this format.');
+
     return buffer.toString();
   }
 
@@ -320,7 +247,7 @@ class AIService {
   /// Creates a copy of params with modelPath for the isolate
   Future<String> generateLessonPlan(Map<String, dynamic> params) async {
     final modelPath = await ensureModelAvailable();
-    
+
     if (modelPath == null) {
       // If no model, return simulated response
       final topic = params['topic'] ?? 'General Lesson';
@@ -332,7 +259,7 @@ class AIService {
         learningArea: learningArea,
       );
     }
-    
+
     if (!await File(modelPath).exists()) {
       throw Exception('Model not available: Cannot generate lesson plan');
     }
@@ -357,7 +284,7 @@ class AIService {
         onProgress: onProgress,
         onError: (error) => print('AI Service error: $error'),
       );
-      
+
       if (available != null) {
         print('AI Service initialized with model at: $available');
       } else if (downloadOnDemand) {
