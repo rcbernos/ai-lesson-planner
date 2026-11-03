@@ -17,18 +17,25 @@
 
 **T1.2 - Clean build verified:**
 - `flutter analyze`: zero issues
-- `flutter test`: 31 tests pass
+- `flutter test`: 35 tests pass
 - `flutter build linux`: binary produced successfully
 
 **T1.3 - Domain model complete:**
 - Created `lib/core/models/lesson_plan.dart` with 7 classes
 - Created fixture and tests for JSON round-trip
-- All 31 tests pass
+- All 35 tests pass
 
 **T1.4 - App shell and theme complete:**
 - Created `lib/core/theme.dart` with light/dark Material 3 themes
 - Created `lib/features/shell/app_shell.dart` with NavigationRail
 - Updated `lib/main.dart` to use AppShell
 - Updated widget tests for new app structure
+- All 35 tests pass
 
-**Next task:** T1.5 - Generator interface and mock
+**T1.5 - Generator interface and mock complete:**
+- Created `lib/core/generation/lesson_generator.dart` with OutputLanguage, GradeInput, GenerationRequest, GenerationEvent hierarchy, and LessonGenerator abstract class
+- Created `lib/core/generation/mock_lesson_generator.dart` with streaming simulation
+- Created `test/mock_generator_test.dart` with 4 tests verifying section order, grade count, flow minutes, and cancel behavior
+- `flutter analyze`: zero issues, `flutter test`: all 35 tests pass
+
+**Next task:** T1.6 - Generator form
