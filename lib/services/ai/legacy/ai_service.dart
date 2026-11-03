@@ -1,16 +1,16 @@
 /// AI Service for LLM model operations and inference
+// ignore_for_file: dangling_library_doc_comments, avoid_print, prefer_const_declarations
 import 'dart:async';
 import 'dart:io';
 import 'dart:isolate';
 
 import 'package:llama_cpp_dart/llama_cpp_dart.dart';
 
-import '../core/app_config.dart';
+import '../../../core/app_config.dart';
 import 'downloads.dart'; // Same directory - no path needed
 
 /// Simple logging function - replaces Flutter's debugPrint for cross-platform compatibility
 void log(String message) {
-  // ignore: avoid_print
   print(message);
 }
 

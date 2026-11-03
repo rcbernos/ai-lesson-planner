@@ -1,11 +1,12 @@
 /// Download service for managing GGUF model downloads with checksum verification
+// ignore_for_file: dangling_library_doc_comments, avoid_print, prefer_const_declarations
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 
-import '../core/app_config.dart';
+import '../../../core/app_config.dart';
 
 /// Download progress callback type
 typedef ProgressCallback = void Function(int received, int total);

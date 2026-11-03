@@ -1,8 +1,9 @@
 /// Riverpod providers for AI services
+// ignore_for_file: dangling_library_doc_comments
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../services/ai_service.dart';
-import '../../services/downloads.dart';
+import 'ai_service.dart';
+import 'downloads.dart';
 
 /// Provider for the AI Service singleton
 final aiServiceProvider = Provider<AIService>((ref) {

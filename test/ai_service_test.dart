@@ -1,7 +1,7 @@
 import 'package:test/test.dart';
 
-import 'package:ai_lesson_planner/services/ai_service.dart';
-import 'package:ai_lesson_planner/services/downloads.dart';
+import 'package:ai_lesson_planner/services/ai/legacy/ai_service.dart';
+import 'package:ai_lesson_planner/services/ai/legacy/downloads.dart';
 import 'package:ai_lesson_planner/core/app_config.dart';
 
 void main() {
