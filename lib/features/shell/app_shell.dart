@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
 import 'package:ai_lesson_planner/features/library/library_screen.dart';
+import 'package:ai_lesson_planner/features/assistant/assistant_screen.dart';
+import 'package:ai_lesson_planner/features/settings/settings_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -53,13 +55,9 @@ class _AppShellState extends State<AppShell> {
       case 1:
         return const LibraryScreen();
       case 2:
-        return const Center(
-          child: Text('Assistant'),
-        );
+        return const AssistantScreen();
       case 3:
-        return const Center(
-          child: Text('Settings'),
-        );
+        return const SettingsScreen();
       default:
         return const GeneratorScreen();
     }

@@ -43,3 +43,10 @@
 - Created `library_screen.dart` with ListView of saved plans
 - Added Save button to generator_screen AppBar
 - Updated NavigationRail to show LibraryScreen
+
+**T1.10 - Settings and Assistant placeholders complete:**
+- Created `settings_screen.dart` with language selector, data folder path, AI status card
+- Created `assistant_screen.dart` with "Coming soon" placeholder and disabled input
+- Updated `app_shell.dart` to use new screens for Assistant and Settings tabs
+
+**Next:** Phase 1 acceptance testing by human
