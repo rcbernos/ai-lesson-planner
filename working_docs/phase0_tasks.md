@@ -2,19 +2,17 @@
 
 **Goal:** Prepare the repository for solo development on `dev1` branch. Remove old multi-dev artifacts, move unverified AI code to legacy, fix dependencies, fonts, paths, and tests so the codebase is clean and buildable.
 
-**Branch:** `dev1` (create from `main`). Merge to `main` only when Phase 0 is complete and verified.
+**Branch:** `dev1`
 
 Each card is one agent session. Do the cards in order.
 
 ---
 
 ## P0.1 Create PROGRESS.md and dev1 branch
-**Files:** `working_docs/PROGRESS.md` (new), repo root.
+**Files:** `working_docs/PROGRESS.md`, repo root.
 **Do:**
-1. `git checkout main`
-2. `git checkout -b dev1`
-3. Create `working_docs/PROGRESS.md` with initial status (2-5 lines: current state and next task)
-4. Keep `PROGRESS.md` under 60 lines
+1. Update `working_docs/PROGRESS.md` with initial status (2-5 lines: current state and next task)
+2. Keep `PROGRESS.md` under 60 lines
 **Verify:** `git branch` shows `main` and `dev1`, `PROGRESS.md` exists.
 **Commit:** `chore: create dev1 branch and PROGRESS.md`
 
