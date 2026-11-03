@@ -12,7 +12,7 @@ Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for mul
 
 ## Code rules
 - Branch: work on `dev1`. Never commit to `main`.
-- Before every commit: `dart format .`, `flutter analyze` (zero issues), `flutter test`.
+- (ignore for phase0 tasks) Before every commit: `dart format .`, `flutter analyze` (zero issues), `flutter test`.
 - Conventional commits: `feat(scope): …`, `fix`, `docs`, `refactor`, `test`, `chore`.
 - Never commit automatically. The human will commit manually after each task.
 - Keep every file under about 250 lines. Split rather than grow.
