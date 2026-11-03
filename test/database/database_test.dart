@@ -65,9 +65,11 @@ void main() {
 
   group('Reference Notes CRUD', () {
     test('insert -> fetch -> update -> delete a reference note', () async {
-      final lessonId = await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
+      final lessonId =
+          await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
 
-      final noteId = await db.insertReferenceNote(ReferenceNotesCompanion.insert(
+      final noteId =
+          await db.insertReferenceNote(ReferenceNotesCompanion.insert(
         lessonPlanId: Value(lessonId),
         title: 'DepEd K-12 Curriculum Guide',
         content: const Value('Curriculum standards reference.'),
@@ -90,9 +92,11 @@ void main() {
 
   group('Bibliography CRUD', () {
     test('insert -> fetch -> update -> delete a bibliography entry', () async {
-      final lessonId = await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
+      final lessonId =
+          await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
 
-      final entryId = await db.insertBibliographyEntry(BibliographyCompanion.insert(
+      final entryId =
+          await db.insertBibliographyEntry(BibliographyCompanion.insert(
         lessonPlanId: Value(lessonId),
         author: 'Department of Education',
         title: 'K to 12 Basic Education Curriculum Guide',
@@ -115,8 +119,6 @@ void main() {
       expect(await db.getBibliographyForLessonPlan(lessonId), isEmpty);
     });
   });
-
-
 
   group('First-run seeding', () {
     test('fresh database is seeded with default rows', () async {
