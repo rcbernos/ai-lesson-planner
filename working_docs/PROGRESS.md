@@ -43,3 +43,11 @@
 - Enhanced FlowTable to show per-grade activity columns
 - Full flow: form → GenerationRequest → stream events → IlawPlanView displays multi-column plan
 - Cancel button stops generation, error handling implemented
+
+**Bug fix - Hybrid Controller Pattern:**
+- Converted `generator_screen.dart` to `ConsumerStatefulWidget` with TextControllers for all header fields
+- Fixed date sync issue by calling `_syncControllersFromState` in build() instead of `didChangeDependencies`
+- Fixed other header fields (school, teacher, learning area, term, sessions, minutes, sharedSubTheme) by using controllers
+- Added required field indicators (*) for all required fields
+- Added errorText validation feedback on empty required fields
+- Updated `grade_input_card.dart` with TextController for subTheme field and asterisks for required grade fields

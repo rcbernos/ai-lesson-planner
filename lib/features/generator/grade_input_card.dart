@@ -27,6 +27,7 @@ class GradeInputCard extends ConsumerStatefulWidget {
 class _GradeInputCardState extends ConsumerState<GradeInputCard> {
   late final TextEditingController _maleController;
   late final TextEditingController _femaleController;
+  late final TextEditingController _subThemeController;
   late final TextEditingController _competencyController;
   late String _gradeLabel;
 
@@ -36,6 +37,7 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
     _maleController = TextEditingController(text: widget.grade.male.toString());
     _femaleController =
         TextEditingController(text: widget.grade.female.toString());
+    _subThemeController = TextEditingController(text: widget.grade.subTheme);
     _competencyController =
         TextEditingController(text: widget.grade.competency);
     _gradeLabel = widget.grade.gradeLabel;
@@ -45,6 +47,7 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
   void dispose() {
     _maleController.dispose();
     _femaleController.dispose();
+    _subThemeController.dispose();
     _competencyController.dispose();
     super.dispose();
   }
@@ -52,13 +55,14 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
   void _updateGrade() {
     final male = int.tryParse(_maleController.text) ?? 0;
     final female = int.tryParse(_femaleController.text) ?? 0;
+    final subTheme = _subThemeController.text;
     final competency = _competencyController.text;
 
     widget.onChanged(GradeInput(
       gradeLabel: _gradeLabel,
       male: male,
       female: female,
-      subTheme: widget.grade.subTheme,
+      subTheme: subTheme,
       competency: competency,
     ));
   }
@@ -95,7 +99,7 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                   child: DropdownButtonFormField<String>(
                     initialValue: _gradeLabel,
                     decoration: const InputDecoration(
-                      labelText: 'Grade',
+                      labelText: '* Grade',
                       border: OutlineInputBorder(),
                     ),
                     items: [
@@ -148,20 +152,23 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
             const SizedBox(height: 12),
             // Sub-theme
             TextFormField(
-              decoration: const InputDecoration(
-                labelText: 'Sub-theme',
-                border: OutlineInputBorder(),
+              controller: _subThemeController,
+              decoration: InputDecoration(
+                labelText: '* Sub-theme',
+                border: const OutlineInputBorder(),
+                errorText: widget.grade.subTheme.isEmpty ? 'Required' : null,
               ),
-              initialValue: widget.grade.subTheme,
-              onChanged: (value) => _updateGrade(),
+              maxLines: 2,
+              onChanged: (_) => _updateGrade(),
             ),
             const SizedBox(height: 12),
             // Competency
             TextFormField(
               controller: _competencyController,
-              decoration: const InputDecoration(
-                labelText: 'Competency',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: '* Competency',
+                border: const OutlineInputBorder(),
+                errorText: widget.grade.competency.isEmpty ? 'Required' : null,
               ),
               maxLines: 2,
               onChanged: (_) => _updateGrade(),
