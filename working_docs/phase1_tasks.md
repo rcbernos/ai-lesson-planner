@@ -8,27 +8,45 @@ Each card is one agent session. Do the cards in order.
 
 ---
 
+## Current Status
+
+**Phase 0 - Repository Reconciliation: COMPLETED**
+- Branch `dev1` exists and is checked out
+- AI engine code moved to `lib/services/ai/legacy/` with no imports elsewhere
+- Dependencies fixed: `llama_cpp_dart` removed, `file_picker` added
+- Noto Sans fonts added to `assets/fonts/` (Regular, Bold)
+- Path resolution fixed in `utils.dart` using `path_provider`
+- Database work from `dev2` merged into `dev1`
+- Drift/SQLite layer complete with tables, CRUD, and first-run seeding
+- All tests pass (20 tests), `flutter analyze` passes with zero issues
+- `flutter build linux` produces a working binary
+
+**Next task:** T1.1 - Update PROGRESS.md & verify build state
+
+---
+
 ## Pre-flight (human, not the agent)
 - Install Flutter and the Linux desktop toolchain on Debian 13 (clang, cmake, ninja-build, pkg-config, GTK 3 dev headers). Run `flutter doctor` until the Linux toolchain line is green.
 - In parallel, run Spike S from the master plan (about 1 hour) and record the numbers in `PROGRESS.md`.
 
 ---
 
-## T1.1 Reconcile the repo (human with agent help)
-**Files:** `working_docs/PROGRESS.md` (new), `AGENTS.md` (copy in), repo root.
+## T1.1 Update PROGRESS.md (human with agent help)
+**Files:** `working_docs/PROGRESS.md`, `working_docs/phase1_tasks.md`, repo root.
 **Do:**
-1. `git branch -a` and `git log --oneline --graph --all`. Find where the database work (old Dev 2) and the AI-engine work (old Dev 1) live.
-2. Create branch `dev1` from `main`. Merge the database work into `dev1`.
-3. Move the unverified AI code to `lib/services/ai/legacy/` and make sure nothing imports it. Don't delete it.
-4. Delete the old per-dev plan files in `working_docs/`. Keep one `PROGRESS.md` (under 30 lines: current state and next task).
-**Verify:** `git status` clean, `git branch` shows `main` and `dev1`, `PROGRESS.md` exists.
-**Commit:** `chore: consolidate branches and docs for solo workflow`
+1. Update `PROGRESS.md` to be under 30 lines reflecting current state (Phase 0 complete).
+2. Verify `git status` shows no uncommitted changes.
+3. Verify `git branch` shows `dev1` as current.
+**Verify:** `PROGRESS.md` exists and is under 30 lines, `git status` clean.
+**Commit:** `docs: update PROGRESS.md for Phase 1`
 
-## T1.2 Fix the build
-**Files:** `pubspec.yaml`, `pubspec.lock`, one smoke test.
-**Do:** repair dependencies. Remove `llama_cpp_dart`. Keep `docs_gee: ^1.5.0`, `pdf`, `archive`. Add or confirm `flutter_riverpod`, `drift`, `drift_dev` (dev), `build_runner` (dev), `sqlite3_flutter_libs`, `path`, `path_provider`, `http`, `crypto`, `uuid`, `file_picker`. Then `dart run build_runner build --delete-conflicting-outputs` and `flutter pub get`.
-**Verify:** `flutter analyze` has zero issues, `flutter test` passes, `flutter build linux` produces a binary, `pubspec.lock` is committed.
-**Commit:** `fix: repair dependencies and get a clean build`
+**Next task:** T1.2 - Verify clean build
+
+## T1.2 Verify clean build
+**Files:** `pubspec.yaml`, `pubspec.lock`.
+**Do:** This was completed in Phase 0. Verify by running `flutter build linux` and ensure `pubspec.lock` is committed.
+**Verify:** `flutter analyze` has zero issues, `flutter test` passes, `flutter build linux` produces a binary.
+**Commit:** `verify: confirm clean build for Phase 1`
 
 ## T1.3 Domain model
 **Files:** `lib/core/models/lesson_plan.dart`, `test/lesson_plan_test.dart`, `test/fixtures/sample_plan.dart`.
