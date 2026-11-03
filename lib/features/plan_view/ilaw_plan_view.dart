@@ -132,6 +132,77 @@ class IlawPlanView extends StatelessWidget {
               Text(plan.learnerContext,
                   style: const TextStyle(
                       fontSize: 13, fontStyle: FontStyle.italic)),
+              const SizedBox(height: 16),
+              // Standards & Objectives Matrix Table
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Table(
+                  border: TableBorder.all(color: Colors.grey.shade400),
+                  columnWidths: {
+                    0: const FixedColumnWidth(130), // Row label header
+                    for (int i = 0; i < plan.grades.length; i++)
+                      (i + 1): const FixedColumnWidth(200), // Per-grade columns
+                  },
+                  children: [
+                    // Header row with grade labels
+                    TableRow(
+                      decoration: BoxDecoration(color: const Color(0xFFEEEEEE)),
+                      children: [
+                        const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Standard / Objective',
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        for (final grade in plan.grades)
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(grade.gradeLabel,
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold))),
+                      ],
+                    ),
+                    // Content Standard Row
+                    TableRow(children: [
+                      const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Content Standard')),
+                      for (final grade in plan.grades)
+                        Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(grade.contentStandard)),
+                    ]),
+                    // Performance Standard Row
+                    TableRow(children: [
+                      const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Performance Standard')),
+                      for (final grade in plan.grades)
+                        Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(grade.performanceStandard)),
+                    ]),
+                    // Competencies Row
+                    TableRow(children: [
+                      const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Competencies')),
+                      for (final grade in plan.grades)
+                        Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(grade.competencies.join(', '))),
+                    ]),
+                    // Objectives Row
+                    TableRow(children: [
+                      const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text('Objectives')),
+                      for (final grade in plan.grades)
+                        Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(grade.objectives.join(', '))),
+                    ]),
+                  ],
+                ),
+              ),
             ])));
   }
 
@@ -142,12 +213,12 @@ class IlawPlanView extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Table(
             columnWidths: const {
-              0: FlexColumnWidth(1), // Grade
-              1: FlexColumnWidth(3), // Formative
-              2: FlexColumnWidth(3), // Exit Task
-              3: FlexColumnWidth(3), // Success Criteria
+              0: FixedColumnWidth(80), // Grade label
+              1: FixedColumnWidth(170), // Formative Assessment
+              2: FixedColumnWidth(170), // Exit Task
+              3: FixedColumnWidth(170), // Success Criteria
             },
-            border: TableBorder.all(color: Colors.black12, width: 1),
+            border: TableBorder.all(color: Colors.grey.shade400),
             children: [
               const TableRow(children: [
                 Padding(
@@ -191,11 +262,11 @@ class IlawPlanView extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Table(
             columnWidths: const {
-              0: FlexColumnWidth(1), // Grade
-              1: FlexColumnWidth(3), // Remediation
-              2: FlexColumnWidth(3), // Enrichment
+              0: FixedColumnWidth(80), // Grade label
+              1: FixedColumnWidth(210), // Remediation
+              2: FixedColumnWidth(210), // Enrichment
             },
-            border: TableBorder.all(color: Colors.black12, width: 1),
+            border: TableBorder.all(color: Colors.grey.shade400),
             children: [
               const TableRow(children: [
                 Padding(
