@@ -29,9 +29,17 @@
 - Created `lib/core/generation/lesson_generator.dart` with event hierarchy
 - Created `lib/core/generation/mock_lesson_generator.dart` with streaming
 
-**T1.8 - Wire generator to renderer complete:**
+**T1.7 - Plan renderer complete:**
+- Updated `IlawPlanView` with complete header (School, Teacher, Learning Area, Date, Term, Sessions, Minutes, Multigrade Model)
+- Added Intentions section showing shared sub-theme and objective
+- Added Assessment table per grade
+- Added Ways Forward table per grade
+- Added Reflection Questions section
+
+**T1.8 - Wire generator to renderer complete (enhanced):**
 - Created `lib/core/providers.dart` with Riverpod providers
 - Created `lib/features/generator/generation_controller.dart` with StateNotifier
 - Updated `generator_screen.dart` to wire Generate to mock generation
-- Full flow: form → GenerationRequest → stream events → IlawPlanView displays plan
+- Enhanced FlowTable to show per-grade activity columns
+- Full flow: form → GenerationRequest → stream events → IlawPlanView displays multi-column plan
 - Cancel button stops generation, error handling implemented
