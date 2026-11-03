@@ -21,6 +21,13 @@ class FlowTable extends StatelessWidget {
             child: Text(grade, style: TextStyle(fontWeight: FontWeight.bold))),
     ];
 
+    // Build columnWidths map - Minutes is fixed, others are flex
+    final columnWidths = {
+      0: const FixedColumnWidth(50), // Minutes column
+      for (int i = 0; i < gradeLabels.length + 1; i++)
+        i + 1: const FlexColumnWidth(1), // Stage + grade columns
+    };
+
     // Build data rows
     final rows = <TableRow>[];
 
@@ -33,17 +40,12 @@ class FlowTable extends StatelessWidget {
 
       // Add grade column cells
       if (stage.wholeClass) {
-        // Whole class activity spans all grade columns
-        final spanCount = gradeLabels.length;
-        children
-            .addAll(List.generate(spanCount, (_) => const SizedBox.shrink()));
-        // We'll use a different approach - add the activity in the first grade cell
-        // and let the visual indicator show it's whole class
-        if (gradeLabels.isNotEmpty) {
-          children[2] = Padding(
+        // Whole class activity - show in all grade columns
+        for (int i = 0; i < gradeLabels.length; i++) {
+          children.add(Padding(
               padding: const EdgeInsets.all(8),
               child:
-                  Text(stage.wholeClassActivity, textAlign: TextAlign.center));
+                  Text(stage.wholeClassActivity, textAlign: TextAlign.center)));
         }
       } else {
         // Per-grade activities
@@ -61,6 +63,7 @@ class FlowTable extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Table(
+        columnWidths: columnWidths,
         border: TableBorder.all(color: Colors.black12, width: 1),
         children: [
           TableRow(

@@ -51,3 +51,9 @@
 - Added required field indicators (*) for all required fields
 - Added errorText validation feedback on empty required fields
 - Updated `grade_input_card.dart` with TextController for subTheme field and asterisks for required grade fields
+
+**Bug fix - Table column widths:**
+- Added `columnWidths` to Assessment table: Grade (FlexColumnWidth 1), Formative/Exit Task/Success Criteria (FlexColumnWidth 3)
+- Added `columnWidths` to Ways Forward table: Grade (FlexColumnWidth 1), Remediation/Enrichment (FlexColumnWidth 3)
+- Added `columnWidths` to FlowTable: Minutes (FixedColumnWidth 50), Stage + grades (FlexColumnWidth 1)
+- Fixed wholeClass activity display in FlowTable to show activity in all grade columns

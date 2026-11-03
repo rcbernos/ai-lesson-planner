@@ -141,6 +141,12 @@ class IlawPlanView extends StatelessWidget {
     return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Table(
+            columnWidths: const {
+              0: FlexColumnWidth(1), // Grade
+              1: FlexColumnWidth(3), // Formative
+              2: FlexColumnWidth(3), // Exit Task
+              3: FlexColumnWidth(3), // Success Criteria
+            },
             border: TableBorder.all(color: Colors.black12, width: 1),
             children: [
               const TableRow(children: [
@@ -184,6 +190,11 @@ class IlawPlanView extends StatelessWidget {
     return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Table(
+            columnWidths: const {
+              0: FlexColumnWidth(1), // Grade
+              1: FlexColumnWidth(3), // Remediation
+              2: FlexColumnWidth(3), // Enrichment
+            },
             border: TableBorder.all(color: Colors.black12, width: 1),
             children: [
               const TableRow(children: [
