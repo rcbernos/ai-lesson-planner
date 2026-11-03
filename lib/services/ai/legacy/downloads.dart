@@ -34,11 +34,11 @@ class DownloadService {
   Future<File> getModelFile() async {
     final appDir = await getAppSupportDir();
     final modelDir = Directory('${appDir.path}/models');
-    
+
     if (!await modelDir.exists()) {
       await modelDir.create(recursive: true);
     }
-    
+
     return File('${modelDir.path}/${AppConfig.modelFileName}');
   }
 
@@ -69,7 +69,7 @@ class DownloadService {
 
     final chunks = <int>[];
     final raf = file.openRead();
-    
+
     await for (final chunk in raf) {
       chunks.addAll(chunk);
     }
@@ -84,14 +84,14 @@ class DownloadService {
     try {
       final actualChecksum = await calculateFileChecksum(filePath);
       final expectedChecksum = AppConfig.modelChecksum;
-      
+
       // If checksum is still a placeholder, consider it unverified
-      if (expectedChecksum.startsWith('placeholder') || 
-          expectedChecksum.isEmpty || 
+      if (expectedChecksum.startsWith('placeholder') ||
+          expectedChecksum.isEmpty ||
           expectedChecksum.length != 64) {
         return false;
       }
-      
+
       return actualChecksum.toLowerCase() == expectedChecksum.toLowerCase();
     } catch (e) {
       return false;
@@ -106,7 +106,7 @@ class DownloadService {
   }) async {
     try {
       final url = Uri.parse(AppConfig.getModelDownloadUrl());
-      
+
       // Final check for valid URL
       if (!url.toString().startsWith('http')) {
         onError?.call('Invalid download URL: ${url.toString()}');
@@ -115,15 +115,15 @@ class DownloadService {
 
       // Get the target file
       final file = await getModelFile();
-      
+
       // Create HTTP request with timeout
       final client = http.Client();
       final request = http.Request('GET', url);
-      
+
       // Send request with timeout
       final response = await client.send(request).timeout(
-        const Duration(seconds: 30),
-      );
+            const Duration(seconds: 30),
+          );
 
       if (response.statusCode != 200) {
         client.close();
@@ -142,7 +142,7 @@ class DownloadService {
       await for (final chunk in response.stream) {
         sink.add(chunk);
         downloaded += chunk.length;
-        
+
         onProgress?.call(downloaded, contentLength);
       }
 
@@ -166,7 +166,6 @@ class DownloadService {
 
       onComplete?.call(file.path);
       return file.path;
-
     } catch (e) {
       onError?.call('Download error: ${e.toString()}');
       return null;
@@ -177,7 +176,7 @@ class DownloadService {
   static Future<String> downloadModelWithDefaults() async {
     final service = DownloadService();
     String? result;
-    
+
     await service.downloadModel(
       onProgress: (received, total) {
         // Simple progress logging
@@ -192,7 +191,7 @@ class DownloadService {
         print('Download completed: $filePath');
       },
     );
-    
+
     return result ?? '';
   }
 }

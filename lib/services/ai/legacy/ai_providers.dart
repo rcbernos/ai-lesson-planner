@@ -80,20 +80,21 @@ class AIServiceNotifier extends StateNotifier<AIServiceState> {
 
   Future<void> initialize() async {
     state = state.copyWith(isInitialized: false);
-    
+
     try {
       await _aiService.ensureModelAvailable(
         onProgress: (received, total) {
           state = state.copyWith(
             isDownloading: true,
-            downloadProgress: DownloadProgress(received: received, total: total),
+            downloadProgress:
+                DownloadProgress(received: received, total: total),
           );
         },
         onError: (error) {
           state = state.copyWith(error: error);
         },
       );
-      
+
       final path = await _aiService.getModelPath();
       state = state.copyWith(
         isInitialized: true,
@@ -133,7 +134,7 @@ class AIServiceNotifier extends StateNotifier<AIServiceState> {
         state = state.copyWith(error: error, isDownloading: false);
       },
     );
-    
+
     state = state.copyWith(
       isDownloading: false,
       modelPath: await _aiService.getModelPath(),
@@ -156,7 +157,8 @@ class AIServiceNotifier extends StateNotifier<AIServiceState> {
 }
 
 /// Provider for AI Service State
-final aiServiceStateProvider = StateNotifierProvider<AIServiceNotifier, AIServiceState>((ref) {
+final aiServiceStateProvider =
+    StateNotifierProvider<AIServiceNotifier, AIServiceState>((ref) {
   final aiService = ref.watch(aiServiceProvider);
   return AIServiceNotifier(aiService);
 });

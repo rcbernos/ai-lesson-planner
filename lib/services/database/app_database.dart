@@ -15,8 +15,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   /// Test-only constructor that opens the database at an explicit file path.
-  AppDatabase.forTesting(File file)
-      : super(_openConnectionForFile(file));
+  AppDatabase.forTesting(File file) : super(_openConnectionForFile(file));
 
   @override
   int get schemaVersion => 1;
@@ -60,7 +59,8 @@ class AppDatabase extends _$AppDatabase {
   Future<int> insertReferenceNote(ReferenceNotesCompanion entry) =>
       into(referenceNotes).insert(entry);
 
-  Future<List<ReferenceNote>> getReferenceNotesForLessonPlan(int lessonPlanId) =>
+  Future<List<ReferenceNote>> getReferenceNotesForLessonPlan(
+          int lessonPlanId) =>
       (select(referenceNotes)
             ..where((t) => t.lessonPlanId.equals(lessonPlanId)))
           .get();
@@ -76,9 +76,9 @@ class AppDatabase extends _$AppDatabase {
   Future<int> insertBibliographyEntry(BibliographyCompanion entry) =>
       into(bibliography).insert(entry);
 
-  Future<List<BibliographyData>> getBibliographyForLessonPlan(int lessonPlanId) =>
-      (select(bibliography)
-            ..where((t) => t.lessonPlanId.equals(lessonPlanId)))
+  Future<List<BibliographyData>> getBibliographyForLessonPlan(
+          int lessonPlanId) =>
+      (select(bibliography)..where((t) => t.lessonPlanId.equals(lessonPlanId)))
           .get();
 
   Future<bool> updateBibliographyEntry(BibliographyData entry) =>
@@ -91,7 +91,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> seed() async {
     // Guard against duplicate seeding
-    final existing = await select(referenceNotes).get().then((r) => r.isNotEmpty);
+    final existing =
+        await select(referenceNotes).get().then((r) => r.isNotEmpty);
     if (existing) return;
 
     await transaction(() async {

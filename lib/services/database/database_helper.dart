@@ -15,7 +15,7 @@ class DatabaseHelper {
     return _db!;
   }
 
-    /// Closes the underlying database.
+  /// Closes the underlying database.
   Future<void> close() async {
     await _db?.close();
   }

@@ -1,8 +1,9 @@
+// ignore_for_file: dangling_library_doc_comments, prefer_const_declarations
 /// Application configuration constants
 class AppConfig {
   static const String appName = 'AI Lesson Plan Assistant';
   static const String version = '1.0.0';
-  
+
   /// ILAW Format - Official DepEd Daily Lesson Plan Template
   /// Based on official DepEd DLP format for Grades 1-4
   static const String ilawFormat = '''
@@ -121,37 +122,39 @@ Content has been reviewed and refined by the teacher.
 
   /// Model file name
   static const String modelFileName = 'sea-liongguf-q4_0.gguf';
-  
+
   /// Model download URL (HuggingFace/primary source)
-  static const String modelDownloadUrl = 'https://huggingface.co/codellama/sea-lion-7b-gguf/resolve/main/sealion-7b-q4_0.gguf';
-  
+  static const String modelDownloadUrl =
+      'https://huggingface.co/codellama/sea-lion-7b-gguf/resolve/main/sealion-7b-q4_0.gguf';
+
   /// Expected model file size in bytes (for verification)
   /// TODO: Update with actual model file size once downloaded
   static const int modelFileSize = 4000000000; // Example: 4GB
-  
+
   /// SHA256 checksum of the model file for integrity verification
   /// TODO: Update with actual SHA256 checksum after first download
-  static const String modelChecksum = 'placeholder-sha256-checksum-not-yet-verified';
-  
+  static const String modelChecksum =
+      'placeholder-sha256-checksum-not-yet-verified';
+
   /// Default export directory
   static const String defaultExportDir = '/LMS_Data/Exports/';
-  
+
   /// Download chunk size for streaming downloads (in bytes)
   static const int downloadChunkSize = 1048576; // 1MB chunks
-  
+
   /// Timeout for model download (in seconds)
   static const int downloadTimeoutSeconds = 300; // 5 minutes
-  
+
   /// Get the model download URL (can be overridden for testing)
   static String getModelDownloadUrl() => modelDownloadUrl;
-  
+
   /// Check if the configuration has valid checksum
   static bool isChecksumVerified() {
-    return !modelChecksum.startsWith('placeholder') && 
-           modelChecksum.isNotEmpty &&
-           modelChecksum.length == 64; // SHA256 is 64 hex chars
+    return !modelChecksum.startsWith('placeholder') &&
+        modelChecksum.isNotEmpty &&
+        modelChecksum.length == 64; // SHA256 is 64 hex chars
   }
-  
+
   /// Get the expected model file size in MB
   static String getModelSizeFormatted() {
     final mb = modelFileSize / (1024 * 1024);

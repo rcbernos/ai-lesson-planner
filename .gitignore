@@ -38,3 +38,15 @@ packages.yaml
 
 # Model files (large binary files)
 models/*.gguf
+
+# Flutter generated files
+.flutter-plugins-dependencies
+*.g.dart
+GeneratedPluginRegistrant.*
+
+# macOS assets (generated icons)
+macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_*.png
+
+# Windows generated files
+windows/flutter/generated_plugins.cmake
+windows/runner/runner.exe.manifest
