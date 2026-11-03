@@ -23,7 +23,7 @@ class AppUtils {
   static Future<void> ensureDirectoriesExist() async {
     final appDir = await getAppSupportDir();
     final modelDir = Directory('$appDir/models');
-    
+
     // Use path_provider to get the application documents directory
     final docsDir = await getApplicationDocumentsDirectory();
     final exportDir = Directory('$docsDir/LMS_Data/Exports');
