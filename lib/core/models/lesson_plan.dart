@@ -73,7 +73,7 @@ class LessonPlan {
   final String aiUseDeclaration;
 
   /// The current schema version for this plan format
-  static const int currentSchemaVersion = 1;
+  static const int currentSchemaVersion = 2;
 
   /// Calculate total minutes from flow stages
   int get totalFlowMinutes =>
@@ -118,14 +118,18 @@ class LessonPlan {
           .map((s) => FlowStage.fromJson(s as Map<String, dynamic>))
           .toList(),
       assessments: (json['assessments'] as List<dynamic>?)
-          ?.map((a) => GradeAssessment.fromJson(a as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((a) => GradeAssessment.fromJson(a as Map<String, dynamic>))
+              .toList() ??
+          [],
       reflectionQuestions: (json['reflectionQuestions'] as List<dynamic>?)
-          ?.map((r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map(
+                  (r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>))
+              .toList() ??
+          [],
       waysForward: (json['waysForward'] as List<dynamic>?)
-          ?.map((w) => GradeWaysForward.fromJson(w as Map<String, dynamic>))
-          .toList() ?? [],
+              ?.map((w) => GradeWaysForward.fromJson(w as Map<String, dynamic>))
+              .toList() ??
+          [],
       notesNextSession: json['notesNextSession'] as String,
       preparedBy: json['preparedBy'] as String,
       checkedBy: json['checkedBy'] as String,

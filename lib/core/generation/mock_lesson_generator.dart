@@ -121,6 +121,7 @@ class MockLessonGenerator implements LessonGenerator {
               formative: 'Obserbahan ang pakikilahok.',
               exitTask: 'Isulat ang sumusunod.',
               successCriteria: 'Nailalarawan at nakapagpapahayag.',
+              competencyIndex: 0,
             ))
         .toList();
   }
@@ -161,43 +162,49 @@ class MockLessonGenerator implements LessonGenerator {
     final a = total ~/ 3;
     final w = total - m - d - p - a;
 
+    // Build competency index map for non-whole-class stages
+    final competencyIndexByGrade =
+        Map.fromEntries(grades.map((g) => MapEntry(g.gradeLabel, 0)));
+
     return [
       FlowStage(
           minutes: m,
           stage: 'Motivation',
           wholeClass: true,
           activityByGrade: {},
-          wholeClassActivity: 'Ipakita ang larawan.'),
+          wholeClassActivity: 'Ipakita ang larawan.',
+          competencyIndexByGrade: const {}),
       FlowStage(
-        minutes: d,
-        stage: 'Direct Teaching',
-        wholeClass: false,
-        activityByGrade: Map.fromEntries(
-            grades.map((g) => MapEntry(g.gradeLabel, 'Basahin at ilarawan.'))),
-        wholeClassActivity: '',
-      ),
+          minutes: d,
+          stage: 'Direct Teaching',
+          wholeClass: false,
+          activityByGrade: Map.fromEntries(grades
+              .map((g) => MapEntry(g.gradeLabel, 'Basahin at ilarawan.'))),
+          wholeClassActivity: '',
+          competencyIndexByGrade: competencyIndexByGrade),
       FlowStage(
-        minutes: p,
-        stage: 'Practice',
-        wholeClass: false,
-        activityByGrade: Map.fromEntries(
-            grades.map((g) => MapEntry(g.gradeLabel, 'Gawin ang worksheet.'))),
-        wholeClassActivity: '',
-      ),
+          minutes: p,
+          stage: 'Practice',
+          wholeClass: false,
+          activityByGrade: Map.fromEntries(grades
+              .map((g) => MapEntry(g.gradeLabel, 'Gawin ang worksheet.'))),
+          wholeClassActivity: '',
+          competencyIndexByGrade: competencyIndexByGrade),
       FlowStage(
-        minutes: a,
-        stage: 'Activity',
-        wholeClass: false,
-        activityByGrade: Map.fromEntries(
-            grades.map((g) => MapEntry(g.gradeLabel, 'Gumawa ng guhit.'))),
-        wholeClassActivity: '',
-      ),
+          minutes: a,
+          stage: 'Activity',
+          wholeClass: false,
+          activityByGrade: Map.fromEntries(
+              grades.map((g) => MapEntry(g.gradeLabel, 'Gumawa ng guhit.'))),
+          wholeClassActivity: '',
+          competencyIndexByGrade: competencyIndexByGrade),
       FlowStage(
           minutes: w,
           stage: 'Wrap-up',
           wholeClass: true,
           activityByGrade: {},
-          wholeClassActivity: 'Ipagpakita ang huling gawa.'),
+          wholeClassActivity: 'Ipagpakita ang huling gawa.',
+          competencyIndexByGrade: const {}),
     ];
   }
 }

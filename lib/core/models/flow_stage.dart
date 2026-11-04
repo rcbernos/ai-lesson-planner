@@ -8,6 +8,7 @@ class FlowStage {
     required this.wholeClass,
     required this.activityByGrade,
     required this.wholeClassActivity,
+    this.competencyIndexByGrade = const {},
   });
 
   final int minutes;
@@ -15,6 +16,7 @@ class FlowStage {
   final bool wholeClass;
   final Map<String, String> activityByGrade;
   final String wholeClassActivity;
+  final Map<String, int> competencyIndexByGrade;
 
   Map<String, dynamic> toJson() => {
         'minutes': minutes,
@@ -22,6 +24,7 @@ class FlowStage {
         'wholeClass': wholeClass,
         'activityByGrade': activityByGrade,
         'wholeClassActivity': wholeClassActivity,
+        'competencyIndexByGrade': competencyIndexByGrade,
       };
 
   factory FlowStage.fromJson(Map<String, dynamic> json) => FlowStage(
@@ -31,6 +34,10 @@ class FlowStage {
         activityByGrade: Map<String, String>.from(
             json['activityByGrade'] as Map<String, dynamic>),
         wholeClassActivity: json['wholeClassActivity'] as String,
+        competencyIndexByGrade: Map<String, int>.from(
+            (json['competencyIndexByGrade'] as Map<String, dynamic>?)
+                    ?.map((k, v) => MapEntry(k, v as int)) ??
+                const {}),
       );
 
   FlowStage copyWith({
@@ -39,6 +46,7 @@ class FlowStage {
     bool? wholeClass,
     Map<String, String>? activityByGrade,
     String? wholeClassActivity,
+    Map<String, int>? competencyIndexByGrade,
   }) =>
       FlowStage(
         minutes: minutes ?? this.minutes,
@@ -46,5 +54,7 @@ class FlowStage {
         wholeClass: wholeClass ?? this.wholeClass,
         activityByGrade: activityByGrade ?? this.activityByGrade,
         wholeClassActivity: wholeClassActivity ?? this.wholeClassActivity,
+        competencyIndexByGrade:
+            competencyIndexByGrade ?? this.competencyIndexByGrade,
       );
 }

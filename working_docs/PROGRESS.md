@@ -21,3 +21,9 @@
 - Commit: feat(core): copyWith, plan sections and schema versioning
 
 Next: T2.2 Model: competency references (D13)
+
+### T2.2 Complete
+- Added `competencyIndexByGrade` to FlowStage, `competencyIndex` to GradeAssessment
+- Bumped `currentSchemaVersion` to 2; v1 JSON loads with empty/null defaults
+- Mock populates comp indices: empty for whole-class stages, index 0 for each grade
+- 58 tests pass; no issues in modified files
