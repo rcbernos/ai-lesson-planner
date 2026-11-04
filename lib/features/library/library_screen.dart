@@ -31,7 +31,10 @@ class LibraryScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigate to the Generator screen to create a new plan
+          // Reset generator state for a fresh start
+          ref.read(generatedPlanProvider.notifier).state = null;
+          ref.read(planEditorProvider.notifier).clear();
+
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const GeneratorScreen(),

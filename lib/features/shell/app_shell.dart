@@ -1,10 +1,9 @@
 /// App shell with NavigationRail for desktop navigation.
-/// Provides four destinations: Generator, Library, Assistant, Settings.
+/// Provides three destinations: Library, Assistant, Settings.
 library;
 
 import 'package:flutter/material.dart';
 
-import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
 import 'package:ai_lesson_planner/features/library/library_screen.dart';
 import 'package:ai_lesson_planner/features/assistant/assistant_screen.dart';
 import 'package:ai_lesson_planner/features/settings/settings_screen.dart';
@@ -20,11 +19,6 @@ class _AppShellState extends State<AppShell> {
   int _selectedIndex = 0;
 
   static const List<_NavigationDestination> _destinations = [
-    _NavigationDestination(
-      icon: Icons.table_view,
-      activeIcon: Icons.table_view,
-      label: 'Generator',
-    ),
     _NavigationDestination(
       icon: Icons.library_books_rounded,
       activeIcon: Icons.library_books_rounded,
@@ -51,15 +45,13 @@ class _AppShellState extends State<AppShell> {
   Widget _buildStage() {
     switch (_selectedIndex) {
       case 0:
-        return const GeneratorScreen();
-      case 1:
         return const LibraryScreen();
-      case 2:
+      case 1:
         return const AssistantScreen();
-      case 3:
+      case 2:
         return const SettingsScreen();
       default:
-        return const GeneratorScreen();
+        return const LibraryScreen();
     }
   }
 

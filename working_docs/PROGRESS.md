@@ -20,3 +20,7 @@
 - Fix: FlowTable L section had 2 extra columns for 2-grade plans - refresh icon columns now only render when `onRegenerate` is provided.
 
 ## Next: T2.15 - Migration test harness
+
+- refactor(shell): remove Generator from nav rail, library is main entry point
+- Library "New Plan" button (FloatingActionButton) now resets generator state before navigate
+- All 107 tests pass, updated widget_test for new nav rail structure

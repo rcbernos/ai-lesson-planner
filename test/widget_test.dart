@@ -22,9 +22,8 @@ void main() {
     // Verify that the MaterialApp is properly configured.
     expect(find.byType(MaterialApp), findsOneWidget);
 
-    // Verify the center content shows default page (Generator appears in both
-    // NavigationRail destination and center content area).
-    expect(find.text('Generator'), findsNWidgets(2));
+    // Verify the center content shows default page (Library)
+    expect(find.text('Library'), findsNWidgets(2));
   });
 
   testWidgets('NavigationRail has multiple destinations',
@@ -37,9 +36,11 @@ void main() {
     expect(find.byType(NavigationRail), findsOneWidget);
 
     // Verify Library, Assistant, Settings destination labels are present.
-    // (Generator appears twice - in NavigationRail and center content)
-    expect(find.text('Library'), findsOneWidget);
+    expect(find.text('Library'), findsNWidgets(2));
     expect(find.text('Assistant'), findsOneWidget);
     expect(find.text('Settings'), findsOneWidget);
+
+    // Verify Generator is NOT in the NavigationRail anymore
+    expect(find.text('Generator'), findsNothing);
   });
 }
