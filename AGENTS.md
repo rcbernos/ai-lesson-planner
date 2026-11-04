@@ -12,11 +12,23 @@ Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for mul
 5. Stop after the card. If Verify still fails after 3 attempts, stop and report what you tried.
 
 ## Using tools
-- Never guess a path. Use only paths from your card, `PROGRESS.md`, or a list/search result. To find where a class is defined, search the codebase for `class Name`. Don't open a file just because its name sounds right. If a read says "not found", list the folder; don't try name variations.
-- Read one file per call, and only files the card needs.
+Available tools (use these exact names; there is no `shell` or `bash`):
+- `read_files`: read one or more files.
+- `search_codebase`: search the workspace. Use it to find where a class or function is defined.
+- `run_commands`: run shell commands (tests, analyze, format, git status).
+- `editor`: edit files. Use it for most edits.
+- `apply_patch`: apply a diff. Use it only for changes in several places of one file.
+- `fetch_web_content`: fetch a web page. Use it only if the card asks for it (the app itself is offline).
+- `skills`: invoke a configured skill. Use it only if the card names one.
+- `ask_question`: ask the human when a requirement is unclear or you are stuck.
+- `submit_and_exit`: finish. Print your summary and the commit message first, then call it.
+
+Rules:
+- Never guess a path. Use only paths from your card, `PROGRESS.md`, or a list/search result. Don't open a file just because its name sounds right. If a read says "not found", list the folder; don't try name variations.
+- Read only the files the card needs.
 - Make one tool call at a time, as the last thing in your message. Wait for the result.
 - Keep each edit under about 6000 characters. Prefer a targeted edit over rewriting a file. For a new file over about 150 lines, create the first part, then add the rest in later edits.
-- If a call fails or comes back garbled, retry once with a simpler call (one file, smaller edit). Never resend the same payload a third time; stop and ask the human.
+- If a call fails, is rejected, or comes back garbled, retry once with a simpler call. Never resend the same payload a third time; stop and ask the human.
 
 ## Where things live
 - Plan model classes (`LessonPlan`, `PlanHeader`, `GradeBlock`, `FlowStage`, and the rest): `lib/core/models/`, entry point `lesson_plan.dart`.
