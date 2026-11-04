@@ -27,7 +27,7 @@ Rules:
 - Never guess a path. Use only paths from your card, `PROGRESS.md`, or a list/search result. Don't open a file just because its name sounds right. If a read says "not found", list the folder; don't try name variations.
 - Read only the files the card needs.
 - Make one tool call at a time, as the last thing in your message. Wait for the result.
-- Keep each edit under about 6000 characters. Prefer a targeted edit over rewriting a file. For a new file over about 150 lines, create the first part, then add the rest in later edits.
+- Every `editor` call, whether it edits or creates a file, must stay under about 6000 characters, roughly 100 lines of Dart. Prefer a targeted edit over rewriting a file. For a new file longer than that, decide the split first, create the file with the first part, then add each remaining part in its own call.
 - If a call fails, is rejected, or comes back garbled, retry once with a simpler call. Never resend the same payload a third time; stop and ask the human.
 
 ## Where things live
