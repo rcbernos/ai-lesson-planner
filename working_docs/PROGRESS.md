@@ -13,5 +13,6 @@
 - T2.12 Complete: `regenerateSection` in GenerationController, `currentLanguageProvider`, refresh icons on SectionBanners. Tests: 103 pass.
 - T2.13 Complete: `gradeLabel` param in `regenerateSection()`, refresh buttons in FlowTable (header + cells), `onRegenerate` callback in AssessmentSection/WaysForwardSection. Tests: 107 pass.
 - T2.14 Complete: `PlanRepository.update()`, library opens in PlanWorkspace with savedId, Save/ Update as Copy logic. Tests: 107 pass.
+- Fix: Riverpod error when loading generated plan - changed `build()` to use `ref.listen()` instead of modifying provider state during widget tree building.
 
 ## Next: T2.15 - Migration test harness

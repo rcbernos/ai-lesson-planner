@@ -3,6 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'generator_form_state.dart';
 import 'grade_input_card.dart';
 import 'generation_controller.dart';
@@ -78,6 +79,16 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen for generated plan changes and load into editor
+    ref.listen<LessonPlan?>(
+      generatedPlanProvider,
+      (previous, next) {
+        if (next != null) {
+          ref.read(planEditorProvider.notifier).load(next);
+        }
+      },
+    );
+
     final formState = ref.watch(generatorFormProvider);
     final formNotifier = ref.read(generatorFormProvider.notifier);
     final genState = ref.watch(generationControllerProvider);
@@ -87,8 +98,6 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
     _syncControllers(formState);
 
     if (generatedPlan != null) {
-      // Load the plan into the editor state for editing
-      ref.read(planEditorProvider.notifier).load(generatedPlan);
       return const PlanWorkspace();
     }
     if (genState.isGenerating)
