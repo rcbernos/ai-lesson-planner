@@ -35,3 +35,13 @@
 - PlanEditorNotifier with load, update, applyRegenerated, undo, markSaved, clear.
 - History capped at 20 steps; provider uses keepAlive() to survive tab switches.
 - 81 tests pass.
+
+### T2.7 Complete
+- Added PlanChange typedef in plan_sections.dart; onChange param on IlawPlanView.
+- Added SectionBanner widget in ilaw_plan_view.dart for I/L/A/W banners.
+- Created plan_sections.dart (stub implementations) and assessment_tables.dart (working implementations).
+- Updated IlawPlanView build to use SectionBanner with PlanSection enum.
+- Removed unused _section helper method.
+- New files: plan_sections.dart (33 lines), assessment_tables.dart (163 lines) - both under 250.
+- Note: ilaw_plan_view.dart is 382 lines - needs split card to move private widget methods to section files.
+- 81 tests pass.

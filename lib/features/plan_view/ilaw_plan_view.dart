@@ -4,10 +4,49 @@ library;
 import 'package:flutter/material.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'flow_table.dart';
+import 'plan_sections.dart'; // for PlanChange typedef
+
+/// Section banner widget for ILAW section headers (I, L, A, W).
+/// Built in IlawPlanView as per spec, with optional actions for future use.
+class SectionBanner extends StatelessWidget {
+  const SectionBanner(this.section, {this.actions = const [], super.key});
+  final PlanSection section;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<PlanSection, Color> colors = {
+      PlanSection.intentions: Colors.orange,
+      PlanSection.learningExperiences: Colors.blue,
+      PlanSection.assessment: Colors.green,
+      PlanSection.waysForward: Colors.purple,
+    };
+    final color = colors[section] ?? Colors.grey;
+    final Map<PlanSection, String> labels = {
+      PlanSection.intentions: 'I - Intentions',
+      PlanSection.learningExperiences: 'L - Learning Experiences',
+      PlanSection.assessment: 'A - Assessment',
+      PlanSection.waysForward: 'W - Ways Forward',
+    };
+
+    return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(children: [
+          Icon(Icons.circle, color: color, size: 16),
+          const SizedBox(width: 8),
+          Text(labels[section] ?? section.name,
+              style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+          const Spacer(),
+          ...actions,
+        ]));
+  }
+}
 
 class IlawPlanView extends StatelessWidget {
-  const IlawPlanView({required this.plan, super.key});
+  const IlawPlanView({required this.plan, this.onChange, super.key});
   final LessonPlan plan;
+  final PlanChange? onChange;
+
   List<String> get grades => plan.grades.map((g) => g.gradeLabel).toList();
   @override
   Widget build(BuildContext context) {
@@ -15,13 +54,13 @@ class IlawPlanView extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _header(),
-        _section('I - Intentions', Colors.orange),
+        const SectionBanner(PlanSection.intentions),
         _intentionsSection(context),
-        _section('L - Learning Experiences', Colors.blue),
+        const SectionBanner(PlanSection.learningExperiences),
         FlowTable(flow: plan.flow, gradeLabels: grades),
-        _section('A - Assessment', Colors.green),
+        const SectionBanner(PlanSection.assessment),
         _assessmentsSection(),
-        _section('W - Ways Forward', Colors.purple),
+        const SectionBanner(PlanSection.waysForward),
         _waysForwardSection(),
         _reflectionSection(),
         _footer(),
@@ -109,13 +148,6 @@ class IlawPlanView extends StatelessWidget {
                   ])),
             ]),
           ])));
-  Widget _section(String t, Color c) => Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(children: [
-        Icon(Icons.circle, color: c, size: 16),
-        const SizedBox(width: 8),
-        Text(t, style: TextStyle(fontWeight: FontWeight.bold, color: c))
-      ]));
 
   Widget _intentionsSection(BuildContext context) {
     final brightness = Theme.of(context).brightness;
