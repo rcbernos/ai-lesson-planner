@@ -9,26 +9,19 @@
 ## Phase 2 - starting at T2.0
 
 ### T2.0 Complete
-- AGENTS.md updated with Phase 2 file reference.
-- Flutter hooks: no matches found in lib/test code.
-- File sizes: largest file under 250 lines (ilaw_plan_view.dart: 343 lines - UI).
+- AGENTS.md updated with Phase 2 file reference; no flutter_hooks found.
 
 ### T2.1 Complete
-- Fixed `part of` directive in 5 part files (plan_header.dart, grade_block.dart, flow_stage.dart, assessment.dart, ways_forward.dart)
-- Fixed `toJson` to include `aiUseDeclaration`
-- Fixed `fromJson` to treat missing optional lists as empty
-- All 53 tests pass; `flutter analyze` shows only info-level issues
-- Commit: feat(core): copyWith, plan sections and schema versioning
-
-Next: T2.2 Model: competency references (D13)
+- Fixed `part of` directives; `toJson`/`fromJson`; 53 tests pass.
 
 ### T2.2 Complete
-- Added `competencyIndexByGrade` to FlowStage, `competencyIndex` to GradeAssessment
-- Bumped `currentSchemaVersion` to 2; v1 JSON loads with empty/null defaults
-- Mock populates comp indices: empty for whole-class stages, index 0 for each grade
-- 58 tests pass; no issues in modified files
+- Added `competencyIndexByGrade`/`competencyIndex`; v1 JSON loads; 58 tests pass.
 
 ### T2.3 Complete
-- Created validation framework with stable issue codes (header.required, grades.count, flow.minutes_sum, etc.)
-- Split validator into 7 files under 250 lines each (header_validator, grades_validator, flow_validator, assessment_validator, ways_forward_validator, intentions_validator, validation_issue)
-- Validates all rules: header, grades, intentions, flow, assessment, ways forward, reflection, declaration
+- Validation framework with stable codes; split into 7 files under 250 lines each.
+
+### T2.4 Complete
+- `replaceSection` extension for regeneration; supports full sections and grade slices.
+- 72 tests pass; files: plan_section_patch.dart, plan_section_patch_test.dart.
+
+Next: T2.5 generateSection on the generator interface
