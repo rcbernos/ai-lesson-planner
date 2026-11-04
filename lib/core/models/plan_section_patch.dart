@@ -22,7 +22,7 @@ extension PlanSectionPatch on LessonPlan {
           source.grades.any((g) => g.gradeLabel == gradeLabel);
       if (!thisHasGrade) {
         throw ArgumentError(
-            'Grade label "$gradeLabel" not found in source plan');
+            'Grade label "$gradeLabel" not found in current plan');
       }
       if (!sourceHasGrade) {
         throw ArgumentError(
