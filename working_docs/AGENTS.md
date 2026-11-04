@@ -6,9 +6,13 @@ Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for mul
 1. Read `working_docs/PROGRESS.md`, then ONLY the task card you were given from the current phase file. Do not read other plan files.
 2. Do exactly one task card. Touch only the files it lists (max 3). If you think more files are needed, stop and say so.
 3. Run its Verify commands. Do not commit until they pass.
-4. Commit with the card's commit message, then add 2 to 5 lines to `PROGRESS.md` (what changed, what is next). Keep that file under 60 lines; summarize old entries.
+4. Print the card's commit message and add 2 to 5 lines to `PROGRESS.md`. Do not commit; the human commits.
 
-**Current Phase File:** `working_docs/phase1_tasks.md` (Phase 1: Visible App for dev1 branch)
+**Current Phase File:** `working_docs/phase2_tasks.md` (Phase 2: Solid Plan Model for dev1 branch)
+
+## Additional rules
+- Generated files (`*.g.dart`, Drift schema dumps, generated migration helpers) don't count toward the 3-file limit.
+- Seed data and curriculum text come from the human only. Never write competency text, standards, or references yourself.
 
 ## Code rules
 - Branch: work on `dev1`. Never commit to `main`.
