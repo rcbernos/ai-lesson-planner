@@ -29,3 +29,9 @@
 - Added `GenerationRequest.fromPlan` factory to build requests from existing plans.
 - Mock appends "(variant N)" markers for visibility during regeneration.
 - 73 tests pass.
+
+### T2.6 Complete
+- Added PlanEditorState with plan, issues, dirty, savedId, canUndo.
+- PlanEditorNotifier with load, update, applyRegenerated, undo, markSaved, clear.
+- History capped at 20 steps; provider uses keepAlive() to survive tab switches.
+- 81 tests pass.

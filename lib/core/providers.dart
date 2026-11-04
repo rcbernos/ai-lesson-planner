@@ -6,6 +6,7 @@ import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/core/generation/mock_lesson_generator.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/features/generator/generation_controller.dart';
+import 'package:ai_lesson_planner/features/plan_editor/plan_editor_state.dart';
 import 'package:ai_lesson_planner/services/database/plan_repository.dart';
 
 /// Provides the LessonGenerator implementation.
@@ -29,3 +30,13 @@ final generationControllerProvider =
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
   return PlanRepository();
 });
+
+/// Provides the plan editor state with undo history.
+/// Survives tab switches (no auto-dispose).
+final planEditorProvider =
+    StateNotifierProvider<PlanEditorNotifier, PlanEditorState?>(
+  (ref) {
+    ref.keepAlive();
+    return PlanEditorNotifier();
+  },
+);
