@@ -65,8 +65,8 @@ void main() {
       expect(notifier.state.grades.length, equals(initialLength));
     });
 
-    test('removing grade below 2 is blocked', () {
-      // Add 2 grades first
+    test('removing grade below 1 is blocked', () {
+      // Add 1 grade first (monograde plans are allowed)
       notifier.addGrade(GradeInput(
         gradeLabel: 'Grade 2',
         male: 10,
@@ -74,21 +74,14 @@ void main() {
         subTheme: 'Test',
         competency: 'Test',
       ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 3',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
 
-      expect(notifier.state.grades.length, equals(2));
+      expect(notifier.state.grades.length, equals(1));
 
-      // Try to remove
+      // Try to remove - should be blocked (prevents empty grades)
       notifier.removeGrade(0);
 
-      // Should still be 2
-      expect(notifier.state.grades.length, equals(2));
+      // Should still be 1
+      expect(notifier.state.grades.length, equals(1));
     });
 
     test('removing grade when 3+ works', () {

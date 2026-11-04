@@ -15,5 +15,7 @@
 - T2.14 Complete: `PlanRepository.update()`, library opens in PlanWorkspace with savedId, Save/ Update as Copy logic. Tests: 107 pass.
 - Fix: Riverpod error when loading generated plan - changed `build()` to use `ref.listen()` instead of modifying provider state during widget tree building.
 - Fix: Reflection questions showing closure syntax - fixed string interpolation in mock generator `${_firstWord(sharedSubTheme)}`.
+- Fix: Allow monograde plans (minimum 1 grade instead of 2), corrected grade removal validation.
+- Fix: Corrected error message in plan_section_patch.dart validation for grade label not found.
 
 ## Next: T2.15 - Migration test harness

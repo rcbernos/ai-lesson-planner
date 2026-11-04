@@ -155,7 +155,7 @@ class GeneratorFormNotifier extends StateNotifier<GeneratorFormState> {
   }
 
   void removeGrade(int index) {
-    if (state.grades.length <= 2) return;
+    if (state.grades.length <= 1) return;  // Block removal below 1 grade - allows monograde plans
     final newGrades = [...state.grades];
     newGrades.removeAt(index);
     state = state.copyWith(grades: newGrades);
