@@ -120,53 +120,60 @@ class IlawPlanView extends StatelessWidget {
   Widget _intentionsSection(BuildContext context) {
     final brightness = Theme.of(context).brightness;
     final isDark = brightness == Brightness.dark;
-    final headerColor = isDark ? const Color(0xFF333333) : const Color(0xFFEEEEEE);
+    final headerColor =
+        isDark ? const Color(0xFF333333) : const Color(0xFFEEEEEE);
     final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade400;
     final textColor = isDark ? Colors.white70 : Colors.black87;
 
     return Card(
-      color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
-      child: Padding(
-          padding: const EdgeInsets.all(16),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(plan.sharedSubTheme,
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
-                const SizedBox(height: 8),
-                Text(plan.bothGradesObjective,
-                    style: TextStyle(fontSize: 14, color: textColor)),
-                const SizedBox(height: 8),
-                Text(plan.learnerContext,
-                    style: TextStyle(
-                        fontSize: 13, fontStyle: FontStyle.italic, color: textColor)),
-                const SizedBox(height: 16),
-                // Standards & Objectives Matrix Table
-                SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Table(
-                      border: TableBorder.all(color: borderColor),
-                      columnWidths: {
-                        0: const FixedColumnWidth(130), // Row label header
-                        for (int i = 0; i < plan.grades.length; i++)
-                          (i + 1): const FixedColumnWidth(200), // Per-grade columns
-                      },
+        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+        child: Padding(
+            padding: const EdgeInsets.all(16),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(plan.sharedSubTheme,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textColor)),
+              const SizedBox(height: 8),
+              Text(plan.bothGradesObjective,
+                  style: TextStyle(fontSize: 14, color: textColor)),
+              const SizedBox(height: 8),
+              Text(plan.learnerContext,
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
+                      color: textColor)),
+              const SizedBox(height: 16),
+              // Standards & Objectives Matrix Table
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Table(
+                  border: TableBorder.all(color: borderColor),
+                  columnWidths: {
+                    0: const FixedColumnWidth(130), // Row label header
+                    for (int i = 0; i < plan.grades.length; i++)
+                      (i + 1): const FixedColumnWidth(200), // Per-grade columns
+                  },
+                  children: [
+                    // Header row with grade labels
+                    TableRow(
+                      decoration: BoxDecoration(color: headerColor),
                       children: [
-                        // Header row with grade labels
-                        TableRow(
-                            decoration: BoxDecoration(color: headerColor),
-                            children: [
-                              const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Text('Standard / Objective',
-                                      style: TextStyle(fontWeight: FontWeight.bold))),
-                              for (final grade in plan.grades)
-                                Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(grade.gradeLabel,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: isDark ? Colors.white : Colors.black))),
+                        const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text('Standard / Objective',
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                        for (final grade in plan.grades)
+                          Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(grade.gradeLabel,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black))),
                       ],
                     ),
                     // Content Standard Row

@@ -105,6 +105,30 @@ void main() {
         expect(labels, contains('Grade 3'));
         expect(labels, contains('Grade 4'));
       });
+
+      test('Phase 1 JSON without schemaVersion loads successfully', () {
+        final jsonMap = samplePlan.toJson();
+        jsonMap.remove('schemaVersion');
+        final json = jsonEncode(jsonMap);
+        final decoded = jsonDecode(json) as Map<String, dynamic>;
+        final result = LessonPlan.fromJson(decoded);
+
+        expect(result.header.school, equals(samplePlan.header.school));
+        expect(result.grades.length, equals(samplePlan.grades.length));
+        expect(result.flow.length, equals(samplePlan.flow.length));
+      });
+
+      test('JSON with schemaVersion > current throws PlanVersionException', () {
+        final jsonMap = samplePlan.toJson();
+        jsonMap['schemaVersion'] = 99;
+        final json = jsonEncode(jsonMap);
+        final decoded = jsonDecode(json) as Map<String, dynamic>;
+
+        expect(
+          () => LessonPlan.fromJson(decoded),
+          throwsA(isA<PlanVersionException>()),
+        );
+      });
     });
 
     group('ReflectionQuestion', () {
@@ -123,6 +147,44 @@ void main() {
 
         expect(result.gradeLabel, isNull);
         expect(result.text, equals('Test'));
+      });
+
+      test('copyWith with clearGradeLabel sets gradeLabel to null', () {
+        final question = ReflectionQuestion(
+          gradeLabel: 'Grade 3',
+          text: 'Test question',
+        );
+        final updated = question.copyWith(clearGradeLabel: true);
+
+        expect(updated.gradeLabel, isNull);
+        expect(updated.text, equals('Test question'));
+      });
+
+      test(
+          'copyWith with gradeLabel and clearGradeLabel=false keeps new gradeLabel',
+          () {
+        final question = ReflectionQuestion(
+          gradeLabel: 'Grade 3',
+          text: 'Test question',
+        );
+        final updated = question.copyWith(
+          gradeLabel: 'Grade 4',
+          clearGradeLabel: false,
+        );
+
+        expect(updated.gradeLabel, equals('Grade 4'));
+        expect(updated.text, equals('Test question'));
+      });
+    });
+
+    group('PlanSection', () {
+      test('eventName matches MockLessonGenerator section names', () {
+        expect(PlanSection.header.eventName, equals(''));
+        expect(PlanSection.intentions.eventName, equals('Intentions'));
+        expect(PlanSection.learningExperiences.eventName,
+            equals('Learning Experiences'));
+        expect(PlanSection.assessment.eventName, equals('Assessment'));
+        expect(PlanSection.waysForward.eventName, equals('Ways Forward'));
       });
     });
   });

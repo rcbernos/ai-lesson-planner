@@ -1,297 +1,39 @@
+part 'plan_header.dart';
+part 'grade_block.dart';
+part 'flow_stage.dart';
+part 'assessment.dart';
+part 'ways_forward.dart';
+
 /// Domain model for ILAW lesson plans.
 /// Plain Dart data classes with hand-written JSON serialization.
-library;
 
-/// Headers for a lesson plan
-class PlanHeader {
-  PlanHeader({
-    required this.school,
-    required this.teacher,
-    required this.learningArea,
-    required this.date,
-    required this.term,
-    required this.sessions,
-    required this.sessionMinutes,
-    required this.multigradeModel,
-  });
-
-  final String school;
-  final String teacher;
-  final String learningArea;
-  final String date;
-  final String term;
-  final int sessions;
-  final int sessionMinutes;
-  final String multigradeModel;
-
-  Map<String, dynamic> toJson() => {
-        'school': school,
-        'teacher': teacher,
-        'learningArea': learningArea,
-        'date': date,
-        'term': term,
-        'sessions': sessions,
-        'sessionMinutes': sessionMinutes,
-        'multigradeModel': multigradeModel,
-      };
-
-  factory PlanHeader.fromJson(Map<String, dynamic> json) => PlanHeader(
-        school: json['school'] as String,
-        teacher: json['teacher'] as String,
-        learningArea: json['learningArea'] as String,
-        date: json['date'] as String,
-        term: json['term'] as String,
-        sessions: json['sessions'] as int,
-        sessionMinutes: json['sessionMinutes'] as int,
-        multigradeModel: json['multigradeModel'] as String,
-      );
-
-  PlanHeader copyWith({
-    String? school,
-    String? teacher,
-    String? learningArea,
-    String? date,
-    String? term,
-    int? sessions,
-    int? sessionMinutes,
-    String? multigradeModel,
-  }) =>
-      PlanHeader(
-        school: school ?? this.school,
-        teacher: teacher ?? this.teacher,
-        learningArea: learningArea ?? this.learningArea,
-        date: date ?? this.date,
-        term: term ?? this.term,
-        sessions: sessions ?? this.sessions,
-        sessionMinutes: sessionMinutes ?? this.sessionMinutes,
-        multigradeModel: multigradeModel ?? this.multigradeModel,
-      );
+/// Plan section enum for schema versioning and section tracking
+enum PlanSection {
+  header,
+  intentions,
+  learningExperiences,
+  assessment,
+  waysForward
 }
 
-/// Grade block representing one grade level in a multigrade plan
-class GradeBlock {
-  GradeBlock({
-    required this.gradeLabel,
-    required this.learnersMale,
-    required this.learnersFemale,
-    required this.subTheme,
-    required this.contentStandard,
-    required this.performanceStandard,
-    required this.competencies,
-    required this.objectives,
-  });
-
-  final String gradeLabel;
-  final int learnersMale;
-  final int learnersFemale;
-  final String subTheme;
-  final String contentStandard;
-  final String performanceStandard;
-  final List<String> competencies;
-  final List<String> objectives;
-
-  Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'learnersMale': learnersMale,
-        'learnersFemale': learnersFemale,
-        'subTheme': subTheme,
-        'contentStandard': contentStandard,
-        'performanceStandard': performanceStandard,
-        'competencies': competencies,
-        'objectives': objectives,
+extension PlanSectionName on PlanSection {
+  String get eventName => switch (this) {
+        PlanSection.header => '',
+        PlanSection.intentions => 'Intentions',
+        PlanSection.learningExperiences => 'Learning Experiences',
+        PlanSection.assessment => 'Assessment',
+        PlanSection.waysForward => 'Ways Forward',
       };
-
-  factory GradeBlock.fromJson(Map<String, dynamic> json) => GradeBlock(
-        gradeLabel: json['gradeLabel'] as String,
-        learnersMale: json['learnersMale'] as int,
-        learnersFemale: json['learnersFemale'] as int,
-        subTheme: json['subTheme'] as String,
-        contentStandard: json['contentStandard'] as String,
-        performanceStandard: json['performanceStandard'] as String,
-        competencies: List<String>.from(json['competencies'] as List<dynamic>),
-        objectives: List<String>.from(json['objectives'] as List<dynamic>),
-      );
-
-  GradeBlock copyWith({
-    String? gradeLabel,
-    int? learnersMale,
-    int? learnersFemale,
-    String? subTheme,
-    String? contentStandard,
-    String? performanceStandard,
-    List<String>? competencies,
-    List<String>? objectives,
-  }) =>
-      GradeBlock(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        learnersMale: learnersMale ?? this.learnersMale,
-        learnersFemale: learnersFemale ?? this.learnersFemale,
-        subTheme: subTheme ?? this.subTheme,
-        contentStandard: contentStandard ?? this.contentStandard,
-        performanceStandard: performanceStandard ?? this.performanceStandard,
-        competencies: competencies ?? this.competencies,
-        objectives: objectives ?? this.objectives,
-      );
 }
 
-/// A stage in the lesson flow
-class FlowStage {
-  FlowStage({
-    required this.minutes,
-    required this.stage,
-    required this.wholeClass,
-    required this.activityByGrade,
-    required this.wholeClassActivity,
-  });
-
-  final int minutes;
-  final String stage;
-  final bool wholeClass;
-  final Map<String, String> activityByGrade;
-  final String wholeClassActivity;
-
-  Map<String, dynamic> toJson() => {
-        'minutes': minutes,
-        'stage': stage,
-        'wholeClass': wholeClass,
-        'activityByGrade': activityByGrade,
-        'wholeClassActivity': wholeClassActivity,
-      };
-
-  factory FlowStage.fromJson(Map<String, dynamic> json) => FlowStage(
-        minutes: json['minutes'] as int,
-        stage: json['stage'] as String,
-        wholeClass: json['wholeClass'] as bool,
-        activityByGrade: Map<String, String>.from(
-            json['activityByGrade'] as Map<String, dynamic>),
-        wholeClassActivity: json['wholeClassActivity'] as String,
-      );
-
-  FlowStage copyWith({
-    int? minutes,
-    String? stage,
-    bool? wholeClass,
-    Map<String, String>? activityByGrade,
-    String? wholeClassActivity,
-  }) =>
-      FlowStage(
-        minutes: minutes ?? this.minutes,
-        stage: stage ?? this.stage,
-        wholeClass: wholeClass ?? this.wholeClass,
-        activityByGrade: activityByGrade ?? this.activityByGrade,
-        wholeClassActivity: wholeClassActivity ?? this.wholeClassActivity,
-      );
-}
-
-/// Assessment for one grade level
-class GradeAssessment {
-  GradeAssessment({
-    required this.gradeLabel,
-    required this.formative,
-    required this.exitTask,
-    required this.successCriteria,
-  });
-
-  final String gradeLabel;
-  final String formative;
-  final String exitTask;
-  final String successCriteria;
-
-  Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'formative': formative,
-        'exitTask': exitTask,
-        'successCriteria': successCriteria,
-      };
-
-  factory GradeAssessment.fromJson(Map<String, dynamic> json) =>
-      GradeAssessment(
-        gradeLabel: json['gradeLabel'] as String,
-        formative: json['formative'] as String,
-        exitTask: json['exitTask'] as String,
-        successCriteria: json['successCriteria'] as String,
-      );
-
-  GradeAssessment copyWith({
-    String? gradeLabel,
-    String? formative,
-    String? exitTask,
-    String? successCriteria,
-  }) =>
-      GradeAssessment(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        formative: formative ?? this.formative,
-        exitTask: exitTask ?? this.exitTask,
-        successCriteria: successCriteria ?? this.successCriteria,
-      );
-}
-
-/// Remediation and enrichment pathways for one grade
-class GradeWaysForward {
-  GradeWaysForward({
-    required this.gradeLabel,
-    required this.remediation,
-    required this.enrichment,
-  });
-
-  final String gradeLabel;
-  final String remediation;
-  final String enrichment;
-
-  Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'remediation': remediation,
-        'enrichment': enrichment,
-      };
-
-  factory GradeWaysForward.fromJson(Map<String, dynamic> json) =>
-      GradeWaysForward(
-        gradeLabel: json['gradeLabel'] as String,
-        remediation: json['remediation'] as String,
-        enrichment: json['enrichment'] as String,
-      );
-
-  GradeWaysForward copyWith({
-    String? gradeLabel,
-    String? remediation,
-    String? enrichment,
-  }) =>
-      GradeWaysForward(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        remediation: remediation ?? this.remediation,
-        enrichment: enrichment ?? this.enrichment,
-      );
-}
-
-/// A reflection question, optionally targeted to one grade
-class ReflectionQuestion {
-  ReflectionQuestion({
-    required this.gradeLabel,
-    required this.text,
-  });
-
-  final String? gradeLabel; // null means whole-class
-  final String text;
-
-  Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'text': text,
-      };
-
-  factory ReflectionQuestion.fromJson(Map<String, dynamic> json) =>
-      ReflectionQuestion(
-        gradeLabel: json['gradeLabel'] as String?,
-        text: json['text'] as String,
-      );
-
-  ReflectionQuestion copyWith({
-    String? gradeLabel,
-    String? text,
-  }) =>
-      ReflectionQuestion(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        text: text ?? this.text,
-      );
+/// Exception thrown when a plan version is not supported
+class PlanVersionException implements Exception {
+  final int foundVersion;
+  final int maxVersion;
+  PlanVersionException(this.foundVersion, this.maxVersion);
+  @override
+  String toString() =>
+      'Plan version \\$foundVersion is not supported (max: \\$maxVersion).';
 }
 
 /// Complete lesson plan following the ILAW DLP format
@@ -330,6 +72,9 @@ class LessonPlan {
   final String checkedBy;
   final String aiUseDeclaration;
 
+  /// The current schema version for this plan format
+  static const int currentSchemaVersion = 1;
+
   /// Calculate total minutes from flow stages
   int get totalFlowMinutes =>
       flow.fold<int>(0, (sum, stage) => sum + stage.minutes);
@@ -351,35 +96,42 @@ class LessonPlan {
         'preparedBy': preparedBy,
         'checkedBy': checkedBy,
         'aiUseDeclaration': aiUseDeclaration,
+        'schemaVersion': currentSchemaVersion,
       };
 
-  factory LessonPlan.fromJson(Map<String, dynamic> json) => LessonPlan(
-        header: PlanHeader.fromJson(json['header'] as Map<String, dynamic>),
-        grades: (json['grades'] as List<dynamic>)
-            .map((g) => GradeBlock.fromJson(g as Map<String, dynamic>))
-            .toList(),
-        sharedSubTheme: json['sharedSubTheme'] as String,
-        bothGradesObjective: json['bothGradesObjective'] as String,
-        learnerContext: json['learnerContext'] as String,
-        materials: List<String>.from(json['materials'] as List<dynamic>),
-        references: List<String>.from(json['references'] as List<dynamic>),
-        flow: (json['flow'] as List<dynamic>)
-            .map((s) => FlowStage.fromJson(s as Map<String, dynamic>))
-            .toList(),
-        assessments: (json['assessments'] as List<dynamic>)
-            .map((a) => GradeAssessment.fromJson(a as Map<String, dynamic>))
-            .toList(),
-        reflectionQuestions: (json['reflectionQuestions'] as List<dynamic>)
-            .map((r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>))
-            .toList(),
-        waysForward: (json['waysForward'] as List<dynamic>)
-            .map((w) => GradeWaysForward.fromJson(w as Map<String, dynamic>))
-            .toList(),
-        notesNextSession: json['notesNextSession'] as String,
-        preparedBy: json['preparedBy'] as String,
-        checkedBy: json['checkedBy'] as String,
-        aiUseDeclaration: json['aiUseDeclaration'] as String,
-      );
+  factory LessonPlan.fromJson(Map<String, dynamic> json) {
+    final schemaVersion = json['schemaVersion'] as int? ?? 1;
+    if (schemaVersion > currentSchemaVersion) {
+      throw PlanVersionException(schemaVersion, currentSchemaVersion);
+    }
+    return LessonPlan(
+      header: PlanHeader.fromJson(json['header'] as Map<String, dynamic>),
+      grades: (json['grades'] as List<dynamic>)
+          .map((g) => GradeBlock.fromJson(g as Map<String, dynamic>))
+          .toList(),
+      sharedSubTheme: json['sharedSubTheme'] as String,
+      bothGradesObjective: json['bothGradesObjective'] as String,
+      learnerContext: json['learnerContext'] as String,
+      materials: List<String>.from(json['materials'] as List<dynamic>? ?? []),
+      references: List<String>.from(json['references'] as List<dynamic>? ?? []),
+      flow: (json['flow'] as List<dynamic>)
+          .map((s) => FlowStage.fromJson(s as Map<String, dynamic>))
+          .toList(),
+      assessments: (json['assessments'] as List<dynamic>?)
+          ?.map((a) => GradeAssessment.fromJson(a as Map<String, dynamic>))
+          .toList() ?? [],
+      reflectionQuestions: (json['reflectionQuestions'] as List<dynamic>?)
+          ?.map((r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>))
+          .toList() ?? [],
+      waysForward: (json['waysForward'] as List<dynamic>?)
+          ?.map((w) => GradeWaysForward.fromJson(w as Map<String, dynamic>))
+          .toList() ?? [],
+      notesNextSession: json['notesNextSession'] as String,
+      preparedBy: json['preparedBy'] as String,
+      checkedBy: json['checkedBy'] as String,
+      aiUseDeclaration: json['aiUseDeclaration'] as String,
+    );
+  }
 
   LessonPlan copyWith({
     PlanHeader? header,
