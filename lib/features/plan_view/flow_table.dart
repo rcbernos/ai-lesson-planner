@@ -6,21 +6,27 @@ import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'cell_edit_dialog.dart';
 import 'package:ai_lesson_planner/features/plan_view/plan_sections.dart';
 
+/// Callback type for regenerating a section's grade slice.
+typedef RegenCallback = void Function(PlanSection section, String gradeLabel);
+
 class FlowTable extends StatelessWidget {
   const FlowTable({
     required this.flow,
     required this.gradeLabels,
     this.onChange,
+    this.onRegenerate,
     super.key,
   });
 
   final List<FlowStage> flow;
   final List<String> gradeLabels;
   final PlanChange? onChange;
+  final RegenCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
     // Build explicit fixed widths for every column
+    // Add width for refresh icon column at the end
     final columnWidths = <int, TableColumnWidth>{
       0: const FixedColumnWidth(55), // Minutes column
       1: const FixedColumnWidth(110), // Stage name column
@@ -28,12 +34,14 @@ class FlowTable extends StatelessWidget {
       // Give each grade column a guaranteed minimum width (e.g., 180px)
       for (int i = 0; i < gradeLabels.length; i++)
         (i + 3): const FixedColumnWidth(180),
+      for (int i = 0; i < gradeLabels.length; i++)
+        (gradeLabels.length + 3 + i): const FixedColumnWidth(40), // Refresh icon column
     };
 
     // Calculate total width for the SizedBox wrapper
-    final totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 180.0);
+    final totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 180.0) + (gradeLabels.length * 40.0);
 
-    // Build header row: Minutes, Stage, Whole-class, then one column per grade
+    // Build header row: Minutes, Stage, Whole-class, then one column per grade + refresh icons
     final headerCells = [
       const Padding(
           padding: EdgeInsets.all(8.0),
@@ -49,6 +57,17 @@ class FlowTable extends StatelessWidget {
         Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(label, style: TextStyle(fontWeight: FontWeight.bold))),
+      for (final label in gradeLabels)
+        Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: onRegenerate != null
+                ? IconButton(
+                    icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                    tooltip: 'Regenerate activities for $label',
+                    onPressed: () => _showRegenerateConfirm(context, label),
+                  )
+                : const SizedBox(width: 8),
+        ),
     ];
 
     // Build data rows
@@ -107,6 +126,21 @@ class FlowTable extends StatelessWidget {
         ));
       }
 
+      // Add refresh icon cells for each grade
+      for (final grade in gradeLabels) {
+        children.add(_buildCell(
+          context,
+          onRegenerate != null
+              ? Icons.refresh
+              : null,
+          icon: true,
+          onTap: onRegenerate != null && !stage.wholeClass
+              ? () => _showRegenerateConfirm(context, grade)
+              : null,
+          isEditable: onRegenerate != null,
+        ));
+      }
+
       rows.add(TableRow(children: children));
     }
 
@@ -129,6 +163,32 @@ class FlowTable extends StatelessWidget {
     );
   }
 
+  /// Shows a confirmation dialog before regenerating a grade's cell.
+  void _showRegenerateConfirm(BuildContext context, String gradeLabel) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Regenerate Cell'),
+        content: Text(
+            'This replaces your edits in this section for $gradeLabel. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      onRegenerate?.call(PlanSection.learningExperiences, gradeLabel);
+    }
+  }
+
   Widget _buildCell(BuildContext context, dynamic content,
       {VoidCallback? onTap, bool isEditable = false, bool icon = false}) {
     final widget = GestureDetector(
@@ -139,10 +199,12 @@ class FlowTable extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           color: isEditable ? Theme.of(context).hoverColor : null,
           child: icon
-              ? Icon(content as IconData,
-                  color:
-                      content == Icons.group_work ? Colors.green : Colors.blue,
-                  size: 16)
+              ? (content != null
+                  ? Icon(content as IconData,
+                      color:
+                          content == Icons.group_work ? Colors.green : Colors.blue,
+                      size: 16)
+                  : const SizedBox.shrink())
               : Text(content.toString(), textAlign: TextAlign.center),
         ),
       ),

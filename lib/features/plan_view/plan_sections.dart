@@ -8,6 +8,9 @@ import 'cell_edit_dialog.dart';
 /// Type alias for plan change callbacks.
 typedef PlanChange = void Function(LessonPlan Function(LessonPlan));
 
+/// Callback type for regenerating a section's grade slice.
+typedef RegenCallback = void Function(PlanSection section, String gradeLabel);
+
 /// Helper to split multi-line text into list items, dropping blank lines.
 List<String> splitLines(String text) =>
     text.split('\n').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
@@ -300,9 +303,15 @@ class IntentionsSectionWidget extends StatelessWidget {
 
 /// Assignment section with editable assessment fields.
 class AssessmentSection extends StatelessWidget {
-  const AssessmentSection({super.key, required this.plan, this.onChange});
+  const AssessmentSection({
+    super.key,
+    required this.plan,
+    this.onChange,
+    this.onRegenerate,
+  });
   final LessonPlan plan;
   final PlanChange? onChange;
+  final RegenCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -316,6 +325,7 @@ class AssessmentSection extends StatelessWidget {
           1: FixedColumnWidth(170),
           2: FixedColumnWidth(170),
           3: FixedColumnWidth(170),
+          4: FixedColumnWidth(40), // Refresh icon column
         },
         border: TableBorder.all(color: Colors.grey.shade400),
         children: [
@@ -336,6 +346,9 @@ class AssessmentSection extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 child: Text('Success Criteria',
                     style: TextStyle(fontWeight: FontWeight.bold))),
+            Padding(
+                padding: EdgeInsets.all(8),
+                child: SizedBox.shrink()), // Header for refresh column
           ]),
           for (final a in plan.assessments) _assessmentRow(context, a, canEdit),
         ],
@@ -353,6 +366,15 @@ class AssessmentSection extends StatelessWidget {
           (v) => _updateAssessment('exitTask', a.gradeLabel, v)),
       _editableCell(context, a.successCriteria, canEdit,
           (v) => _updateAssessment('successCriteria', a.gradeLabel, v)),
+      Center(
+        child: onRegenerate != null
+            ? IconButton(
+                icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                tooltip: 'Regenerate assessment for ${a.gradeLabel}',
+                onPressed: () => _showRegenerateConfirm(context, a.gradeLabel),
+              )
+            : const SizedBox.shrink(),
+      ),
     ]);
   }
 
@@ -393,13 +415,45 @@ class AssessmentSection extends StatelessWidget {
             if (i == idx) updated else p.assessments[i],
         ]));
   }
+
+  /// Shows a confirmation dialog before regenerating a grade's assessment.
+  void _showRegenerateConfirm(BuildContext context, String gradeLabel) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Regenerate Assessment'),
+        content: Text(
+            'This replaces your edits in the assessment for $gradeLabel. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      onRegenerate?.call(PlanSection.assessment, gradeLabel);
+    }
+  }
 }
 
 /// Ways Forward section with editable remediation and enrichment.
 class WaysForwardSection extends StatelessWidget {
-  const WaysForwardSection({super.key, required this.plan, this.onChange});
+  const WaysForwardSection({
+    super.key,
+    required this.plan,
+    this.onChange,
+    this.onRegenerate,
+  });
   final LessonPlan plan;
   final PlanChange? onChange;
+  final RegenCallback? onRegenerate;
 
   @override
   Widget build(BuildContext context) {
@@ -412,6 +466,7 @@ class WaysForwardSection extends StatelessWidget {
           0: FixedColumnWidth(80),
           1: FixedColumnWidth(210),
           2: FixedColumnWidth(210),
+          3: FixedColumnWidth(40), // Refresh icon column
         },
         border: TableBorder.all(color: Colors.grey.shade400),
         children: [
@@ -428,6 +483,9 @@ class WaysForwardSection extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 child: Text('Enrichment',
                     style: TextStyle(fontWeight: FontWeight.bold))),
+            Padding(
+                padding: EdgeInsets.all(8),
+                child: SizedBox.shrink()), // Header for refresh column
           ]),
           for (final w in plan.waysForward) _waysRow(context, w, canEdit),
         ],
@@ -442,6 +500,15 @@ class WaysForwardSection extends StatelessWidget {
           (v) => _updateWays('remediation', w.gradeLabel, v)),
       _editableCell(context, w.enrichment, canEdit,
           (v) => _updateWays('enrichment', w.gradeLabel, v)),
+      Center(
+        child: onRegenerate != null
+            ? IconButton(
+                icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                tooltip: 'Regenerate ways forward for ${w.gradeLabel}',
+                onPressed: () => _showRegenerateConfirm(context, w.gradeLabel),
+              )
+            : const SizedBox.shrink(),
+      ),
     ]);
   }
 
@@ -480,6 +547,32 @@ class WaysForwardSection extends StatelessWidget {
           for (int i = 0; i < p.waysForward.length; i++)
             if (i == idx) updated else p.waysForward[i],
         ]));
+  }
+
+  /// Shows a confirmation dialog before regenerating a grade's ways forward.
+  void _showRegenerateConfirm(BuildContext context, String gradeLabel) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Regenerate Ways Forward'),
+        content: Text(
+            'This replaces your edits in the remediation/enrichment for $gradeLabel. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      onRegenerate?.call(PlanSection.waysForward, gradeLabel);
+    }
   }
 }
 

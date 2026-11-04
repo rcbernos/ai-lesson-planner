@@ -100,7 +100,7 @@ class GenerationController extends StateNotifier<GenerationState> {
 
   /// Regenerates a specific section of the current plan.
   /// Applies changes directly to the editor with undo capability.
-  void regenerateSection(PlanSection section) {
+  void regenerateSection(PlanSection section, {String? gradeLabel}) {
     // Cancel any existing subscription
     _cancelSubscription();
 
@@ -124,7 +124,7 @@ class GenerationController extends StateNotifier<GenerationState> {
     final generator = _ref.read(lessonGeneratorProvider);
 
     // Start listening to the stream
-    _subscription = generator.generateSection(request, section, plan).listen(
+    _subscription = generator.generateSection(request, section, plan, gradeLabel: gradeLabel).listen(
       _handleRegenerationEvent,
       onError: (error, stackTrace) {
         state = state.copyWith(
