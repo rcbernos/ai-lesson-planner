@@ -90,6 +90,33 @@ class PlanRepository {
     await _db.deleteLessonPlan(id);
   }
 
+  /// Updates an existing lesson plan in the database.
+  /// Rewrites ilawContent and keeps title, gradeLevel, subject and updatedAt
+  /// in step with the plan. Preserves original createdAt.
+  Future<bool> update(int id, lp.LessonPlan plan) async {
+    final title = _generateTitle(plan);
+    final gradeLevel = _extractGradeLevel(plan);
+    final subject = plan.header.learningArea;
+
+    // Use update with companion to only update specified fields,
+    // preserving createdAt from the original record
+    final affectedRows = await (_db.update(_db.lessonPlans)
+          ..where((t) => t.id.equals(id)))
+        .write(
+      LessonPlansCompanion(
+        title: Value(title),
+        gradeLevel: Value(gradeLevel),
+        subject: Value(subject),
+        ilawContent: Value(jsonEncode(plan.toJson())),
+        status: const Value('saved'),
+        updatedAt: Value(DateTime.now()),
+        // createdAt is not set, so it's preserved
+      ),
+    );
+
+    return affectedRows > 0;
+  }
+
   /// Generates a title from plan metadata.
   /// Format: "Grades {min}-{max} {Subject} - {SubTheme}"
   String _generateTitle(lp.LessonPlan plan) {

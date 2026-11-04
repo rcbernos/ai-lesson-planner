@@ -35,11 +35,16 @@ class FlowTable extends StatelessWidget {
       for (int i = 0; i < gradeLabels.length; i++)
         (i + 3): const FixedColumnWidth(180),
       for (int i = 0; i < gradeLabels.length; i++)
-        (gradeLabels.length + 3 + i): const FixedColumnWidth(40), // Refresh icon column
+        (gradeLabels.length + 3 + i):
+            const FixedColumnWidth(40), // Refresh icon column
     };
 
     // Calculate total width for the SizedBox wrapper
-    final totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 180.0) + (gradeLabels.length * 40.0);
+    final totalWidth = 55.0 +
+        110.0 +
+        80.0 +
+        (gradeLabels.length * 180.0) +
+        (gradeLabels.length * 40.0);
 
     // Build header row: Minutes, Stage, Whole-class, then one column per grade + refresh icons
     final headerCells = [
@@ -59,14 +64,14 @@ class FlowTable extends StatelessWidget {
             child: Text(label, style: TextStyle(fontWeight: FontWeight.bold))),
       for (final label in gradeLabels)
         Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: onRegenerate != null
-                ? IconButton(
-                    icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
-                    tooltip: 'Regenerate activities for $label',
-                    onPressed: () => _showRegenerateConfirm(context, label),
-                  )
-                : const SizedBox(width: 8),
+          padding: const EdgeInsets.all(8.0),
+          child: onRegenerate != null
+              ? IconButton(
+                  icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                  tooltip: 'Regenerate activities for $label',
+                  onPressed: () => _showRegenerateConfirm(context, label),
+                )
+              : const SizedBox(width: 8),
         ),
     ];
 
@@ -130,9 +135,7 @@ class FlowTable extends StatelessWidget {
       for (final grade in gradeLabels) {
         children.add(_buildCell(
           context,
-          onRegenerate != null
-              ? Icons.refresh
-              : null,
+          onRegenerate != null ? Icons.refresh : null,
           icon: true,
           onTap: onRegenerate != null && !stage.wholeClass
               ? () => _showRegenerateConfirm(context, grade)
@@ -201,8 +204,9 @@ class FlowTable extends StatelessWidget {
           child: icon
               ? (content != null
                   ? Icon(content as IconData,
-                      color:
-                          content == Icons.group_work ? Colors.green : Colors.blue,
+                      color: content == Icons.group_work
+                          ? Colors.green
+                          : Colors.blue,
                       size: 16)
                   : const SizedBox.shrink())
               : Text(content.toString(), textAlign: TextAlign.center),

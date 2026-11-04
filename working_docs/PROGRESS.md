@@ -12,5 +12,6 @@
 - T2.11 Complete: `validation_panel.dart` with summary and expandable issue list. Tests: 100 pass.
 - T2.12 Complete: `regenerateSection` in GenerationController, `currentLanguageProvider`, refresh icons on SectionBanners. Tests: 103 pass.
 - T2.13 Complete: `gradeLabel` param in `regenerateSection()`, refresh buttons in FlowTable (header + cells), `onRegenerate` callback in AssessmentSection/WaysForwardSection. Tests: 107 pass.
+- T2.14 Complete: `PlanRepository.update()`, library opens in PlanWorkspace with savedId, Save/ Update as Copy logic. Tests: 107 pass.
 
-## Next: T2.14 - Open, edit and re-save library plans
+## Next: T2.15 - Migration test harness

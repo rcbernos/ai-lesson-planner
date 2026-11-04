@@ -56,17 +56,17 @@ void main() {
       );
       await tester.pumpAndSettle();
       final refreshButtons = find.byIcon(Icons.refresh);
-      
+
       // Tap the first refresh button (should be a header button)
       await tester.tap(refreshButtons.first);
       await tester.pumpAndSettle();
-      
+
       // Should show confirmation dialog
       expect(find.text('Regenerate Cell'), findsOneWidget);
-      
+
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
-      
+
       expect(capturedGrade, isNull);
     });
   });

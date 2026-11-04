@@ -4,7 +4,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
 import 'package:ai_lesson_planner/core/validation/validation_issue.dart';
 import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
@@ -44,8 +43,14 @@ class PlanWorkspace extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.save),
             tooltip: 'Save Plan',
-            onPressed: () => _savePlan(context, ref, plan, errorCount),
+            onPressed: () => _savePlan(context, ref, state, errorCount),
           ),
+          if (state.savedId != null)
+            IconButton(
+              icon: const Icon(Icons.content_copy),
+              tooltip: 'Save as Copy',
+              onPressed: () => _saveAsCopy(context, ref, state),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -84,28 +89,73 @@ class PlanWorkspace extends ConsumerWidget {
     );
   }
 
-  void _savePlan(
-      BuildContext context, WidgetRef ref, LessonPlan plan, int errorCount) {
+  void _savePlan(BuildContext context, WidgetRef ref, PlanEditorState state,
+      int errorCount) {
+    final plan = state.plan;
+    final savedId = state.savedId;
+    final repository = ref.read(planRepositoryProvider);
+
+    if (savedId != null) {
+      // Update existing plan
+      repository.update(savedId, plan).then((success) {
+        if (!context.mounted) return;
+
+        ref.read(planEditorProvider.notifier).markSaved(savedId);
+
+        if (errorCount > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Saved with $errorCount errors')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Plan saved successfully!')),
+          );
+        }
+      }).catchError((error) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Save failed: $error')),
+        );
+      });
+    } else {
+      // Insert new plan
+      repository.savePlan(plan).then((id) {
+        if (!context.mounted) return;
+
+        ref.read(planEditorProvider.notifier).markSaved(id);
+
+        if (errorCount > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Saved with $errorCount errors')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Plan saved successfully!')),
+          );
+        }
+      }).catchError((error) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Save failed: $error')),
+        );
+      });
+    }
+  }
+
+  void _saveAsCopy(BuildContext context, WidgetRef ref, PlanEditorState state) {
+    final plan = state.plan;
     final repository = ref.read(planRepositoryProvider);
 
     repository.savePlan(plan).then((id) {
       if (!context.mounted) return;
 
-      ref.read(planEditorProvider.notifier).markSaved(id);
-
-      if (errorCount > 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Saved with $errorCount errors')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Plan saved successfully!')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Copy saved successfully!')),
+      );
     }).catchError((error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $error')),
+        SnackBar(content: Text('Save as copy failed: $error')),
       );
     });
   }
