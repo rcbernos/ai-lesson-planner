@@ -5,12 +5,14 @@ library;
 import 'dart:async';
 import 'dart:math';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
+import 'package:ai_lesson_planner/core/models/plan_section_patch.dart';
 import 'lesson_generator.dart';
 
 /// Mock implementation that simulates streaming generation with delays.
 class MockLessonGenerator implements LessonGenerator {
   final Random _random = Random();
   bool _isCancelled = false;
+  int _variantCounter = 0;
 
   @override
   Stream<GenerationEvent> generate(GenerationRequest request) async* {
@@ -47,7 +49,117 @@ class MockLessonGenerator implements LessonGenerator {
 
     // Final: complete plan (only if not cancelled)
     if (!_isCancelled) {
+      _isCancelled = false; // Reset for reuse
       yield GenerationCompleted(_buildPlan(request));
+    }
+  }
+
+  @override
+  Stream<GenerationEvent> generateSection(
+    GenerationRequest request,
+    PlanSection section,
+    LessonPlan current, {
+    String? gradeLabel,
+  }) async* {
+    if (_isCancelled) return;
+
+    yield SectionStarted(section.eventName);
+
+    // Build a fresh plan and apply the section replacement
+    final freshPlan = _buildPlan(request);
+    final mergedPlan =
+        current.replaceSection(section, freshPlan, gradeLabel: gradeLabel);
+
+    // Apply variant marker for visibility
+    final variantPlan = _applyVariantMarker(mergedPlan, section, gradeLabel);
+
+    await _simulateDelay();
+    if (_isCancelled) return;
+
+    yield SectionCompleted(section.eventName);
+
+    if (!_isCancelled) {
+      _isCancelled = false; // Reset for reuse
+      yield GenerationCompleted(variantPlan);
+    }
+  }
+
+  /// Applies a "(variant N)" marker to generated content for visibility.
+  LessonPlan _applyVariantMarker(
+      LessonPlan plan, PlanSection section, String? gradeLabel) {
+    final variant = _variantCounter++;
+    final suffix = ' (variant $variant)';
+
+    switch (section) {
+      case PlanSection.header:
+        return plan; // Header never changes
+
+      case PlanSection.intentions:
+        if (gradeLabel != null) {
+          final newGrades = plan.grades.map((g) {
+            if (g.gradeLabel == gradeLabel) {
+              return g.copyWith(
+                objectives: g.objectives.map((o) => '$o$suffix').toList(),
+              );
+            }
+            return g;
+          }).toList();
+          return plan.copyWith(grades: newGrades);
+        }
+        final newGoals = plan.bothGradesObjective + suffix;
+        return plan.copyWith(bothGradesObjective: newGoals);
+
+      case PlanSection.learningExperiences:
+        final newFlow = plan.flow.asMap().values.map((s) {
+          final newActivityByGrade =
+              Map<String, String>.from(s.activityByGrade);
+          if (gradeLabel != null &&
+              newActivityByGrade.containsKey(gradeLabel)) {
+            newActivityByGrade[gradeLabel] =
+                '${newActivityByGrade[gradeLabel]}$suffix';
+          } else if (gradeLabel == null) {
+            newActivityByGrade.updateAll((k, v) => '$v$suffix');
+          }
+          return s.copyWith(activityByGrade: newActivityByGrade);
+        }).toList();
+        return plan.copyWith(flow: newFlow);
+
+      case PlanSection.assessment:
+        final newAssessments = plan.assessments.map((a) {
+          if (gradeLabel != null && a.gradeLabel == gradeLabel) {
+            return a.copyWith(
+              formative: '${a.formative}$suffix',
+              exitTask: '${a.exitTask}$suffix',
+            );
+          }
+          if (gradeLabel == null) {
+            return a.copyWith(
+              formative: '${a.formative}$suffix',
+              exitTask: '${a.exitTask}$suffix',
+            );
+          }
+          return a;
+        }).toList();
+        return plan.copyWith(assessments: newAssessments);
+
+      case PlanSection.waysForward:
+        final newWaysForward = plan.waysForward.map((w) {
+          if (gradeLabel != null && w.gradeLabel == gradeLabel) {
+            return w.copyWith(
+              remediation: '${w.remediation}$suffix',
+              enrichment: '${w.enrichment}$suffix',
+            );
+          }
+          return w;
+        }).toList();
+        final newReflections = plan.reflectionQuestions.map((r) {
+          if (r.gradeLabel == gradeLabel) {
+            return r.copyWith(text: '${r.text}$suffix');
+          }
+          return r;
+        }).toList();
+        return plan.copyWith(
+            waysForward: newWaysForward, reflectionQuestions: newReflections);
     }
   }
 

@@ -24,4 +24,8 @@
 - `replaceSection` extension for regeneration; supports full sections and grade slices.
 - 72 tests pass; files: plan_section_patch.dart, plan_section_patch_test.dart.
 
-Next: T2.5 generateSection on the generator interface
+### T2.5 Complete
+- Added `generateSection` to LessonGenerator interface and MockLessonGenerator.
+- Added `GenerationRequest.fromPlan` factory to build requests from existing plans.
+- Mock appends "(variant N)" markers for visibility during regeneration.
+- 73 tests pass.

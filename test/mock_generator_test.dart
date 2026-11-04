@@ -418,6 +418,67 @@ void main() {
             reason: 'Assessment $i competencyIndex mismatch');
       }
     });
+
+    test('GenerationRequest.fromPlan builds correct request', () async {
+      final plan = LessonPlan(
+        header: PlanHeader(
+          school: 'School',
+          teacher: 'Teacher',
+          learningArea: 'Science',
+          date: '2026-01-15',
+          term: 'Term 1',
+          sessions: 1,
+          sessionMinutes: 90,
+          multigradeModel: 'STDT',
+        ),
+        grades: [
+          GradeBlock(
+            gradeLabel: 'Grade 3',
+            learnersMale: 5,
+            learnersFemale: 5,
+            subTheme: 'Theme',
+            contentStandard: 'Standard',
+            performanceStandard: 'Performance',
+            competencies: ['Comp 1', 'Comp 2'],
+            objectives: ['Obj 1', 'Obj 2'],
+          ),
+          GradeBlock(
+            gradeLabel: 'Grade 4',
+            learnersMale: 4,
+            learnersFemale: 4,
+            subTheme: 'Theme',
+            contentStandard: 'Standard',
+            performanceStandard: 'Performance',
+            competencies: ['Comp 3'],
+            objectives: ['Obj 3'],
+          ),
+        ],
+        sharedSubTheme: 'Theme',
+        bothGradesObjective: 'Both',
+        learnerContext: 'Context',
+        materials: ['M'],
+        references: ['R'],
+        flow: [],
+        assessments: [],
+        reflectionQuestions: [],
+        waysForward: [],
+        notesNextSession: 'Next',
+        preparedBy: 'Teacher',
+        checkedBy: 'Checker',
+        aiUseDeclaration: defaultAiUseDeclaration,
+      );
+
+      final request = GenerationRequest.fromPlan(plan, OutputLanguage.english);
+
+      expect(request.header, equals(plan.header));
+      expect(request.sharedSubTheme, equals('Theme'));
+      expect(request.language, equals(OutputLanguage.english));
+      expect(request.grades.length, equals(2));
+      expect(request.grades[0].gradeLabel, equals('Grade 3'));
+      expect(request.grades[0].competency, equals('Comp 1; Comp 2'));
+      expect(request.grades[1].gradeLabel, equals('Grade 4'));
+      expect(request.grades[1].competency, equals('Comp 3'));
+    });
   });
 }
 
