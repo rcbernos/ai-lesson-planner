@@ -8,6 +8,7 @@ import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
 import 'package:ai_lesson_planner/core/validation/validation_issue.dart';
 import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
+import 'package:ai_lesson_planner/features/plan_view/validation_panel.dart';
 import 'package:ai_lesson_planner/features/plan_editor/plan_editor_state.dart';
 
 /// Workspace widget that displays an editable lesson plan.
@@ -47,17 +48,18 @@ class PlanWorkspace extends ConsumerWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _buildIndicatorBar(context, state),
-          Expanded(
-            child: IlawPlanView(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const ValidationPanel(),
+            _buildIndicatorBar(context, state),
+            IlawPlanView(
               plan: plan,
               onChange: (updater) =>
                   ref.read(planEditorProvider.notifier).update(updater),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

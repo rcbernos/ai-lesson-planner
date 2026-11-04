@@ -20,4 +20,10 @@
 - Removed old _buildPlanView and _savePlan methods from generator_screen.dart.
 - Tests: 98 tests pass (added 5 new tests).
 
-## Next: T2.11 - Validation panel
+### T2.11 Complete
+- Created `validation_panel.dart` with a ValidationPanel widget showing error/warning summary and expandable issue list.
+- Panel grouped issues by section using ExpansionTile for each section.
+- Updated PlanWorkspace to wrap content in SingleChildScrollView for proper scrolling.
+- Tests: 100 tests pass (added 2 new tests).
+
+## Next: T2.12 - Regenerate a section
