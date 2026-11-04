@@ -57,7 +57,11 @@ class IlawPlanView extends StatelessWidget {
         const SectionBanner(PlanSection.intentions),
         _intentionsSection(context),
         const SectionBanner(PlanSection.learningExperiences),
-        FlowTable(flow: plan.flow, gradeLabels: grades),
+        FlowTable(
+          flow: plan.flow,
+          gradeLabels: grades,
+          onChange: onChange,
+        ),
         const SectionBanner(PlanSection.assessment),
         _assessmentsSection(),
         const SectionBanner(PlanSection.waysForward),

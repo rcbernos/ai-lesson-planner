@@ -45,3 +45,11 @@
 - New files: plan_sections.dart (33 lines), assessment_tables.dart (163 lines) - both under 250.
 - Note: ilaw_plan_view.dart is 382 lines - needs split card to move private widget methods to section files.
 - 81 tests pass.
+
+### T2.8 Complete
+- Created cell_edit_dialog.dart with showCellEditDialog function for text/numeric input.
+- Modified FlowTable to accept onChange callback for cell editing.
+- Added _buildCell and _editField helpers for interactive cells.
+- Taps on minutes, stage name, whole-class activity, and grade activities open editable dialogs.
+- Numeric input validation rejects non-integers with error message.
+- 85 tests pass.
