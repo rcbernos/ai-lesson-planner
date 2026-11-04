@@ -14,12 +14,10 @@
 - Added Edit button to ilaw_plan_view.dart's section banners for I, L, A, W sections.
 - Tests: 97 tests pass.
 
-**Note:** `lib/features/plan_view/plan_sections.dart` is ~630 lines, exceeding the 250 line limit. The human should add a split card to separate the editable classes into: HeaderSection + IntentionsSectionWidget + MaterialsSection; AssessmentSection + WaysForwardSection; ReflectionSection + FooterSection + NotesSection.
+### T2.10 Complete
+- Created `plan_workspace.dart` with PlanWorkspace widget showing Save, Undo buttons and "Unsaved changes" chip.
+- Modified `generator_screen.dart` to load plan into planEditorProvider and show PlanWorkspace after generation.
+- Removed old _buildPlanView and _savePlan methods from generator_screen.dart.
+- Tests: 98 tests pass (added 5 new tests).
 
-### T2.8 Complete (re-run for full count)
-- Created cell_edit_dialog.dart with showCellEditDialog function.
-- Modified FlowTable to accept onChange callback.
-- Numeric input validation in place.
-- 97 tests pass.
-
-## Next: T2.10 - Wire the editor to the generator screen
+## Next: T2.11 - Validation panel
