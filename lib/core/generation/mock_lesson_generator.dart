@@ -244,7 +244,7 @@ class MockLessonGenerator implements LessonGenerator {
     for (final g in grades) {
       questions.add(ReflectionQuestion(
         gradeLabel: g.gradeLabel,
-        text: 'Ano ang natutuhan sa $_firstWord(sharedSubTheme)?',
+        text: 'Ano ang natutuhan sa ${_firstWord(sharedSubTheme)}?',
       ));
     }
     questions
