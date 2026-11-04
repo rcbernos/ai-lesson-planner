@@ -2,7 +2,9 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
+import 'package:ai_lesson_planner/core/providers.dart';
 import 'flow_table.dart';
 import 'plan_sections.dart'; // for PlanChange typedef
 
@@ -42,33 +44,97 @@ class SectionBanner extends StatelessWidget {
   }
 }
 
-class IlawPlanView extends StatelessWidget {
+class IlawPlanView extends ConsumerWidget {
   const IlawPlanView({required this.plan, this.onChange, super.key});
   final LessonPlan plan;
   final PlanChange? onChange;
 
   List<String> get grades => plan.grades.map((g) => g.gradeLabel).toList();
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEditable = onChange != null;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _header(),
-        const SectionBanner(PlanSection.intentions),
+        SectionBanner(
+          PlanSection.intentions,
+          actions: isEditable
+              ? [_buildRegenerateButton(context, ref, PlanSection.intentions)]
+              : [],
+        ),
         _intentionsSection(context),
-        const SectionBanner(PlanSection.learningExperiences),
+        SectionBanner(
+          PlanSection.learningExperiences,
+          actions: isEditable
+              ? [
+                  _buildRegenerateButton(
+                      context, ref, PlanSection.learningExperiences)
+                ]
+              : [],
+        ),
         FlowTable(
           flow: plan.flow,
           gradeLabels: grades,
           onChange: onChange,
         ),
-        const SectionBanner(PlanSection.assessment),
+        SectionBanner(
+          PlanSection.assessment,
+          actions: isEditable
+              ? [_buildRegenerateButton(context, ref, PlanSection.assessment)]
+              : [],
+        ),
         _assessmentsSection(),
-        const SectionBanner(PlanSection.waysForward),
+        SectionBanner(
+          PlanSection.waysForward,
+          actions: isEditable
+              ? [_buildRegenerateButton(context, ref, PlanSection.waysForward)]
+              : [],
+        ),
         _waysForwardSection(),
         _reflectionSection(),
         _footer(),
       ]),
+    );
+  }
+
+  /// Builds a refresh button for regenerating a section.
+  Widget _buildRegenerateButton(
+      BuildContext context, WidgetRef ref, PlanSection section) {
+    return IconButton(
+      icon: const Icon(Icons.refresh),
+      tooltip: 'Regenerate ${section.eventName}',
+      onPressed: () => _showRegenerateConfirmation(context, ref, section),
+    );
+  }
+
+  /// Shows confirmation dialog before regenerating a section.
+  void _showRegenerateConfirmation(
+      BuildContext context, WidgetRef ref, PlanSection section) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Regenerate Section'),
+        content:
+            const Text('This replaces your edits in this section. Continue?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              ref
+                  .read(generationControllerProvider.notifier)
+                  .regenerateSection(section);
+            },
+            child: const Text('Regenerate'),
+          ),
+        ],
+      ),
     );
   }
 
