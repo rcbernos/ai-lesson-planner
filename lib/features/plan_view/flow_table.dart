@@ -25,8 +25,10 @@ class FlowTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool hasRegen = onRegenerate != null;
+
     // Build explicit fixed widths for every column
-    // Add width for refresh icon column at the end
+    // Only add refresh icon columns when onRegenerate is provided
     final columnWidths = <int, TableColumnWidth>{
       0: const FixedColumnWidth(55), // Minutes column
       1: const FixedColumnWidth(110), // Stage name column
@@ -34,19 +36,19 @@ class FlowTable extends StatelessWidget {
       // Give each grade column a guaranteed minimum width (e.g., 180px)
       for (int i = 0; i < gradeLabels.length; i++)
         (i + 3): const FixedColumnWidth(180),
-      for (int i = 0; i < gradeLabels.length; i++)
-        (gradeLabels.length + 3 + i):
-            const FixedColumnWidth(40), // Refresh icon column
+      // Refresh icon columns only when regeneration is enabled
+      if (hasRegen)
+        for (int i = 0; i < gradeLabels.length; i++)
+          (gradeLabels.length + 3 + i): const FixedColumnWidth(40),
     };
 
     // Calculate total width for the SizedBox wrapper
-    final totalWidth = 55.0 +
-        110.0 +
-        80.0 +
-        (gradeLabels.length * 180.0) +
-        (gradeLabels.length * 40.0);
+    double totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 180.0);
+    if (hasRegen) {
+      totalWidth += gradeLabels.length * 40.0;
+    }
 
-    // Build header row: Minutes, Stage, Whole-class, then one column per grade + refresh icons
+    // Build header row: Minutes, Stage, Whole-class, then one column per grade [+ refresh icons]
     final headerCells = [
       const Padding(
           padding: EdgeInsets.all(8.0),
@@ -62,17 +64,17 @@ class FlowTable extends StatelessWidget {
         Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(label, style: TextStyle(fontWeight: FontWeight.bold))),
-      for (final label in gradeLabels)
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: onRegenerate != null
-              ? IconButton(
-                  icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
-                  tooltip: 'Regenerate activities for $label',
-                  onPressed: () => _showRegenerateConfirm(context, label),
-                )
-              : const SizedBox(width: 8),
-        ),
+      // Refresh icon cells only when onRegenerate is provided
+      if (hasRegen)
+        for (final label in gradeLabels)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+              tooltip: 'Regenerate activities for $label',
+              onPressed: () => _showRegenerateConfirm(context, label),
+            ),
+          ),
     ];
 
     // Build data rows
@@ -131,17 +133,19 @@ class FlowTable extends StatelessWidget {
         ));
       }
 
-      // Add refresh icon cells for each grade
-      for (final grade in gradeLabels) {
-        children.add(_buildCell(
-          context,
-          onRegenerate != null ? Icons.refresh : null,
-          icon: true,
-          onTap: onRegenerate != null && !stage.wholeClass
-              ? () => _showRegenerateConfirm(context, grade)
-              : null,
-          isEditable: onRegenerate != null,
-        ));
+      // Add refresh icon cells for each grade (only when onRegenerate is provided)
+      if (hasRegen) {
+        for (final grade in gradeLabels) {
+          children.add(_buildCell(
+            context,
+            Icons.refresh,
+            icon: true,
+            onTap: !stage.wholeClass
+                ? () => _showRegenerateConfirm(context, grade)
+                : null, // Whole-class stages don't have per-grade refresh
+            isEditable: true,
+          ));
+        }
       }
 
       rows.add(TableRow(children: children));
