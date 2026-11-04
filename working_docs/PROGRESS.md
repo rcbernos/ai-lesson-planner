@@ -27,3 +27,8 @@ Next: T2.2 Model: competency references (D13)
 - Bumped `currentSchemaVersion` to 2; v1 JSON loads with empty/null defaults
 - Mock populates comp indices: empty for whole-class stages, index 0 for each grade
 - 58 tests pass; no issues in modified files
+
+### T2.3 Complete
+- Created validation framework with stable issue codes (header.required, grades.count, flow.minutes_sum, etc.)
+- Split validator into 7 files under 250 lines each (header_validator, grades_validator, flow_validator, assessment_validator, ways_forward_validator, intentions_validator, validation_issue)
+- Validates all rules: header, grades, intentions, flow, assessment, ways forward, reflection, declaration
