@@ -7,6 +7,7 @@ import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
 import 'flow_table.dart'; // for RegenCallback typedef
 import 'plan_sections.dart'; // for PlanChange typedef
+import 'header_table.dart' as header;
 
 // Reference ILAW banner colors (from reference DLPs)
 const Color _bannerNavy = Color(0xFF1F3864); // Intentions (I)
@@ -73,7 +74,7 @@ class IlawPlanView extends ConsumerWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        _header(),
+        header.HeaderSection(plan: plan, onChange: onChange),
         SectionBanner(
           PlanSection.intentions,
           actions: isEditable
@@ -152,87 +153,6 @@ class IlawPlanView extends ConsumerWidget {
       ),
     );
   }
-
-  Widget _header() => Card(
-      child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(children: [
-            // Row 1: School and Teacher
-            Row(children: [
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('School',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.school),
-                  ])),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Teacher',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.teacher),
-                  ])),
-            ]),
-            const SizedBox(height: 12),
-            // Row 2: Learning Area, Date, Term
-            Row(children: [
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Learning Area',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.learningArea),
-                  ])),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Date',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.date),
-                  ])),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Term',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.term),
-                  ])),
-            ]),
-            const SizedBox(height: 12),
-            // Row 3: Sessions, Session Minutes, Multigrade Model
-            Row(children: [
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Sessions',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('${plan.header.sessions}'),
-                  ])),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Session Minutes',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('${plan.header.sessionMinutes}'),
-                  ])),
-              Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    Text('Multigrade Model',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text(plan.header.multigradeModel),
-                  ])),
-            ]),
-          ])));
 
   Widget _intentionsSection(BuildContext context) {
     final brightness = Theme.of(context).brightness;

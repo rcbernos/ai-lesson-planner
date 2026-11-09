@@ -16,6 +16,7 @@
 - T2.14 Complete: `PlanRepository.update()`, library opens in PlanWorkspace with savedId, Save/ Update as Copy logic. Tests: 107 pass.
 - T2.14.2 Complete: Added `gradeLevels` to PlanHeader, `language` and `preparedByRole`/`checkedByRole` to LessonPlan, restructured `materials` from List to Materials object with items/references. Schema version bumped to 3 with backward compatibility. Tests: 107 pass.
 - T2.14.3 Complete: Updated SectionBanner to full-width filled bars with reference colors (navy #1F3864, green #2E6B2E, brown #8C5A1E, maroon #7A2048), labels changed to uppercase format ("I  INTENTIONS", "L  LEARNING EXPERIENCE", "A  ASSESSMENT", "W  WAYS FORWARD"). Added tests for banner colors and label format. Tests: 108 pass.
+- T2.14.4 Complete: Created header_table.dart with 4-column table layout (School, Teacher; Grade Levels, Learning Area; Teaching Date, Term; Time/Sessions, No. of Learners; Multigrade Model spanning right columns). Added title "DAILY LESSON PLAN FOR GRADE {gradeLevels}". Labels use navy #1F3864 with white bold text. Tap-to-edit via showCellEditDialog. Tests: 108 pass.
 - Fix: Riverpod error when loading generated plan - changed `build()` to use `ref.listen()` instead of modifying provider state during widget tree building.
 - Fix: Reflection questions showing closure syntax - fixed string interpolation in mock generator `${_firstWord(sharedSubTheme)}`.
 - Fix: Allow monograde plans (minimum 1 grade instead of 2), corrected grade removal validation.
