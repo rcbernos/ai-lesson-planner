@@ -252,6 +252,94 @@ Future<String?> showCellEditDialog(
 **Verify:** by hand: open a saved plan, edit a cell, Save, quit, relaunch, the edit is there; "Save as copy" gives two library rows; the library list shows the updated title or date.
 **Commit:** `feat(ui): edit and re-save plans from the library`
 
+## T2.14.1 Create reference scaffold document
+**Files:** `working_docs/ilaw_ai_scaffold.md` (new)
+**Do:** Create the scaffold file as a reference document for future agents. Include:
+- Document anatomy (title, header table, banners I/L/A/W, sections)
+- JSON skeleton with all required fields matching reference format
+- Prompt scaffolds for LLM generation (shared system block, per-section prompts)
+- Validation rules (V1-V13 for flow, grades, assessments, etc.)
+- Renderer spec with colors (#1F3864 navy, #2E6B2E green, #8C5A1E brown, #7A2048 maroon) and layout specs
+The scaffold captures the expected ILAW DLP structure so UI/LLM work stays aligned.
+**Verify:** File exists with complete structure documentation matching reference format.
+**Commit:** `docs: add ilaw_ai_scaffold.md reference document`
+
+## T2.14.2 Update model with missing ILAW fields
+**Files:** `lib/core/models/lesson_plan.dart`, `lib/core/models/plan_header.dart`, `test/fixtures/sample_plan.dart`
+**Do:** Add fields to match reference JSON skeleton:
+- Add `gradeLevels` field to `PlanHeader` (e.g., "III & IV", roman numerals)
+- Add `language` field to `LessonPlan` ("fil", "en", or "mixed")
+- Restructure `materials` from `List<String>` to object with `items` and `references`
+- Add `preparedByRole` and `checkedByRole` fields to `LessonPlan`
+- Bump `currentSchemaVersion` to 3; update `fromJson` with defaults for older saves
+**Verify:** model compiles, all tests pass, schema version incremented.
+**Commit:** `feat(model): add missing ILAW fields for reference alignment`
+
+## T2.14.3 Fix banner layout and colors
+**Files:** `lib/features/plan_view/ilaw_plan_view.dart`
+**Do:** Update `SectionBanner` widget to match reference:
+- Change from colored dot to full-width filled bar background
+- Colors: I=navy #1F3864, L=green #2E6B2E, A=brown #8C5A1E, W=maroon #7A2048
+- Banner text: "I  INTENTIONS", "L  LEARNING EXPERIENCE" (singular, two spaces)
+**Verify:** banners render as filled bars with correct reference colors.
+**Commit:** `feat(ui): fix section banners to match reference format`
+
+## T2.14.4 Redesign header and add title
+**Files:** `lib/features/plan_view/ilaw_plan_view.dart`
+**Do:**
+- Add title "DAILY LESSON PLAN FOR GRADE {gradeLevels}" centered above all
+- Reorganize header to 4-column label/value table matching reference
+- Include all 9 fields: School, Teacher, Learning Area, Date, Term, Sessions, Session Minutes, Multigrade Model, Grade Levels, No. of Learners
+- Format learner count as: "Gr.3: 6  │  Gr.4: 1 (M-3, F-3) (M-1, F-0)"
+**Verify:** header matches reference 4-column table with title line above.
+**Commit:** `feat(ui): redesign header as 4-column table with title`
+
+## T2.14.5 Restructure Intentions section
+**Files:** `lib/features/plan_view/ilaw_plan_view.dart`
+**Do:** Redesign `_intentionsSection` to match reference:
+- Per-grade subTheme line (bold, tagged "(Grade N)")
+- Standards table with blank corner, grades as columns, rows for Content/Performance Standard
+- Competencies as bullet list, tagged [Grade N]
+- Objectives as bullet list, tagged [Grade N] then [Both Grades]
+**Verify:** intentions section matches reference layout with per-grade breakdown.
+**Commit:** `feat(ui): restructure intentions section for reference alignment`
+
+## T2.14.6 Add Learning Experience materials
+**Files:** `lib/features/plan_view/illaw_plan_view.dart`, `lib/core/models/lesson_plan.dart`
+**Do:** Add to Learning Experience section (L banner):
+- Learner Context paragraph (1-2 paragraphs)
+- Materials (Mga Kagamitan) list from `materials.items`
+- References (Mga Sanggunian) list from `materials.references`
+- Keep Flow Table (but fix whole-class rendering in T2.14.7)
+**Verify:** learning experience shows all three components: context, materials/references, flow.
+**Commit:** `feat(ui): add learner context and materials to learning experience`
+
+## T2.14.7 Fix Flow Table, Assessment and Ways Forward tables
+**Files:** `lib/features/plan_view/flow_table.dart`, `lib/features/plan_view/ilaw_plan_view.dart`
+**Do:** 
+- FlowTable: Remove extra "Whole Class" icon column; time display format "5 min"; merge whole-class cells across grades
+- Assessment: Transpose table (grades as columns, rows Formative/Exit Task/Success Criteria)
+- Ways Forward: Move Reflection Questions before table; transpose (grades as columns, rows Remediation/Enrichment)
+**Verify:** tables match reference orientation with grades in columns
+**Commit:** `feat(ui): transpose assessment and ways forward tables, fix flow table`
+
+## T2.14.8 Add Notes rendering and fix Signatures
+**Files:** `lib/features/plan_view/ilaw_plan_view.dart`
+**Do:**
+- Add NotesSection to IlawPlanView (was existing widget but not rendered)
+- Fix Signatures: two side-by-side blocks, name in caps, role displayed beneath, Remove aiUseDeclaration from view
+**Verify:** notes section visible, signatures match reference layout
+**Commit:** `feat(ui): render notes section, fix signature layout`
+
+## T2.14.9 Code cleanup and consolidation
+**Files:** `lib/features/plan_view/flow_table.dart`, `lib/features/plan_view/plan_sections.dart`, `lib/features/plan_view/cell_edit_dialog.dart`
+**Do:**
+- Remove duplicate `RegenCallback` typedef (keep in plan_sections.dart, export from there)
+- Fix `cell_edit_dialog.dart` numeric error not showing: wrap in `StatefulBuilder`
+- Consolidate IlawPlanView to use plan_sections.dart widgets (HeaderSection, IntentionsSection, AssessmentsSection, WaysForwardSection, FooterSection) where onChange is null (read-only rendering)
+**Verify:** no compilation errors, duplicate typedef removed, dialog error displays correctly
+**Commit:** `refactor(ui): consolidate widgets and fix cell edit dialog`
+
 ### Checkpoint: stop here and test by hand
 Generate a 2-grade plan, break the minutes, see the error, fix it, regenerate a section and a cell, undo, save, reopen from the library, edit and save again. Fix any bugs as separate `fix:` commits before starting Group D.
 
@@ -259,7 +347,7 @@ Generate a 2-grade plan, break the minutes, see the error, fix it, regenerate a 
 
 ## Group D: Database and migrations
 
-## T2.15 Migration test harness **(strong model)**
+## T2.16 Migration test harness **(strong model)**
 **Files:** `test/database/migration_test.dart` (new). Generated and exempt: `drift_schemas/drift_schema_v1.json`, `test/generated_migrations/`.
 **Do:**
 1. Check the current `schemaVersion` in `app_database.dart` (expected 1). Do not change the schema in this card.
@@ -269,7 +357,7 @@ Generate a 2-grade plan, break the minutes, see the error, fix it, regenerate a 
 **Verify:** `flutter test test/database/migration_test.dart` passes; `drift_schemas/` is committed.
 **Commit:** `test(db): migration test harness with v1 schema snapshot`
 
-## T2.16 Schema v2: competency bank, plan-note links, settings **(strong model)**
+## T2.17 Schema v2: competency bank, plan-note links, settings **(strong model)**
 **Files:** `lib/models/database/tables.dart`, `lib/services/database/app_database.dart`, `test/database/migration_test.dart`. Generated and exempt: `app_database.g.dart`, `drift_schemas/drift_schema_v2.json`, `test/generated_migrations/`.
 **Do:** add three tables and bump `schemaVersion` to 2. **Do not change** `LessonPlans`, `ReferenceNotes` or `Bibliography` columns.
 ```
@@ -282,7 +370,7 @@ In `onUpgrade`, `if (from < 2)` create the three tables. Fresh installs create e
 **Verify test:** v1 → v2 keeps existing `LessonPlans`, `ReferenceNotes` and `Bibliography` rows and the new tables exist and are empty; a fresh v2 database passes the same checks. Then by hand: copy your backed-up Phase 1 database into place, launch, and open a saved plan.
 **Commit:** `feat(db): schema v2 with competency bank, plan-note links and settings`
 
-## T2.17 Persist settings
+## T2.18 Persist settings
 **Files:** `lib/services/database/settings_repository.dart` (new), `lib/features/settings/settings_screen.dart`, `test/database/settings_repository_test.dart`.
 **Interface:**
 ```dart
@@ -295,7 +383,7 @@ class SettingsRepository {
 **Verify test:** set then get returns the value; unknown key returns null; setting twice overwrites. By hand: change the language, restart, the form default is still the new language.
 **Commit:** `feat(settings): persist default output language in the database`
 
-## T2.18 Competency bank repository and seed
+## T2.19 Competency bank repository and seed
 **Files:** `lib/services/database/competency_repository.dart` (new), `test/database/competency_repository_test.dart`, `pubspec.yaml` (add `assets/seed/` to assets).
 **Prerequisite (human):** `assets/seed/competencies.json` exists (see Pre-flight). If it doesn't, create it containing only `[]` and say so. **Never write competency text yourself.**
 **Interface:**
@@ -317,13 +405,13 @@ class CompetencyRepository {
 
 ## Group E: Form and references
 
-## T2.19 Competency picker in the form
+## T2.20 Competency picker in the form
 **Files:** `lib/features/generator/grade_input_card.dart`, `lib/features/generator/generator_form_state.dart`, `lib/core/providers.dart`.
 **Do:** replace the competency text field with a Flutter `Autocomplete<String>` backed by `CompetencyRepository.search` (filtered by the form's learning area and this card's grade label; empty results are fine). **Free text always works.** When the typed text isn't in the bank, show a checkbox "Add to my competency bank"; when ticked, add it when the user presses Generate (not while typing). Keep the hybrid controller pattern so typing never loses focus or text.
 **Verify:** widget test: typing part of a seeded competency shows a suggestion, picking it fills the field; typing a new text with the box ticked stores it after Generate (use a fake repository). By hand with 2 and 4 grades.
 **Commit:** `feat(ui): competency picker backed by the bank`
 
-## T2.20 References and plan-note links (repository)
+## T2.21 References and plan-note links (repository)
 **Files:** `lib/services/database/plan_references_repository.dart` (new), `lib/services/database/plan_repository.dart`, `test/database/plan_references_test.dart`.
 **First:** read `lib/models/database/tables.dart` to see the real columns of `Bibliography` and `ReferenceNotes`. Use them as they are.
 **Interface:**
@@ -342,7 +430,7 @@ Update `PlanRepository.delete` to remove that plan's `PlanNoteLinks` rows in the
 **Verify test:** linking twice stores one link; `notesForPlan` returns the linked notes; deleting a plan removes its links but not the notes; `formatCitation` of an entry with a missing field has no placeholder text.
 **Commit:** `feat(db): bibliography search, citations and plan-note links`
 
-## T2.21 References and notes panel
+## T2.22 References and notes panel
 **Files:** `lib/features/plan_view/references_panel.dart` (new), `lib/features/plan_view/plan_workspace.dart`, `lib/core/providers.dart`.
 **Do:** a card below the plan in `PlanWorkspace`, titled "References and notes":
 - Lists `plan.references` with edit (reuse `showCellEditDialog`) and remove.
@@ -355,7 +443,7 @@ The panel only prints what the teacher chose; nothing here goes to a model (H7).
 
 ---
 
-## T2.22 Hardening and close-out
+## T2.23 Hardening and close-out
 **Files:** `working_docs/PROGRESS.md` (the rest are bug fixes the human finds, each as its own `fix:` commit).
 **Do (human leads, agent helps):**
 1. Run the **standing manual checks** from section 10 of the master plan.
