@@ -101,7 +101,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find the assessment section banner
-      final assessmentBanner = find.text('A - Assessment');
+      final assessmentBanner = find.text('A  ASSESSMENT');
       expect(assessmentBanner, findsOneWidget);
     });
   });

@@ -5,10 +5,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
-import 'flow_table.dart';
+import 'flow_table.dart'; // for RegenCallback typedef
 import 'plan_sections.dart'; // for PlanChange typedef
 
+// Reference ILAW banner colors (from reference DLPs)
+const Color _bannerNavy = Color(0xFF1F3864); // Intentions (I)
+const Color _bannerGreen = Color(0xFF2E6B2E); // Learning Experiences (L)
+const Color _bannerBrown = Color(0xFF8C5A1E); // Assessment (A)
+const Color _bannerMaroon = Color(0xFF7A2048); // Ways Forward (W)
+
+// Section banner labels (per reference format)
+const String _labelIntentions = 'I  INTENTIONS';
+const String _labelLearningExperiences = 'L  LEARNING EXPERIENCE';
+const String _labelAssessment = 'A  ASSESSMENT';
+const String _labelWaysForward = 'W  WAYS FORWARD';
+
 /// Section banner widget for ILAW section headers (I, L, A, W).
+/// Displays as a full-width filled bar with reference colors.
 /// Built in IlawPlanView as per spec, with optional actions for future use.
 class SectionBanner extends StatelessWidget {
   const SectionBanner(this.section, {this.actions = const [], super.key});
@@ -18,29 +31,31 @@ class SectionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Map<PlanSection, Color> colors = {
-      PlanSection.intentions: Colors.orange,
-      PlanSection.learningExperiences: Colors.blue,
-      PlanSection.assessment: Colors.green,
-      PlanSection.waysForward: Colors.purple,
+      PlanSection.intentions: _bannerNavy,
+      PlanSection.learningExperiences: _bannerGreen,
+      PlanSection.assessment: _bannerBrown,
+      PlanSection.waysForward: _bannerMaroon,
     };
     final color = colors[section] ?? Colors.grey;
     final Map<PlanSection, String> labels = {
-      PlanSection.intentions: 'I - Intentions',
-      PlanSection.learningExperiences: 'L - Learning Experiences',
-      PlanSection.assessment: 'A - Assessment',
-      PlanSection.waysForward: 'W - Ways Forward',
+      PlanSection.intentions: _labelIntentions,
+      PlanSection.learningExperiences: _labelLearningExperiences,
+      PlanSection.assessment: _labelAssessment,
+      PlanSection.waysForward: _labelWaysForward,
     };
 
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(children: [
-          Icon(Icons.circle, color: color, size: 16),
-          const SizedBox(width: 8),
-          Text(labels[section] ?? section.name,
-              style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-          const Spacer(),
-          ...actions,
-        ]));
+    return Container(
+      width: double.infinity,
+      color: color,
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(children: [
+        Text(labels[section] ?? section.name,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.white)),
+        const Spacer(),
+        ...actions,
+      ]),
+    );
   }
 }
 
