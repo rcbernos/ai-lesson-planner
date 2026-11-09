@@ -443,7 +443,7 @@ The panel only prints what the teacher chose; nothing here goes to a model (H7).
 
 ---
 
-## T2.23 Hardening and close-out
+## T2.22 Hardening and close-out
 **Files:** `working_docs/PROGRESS.md` (the rest are bug fixes the human finds, each as its own `fix:` commit).
 **Do (human leads, agent helps):**
 1. Run the **standing manual checks** from section 10 of the master plan.
