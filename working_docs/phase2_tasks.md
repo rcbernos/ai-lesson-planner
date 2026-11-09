@@ -285,13 +285,20 @@ The scaffold captures the expected ILAW DLP structure so UI/LLM work stays align
 **Commit:** `feat(ui): fix section banners to match reference format`
 
 ## T2.14.4 Redesign header and add title
-**Files:** `lib/features/plan_view/ilaw_plan_view.dart`
+**Files:** `lib/features/plan_view/header_table.dart` (new), `lib/features/plan_view/ilaw_plan_view.dart`
 **Do:**
 - Add title "DAILY LESSON PLAN FOR GRADE {gradeLevels}" centered above all
-- Reorganize header to 4-column label/value table matching reference
-- Include all 9 fields: School, Teacher, Learning Area, Date, Term, Sessions, Session Minutes, Multigrade Model, Grade Levels, No. of Learners
-- Format learner count as: "Gr.3: 6  │  Gr.4: 1 (M-3, F-3) (M-1, F-0)"
-**Verify:** header matches reference 4-column table with title line above.
+- Create 4-column, 5-row table layout per reference:
+  - Row 1: School | schoolValue | Grade Levels | gradeLevelsValue
+  - Row 2: Teacher | teacherValue | Learning Area | learningAreaValue
+  - Row 3: Teaching Date | dateValue | Quarter/Term | termValue
+  - Row 4: Time / Sessions | "{n} session{n}s, {m} minutes" | No. of Learners | "Gr.3: 6  │  Gr.4: 1 (M-3, F-3)"
+  - Row 5: Multigrade Model spanning columns 2-4
+- Label cells: navy #1F3864, white bold text; value cells plain
+- Grade Levels: use header.gradeLevels (derive roman numerals if empty)
+- Learner count: format from male/female counts, shorten "Grade 3" to "Gr.3"
+- Keep tap-to-edit via showCellEditDialog when onChange != null (learner counts read-only for now)
+**Verify:** header matches reference 4-column table with title line above
 **Commit:** `feat(ui): redesign header as 4-column table with title`
 
 ## T2.14.5 Restructure Intentions section
@@ -305,7 +312,7 @@ The scaffold captures the expected ILAW DLP structure so UI/LLM work stays align
 **Commit:** `feat(ui): restructure intentions section for reference alignment`
 
 ## T2.14.6 Add Learning Experience materials
-**Files:** `lib/features/plan_view/illaw_plan_view.dart`, `lib/core/models/lesson_plan.dart`
+**Files:** `lib/features/plan_view/ilaw_plan_view.dart`, `lib/core/models/lesson_plan.dart`
 **Do:** Add to Learning Experience section (L banner):
 - Learner Context paragraph (1-2 paragraphs)
 - Materials (Mga Kagamitan) list from `materials.items`
@@ -443,7 +450,7 @@ The panel only prints what the teacher chose; nothing here goes to a model (H7).
 
 ---
 
-## T2.22 Hardening and close-out
+## T2.23 Hardening and close-out
 **Files:** `working_docs/PROGRESS.md` (the rest are bug fixes the human finds, each as its own `fix:` commit).
 **Do (human leads, agent helps):**
 1. Run the **standing manual checks** from section 10 of the master plan.
