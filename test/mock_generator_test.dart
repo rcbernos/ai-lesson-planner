@@ -456,8 +456,10 @@ void main() {
         sharedSubTheme: 'Theme',
         bothGradesObjective: 'Both',
         learnerContext: 'Context',
-        materials: ['M'],
-        references: ['R'],
+        materials: Materials(
+          items: ['M'],
+          references: ['R'],
+        ),
         flow: [],
         assessments: [],
         reflectionQuestions: [],

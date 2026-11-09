@@ -11,6 +11,7 @@ class PlanHeader {
     required this.sessions,
     required this.sessionMinutes,
     required this.multigradeModel,
+    this.gradeLevels = '',
   });
 
   final String school;
@@ -21,6 +22,7 @@ class PlanHeader {
   final int sessions;
   final int sessionMinutes;
   final String multigradeModel;
+  final String gradeLevels;
 
   Map<String, dynamic> toJson() => {
         'school': school,
@@ -31,6 +33,7 @@ class PlanHeader {
         'sessions': sessions,
         'sessionMinutes': sessionMinutes,
         'multigradeModel': multigradeModel,
+        'gradeLevels': gradeLevels,
       };
 
   factory PlanHeader.fromJson(Map<String, dynamic> json) => PlanHeader(
@@ -42,6 +45,7 @@ class PlanHeader {
         sessions: json['sessions'] as int,
         sessionMinutes: json['sessionMinutes'] as int,
         multigradeModel: json['multigradeModel'] as String,
+        gradeLevels: json['gradeLevels'] as String? ?? '',
       );
 
   PlanHeader copyWith({
@@ -53,6 +57,7 @@ class PlanHeader {
     int? sessions,
     int? sessionMinutes,
     String? multigradeModel,
+    String? gradeLevels,
   }) =>
       PlanHeader(
         school: school ?? this.school,
@@ -63,5 +68,6 @@ class PlanHeader {
         sessions: sessions ?? this.sessions,
         sessionMinutes: sessionMinutes ?? this.sessionMinutes,
         multigradeModel: multigradeModel ?? this.multigradeModel,
+        gradeLevels: gradeLevels ?? this.gradeLevels,
       );
 }

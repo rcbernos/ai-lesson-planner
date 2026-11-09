@@ -14,6 +14,7 @@
 - T2.13 Complete: `gradeLabel` param in `regenerateSection()`, refresh buttons in FlowTable (header + cells), `onRegenerate` callback in AssessmentSection/WaysForwardSection. Tests: 107 pass.
 - T2.14.1 Complete: `ilaw_ai_scaffold.md` reference document created with full structure, JSON skeleton, prompt scaffolds, validation rules, and renderer spec.
 - T2.14 Complete: `PlanRepository.update()`, library opens in PlanWorkspace with savedId, Save/ Update as Copy logic. Tests: 107 pass.
+- T2.14.2 Complete: Added `gradeLevels` to PlanHeader, `language` and `preparedByRole`/`checkedByRole` to LessonPlan, restructured `materials` from List to Materials object with items/references. Schema version bumped to 3 with backward compatibility. Tests: 107 pass.
 - Fix: Riverpod error when loading generated plan - changed `build()` to use `ref.listen()` instead of modifying provider state during widget tree building.
 - Fix: Reflection questions showing closure syntax - fixed string interpolation in mock generator `${_firstWord(sharedSubTheme)}`.
 - Fix: Allow monograde plans (minimum 1 grade instead of 2), corrected grade removal validation.

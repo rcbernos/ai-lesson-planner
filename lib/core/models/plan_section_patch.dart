@@ -110,7 +110,7 @@ extension PlanSectionPatch on LessonPlan {
     if (gradeLabel == null) {
       return copyWith(
         learnerContext: source.learnerContext,
-        materials: List.from(source.materials),
+        materials: source.materials,
         flow: _cloneFlowStages(source.flow),
       );
     }

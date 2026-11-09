@@ -200,8 +200,10 @@ class MockLessonGenerator implements LessonGenerator {
       sharedSubTheme: request.sharedSubTheme,
       bothGradesObjective: _objective(request.sharedSubTheme),
       learnerContext: 'Ang mga mag-aaral ay nakatira sa pagitan na kawaranan.',
-      materials: ['Mga larawan', 'Worksheets'],
-      references: ['DepEd Curriculum Guide'],
+      materials: Materials(
+        items: ['Mga larawan', 'Worksheets'],
+        references: ['DepEd Curriculum Guide'],
+      ),
       flow: _buildFlow(header.sessionMinutes, grades),
       assessments: _buildAssessments(grades),
       reflectionQuestions:

@@ -36,6 +36,38 @@ class PlanVersionException implements Exception {
       'Plan version \\$foundVersion is not supported (max: \\$maxVersion).';
 }
 
+/// Instructional materials for a lesson plan.
+class Materials {
+  Materials({
+    this.items = const [],
+    this.references = const [],
+  });
+
+  final List<String> items;
+  final List<String> references;
+
+  Map<String, dynamic> toJson() => {
+        'items': items,
+        'references': references,
+      };
+
+  factory Materials.fromJson(Map<String, dynamic> json) {
+    final items = (json['items'] as List<dynamic>?)?.cast<String>() ?? [];
+    final references =
+        (json['references'] as List<dynamic>?)?.cast<String>() ?? [];
+    return Materials(items: items, references: references);
+  }
+
+  Materials copyWith({
+    List<String>? items,
+    List<String>? references,
+  }) =>
+      Materials(
+        items: items ?? this.items,
+        references: references ?? this.references,
+      );
+}
+
 /// Complete lesson plan following the ILAW DLP format
 class LessonPlan {
   LessonPlan({
@@ -45,7 +77,6 @@ class LessonPlan {
     required this.bothGradesObjective,
     required this.learnerContext,
     required this.materials,
-    required this.references,
     required this.flow,
     required this.assessments,
     required this.reflectionQuestions,
@@ -54,6 +85,9 @@ class LessonPlan {
     required this.preparedBy,
     required this.checkedBy,
     required this.aiUseDeclaration,
+    this.language = 'fil',
+    this.preparedByRole = '',
+    this.checkedByRole = '',
   });
 
   final PlanHeader header;
@@ -61,8 +95,7 @@ class LessonPlan {
   final String sharedSubTheme;
   final String bothGradesObjective;
   final String learnerContext;
-  final List<String> materials;
-  final List<String> references;
+  final Materials materials;
   final List<FlowStage> flow;
   final List<GradeAssessment> assessments;
   final List<ReflectionQuestion> reflectionQuestions;
@@ -71,9 +104,12 @@ class LessonPlan {
   final String preparedBy;
   final String checkedBy;
   final String aiUseDeclaration;
+  final String language;
+  final String preparedByRole;
+  final String checkedByRole;
 
   /// The current schema version for this plan format
-  static const int currentSchemaVersion = 2;
+  static const int currentSchemaVersion = 3;
 
   /// Calculate total minutes from flow stages
   int get totalFlowMinutes =>
@@ -85,8 +121,7 @@ class LessonPlan {
         'sharedSubTheme': sharedSubTheme,
         'bothGradesObjective': bothGradesObjective,
         'learnerContext': learnerContext,
-        'materials': materials,
-        'references': references,
+        'materials': materials.toJson(),
         'flow': flow.map((s) => s.toJson()).toList(),
         'assessments': assessments.map((a) => a.toJson()).toList(),
         'reflectionQuestions':
@@ -96,6 +131,9 @@ class LessonPlan {
         'preparedBy': preparedBy,
         'checkedBy': checkedBy,
         'aiUseDeclaration': aiUseDeclaration,
+        'language': language,
+        'preparedByRole': preparedByRole,
+        'checkedByRole': checkedByRole,
         'schemaVersion': currentSchemaVersion,
       };
 
@@ -104,6 +142,24 @@ class LessonPlan {
     if (schemaVersion > currentSchemaVersion) {
       throw PlanVersionException(schemaVersion, currentSchemaVersion);
     }
+
+    // Handle materials field migration from List<String> to Materials object
+    Materials materials;
+    final materialsValue = json['materials'];
+    if (materialsValue is List<dynamic>) {
+      // Old format: materials is a List<String>
+      final oldMaterials = List<String>.from(materialsValue);
+      final oldReferences =
+          List<String>.from(json['references'] as List<dynamic>? ?? []);
+      materials = Materials(items: oldMaterials, references: oldReferences);
+    } else if (materialsValue is Map<String, dynamic>) {
+      // New format: materials is an object with items and references
+      materials = Materials.fromJson(materialsValue);
+    } else {
+      // Null or unknown format - use empty Materials
+      materials = Materials();
+    }
+
     return LessonPlan(
       header: PlanHeader.fromJson(json['header'] as Map<String, dynamic>),
       grades: (json['grades'] as List<dynamic>)
@@ -112,8 +168,7 @@ class LessonPlan {
       sharedSubTheme: json['sharedSubTheme'] as String,
       bothGradesObjective: json['bothGradesObjective'] as String,
       learnerContext: json['learnerContext'] as String,
-      materials: List<String>.from(json['materials'] as List<dynamic>? ?? []),
-      references: List<String>.from(json['references'] as List<dynamic>? ?? []),
+      materials: materials,
       flow: (json['flow'] as List<dynamic>)
           .map((s) => FlowStage.fromJson(s as Map<String, dynamic>))
           .toList(),
@@ -134,6 +189,9 @@ class LessonPlan {
       preparedBy: json['preparedBy'] as String,
       checkedBy: json['checkedBy'] as String,
       aiUseDeclaration: json['aiUseDeclaration'] as String,
+      language: json['language'] as String? ?? 'fil',
+      preparedByRole: json['preparedByRole'] as String? ?? '',
+      checkedByRole: json['checkedByRole'] as String? ?? '',
     );
   }
 
@@ -143,8 +201,7 @@ class LessonPlan {
     String? sharedSubTheme,
     String? bothGradesObjective,
     String? learnerContext,
-    List<String>? materials,
-    List<String>? references,
+    Materials? materials,
     List<FlowStage>? flow,
     List<GradeAssessment>? assessments,
     List<ReflectionQuestion>? reflectionQuestions,
@@ -153,6 +210,9 @@ class LessonPlan {
     String? preparedBy,
     String? checkedBy,
     String? aiUseDeclaration,
+    String? language,
+    String? preparedByRole,
+    String? checkedByRole,
   }) =>
       LessonPlan(
         header: header ?? this.header,
@@ -161,7 +221,6 @@ class LessonPlan {
         bothGradesObjective: bothGradesObjective ?? this.bothGradesObjective,
         learnerContext: learnerContext ?? this.learnerContext,
         materials: materials ?? this.materials,
-        references: references ?? this.references,
         flow: flow ?? this.flow,
         assessments: assessments ?? this.assessments,
         reflectionQuestions: reflectionQuestions ?? this.reflectionQuestions,
@@ -170,6 +229,9 @@ class LessonPlan {
         preparedBy: preparedBy ?? this.preparedBy,
         checkedBy: checkedBy ?? this.checkedBy,
         aiUseDeclaration: aiUseDeclaration ?? this.aiUseDeclaration,
+        language: language ?? this.language,
+        preparedByRole: preparedByRole ?? this.preparedByRole,
+        checkedByRole: checkedByRole ?? this.checkedByRole,
       );
 }
 

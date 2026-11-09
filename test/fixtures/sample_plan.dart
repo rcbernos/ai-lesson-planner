@@ -16,6 +16,7 @@ LessonPlan createSamplePlan() => LessonPlan(
         sessions: 1,
         sessionMinutes: 90,
         multigradeModel: 'Same Theme, Different Task (STDT)',
+        gradeLevels: 'III & IV',
       ),
       grades: [
         GradeBlock(
@@ -56,11 +57,13 @@ LessonPlan createSamplePlan() => LessonPlan(
           'Nauunawaan ang ulat-panahon at nakapagpapahayag ng ideya.',
       learnerContext:
           'Ang mga mag-aaral ay nakatira sa pamayanang daanan ng bagyo.',
-      materials: [
-        'Mga larawan ng panahon',
-        'Activity sheet',
-      ],
-      references: ['DepEd Curriculum Guide'],
+      materials: Materials(
+        items: [
+          'Mga larawan ng panahon',
+          'Activity sheet',
+        ],
+        references: ['DepEd Curriculum Guide'],
+      ),
       flow: [
         FlowStage(
           minutes: 10,
@@ -161,4 +164,7 @@ LessonPlan createSamplePlan() => LessonPlan(
       preparedBy: 'Maria Santos',
       checkedBy: 'Juan Dela Cruz',
       aiUseDeclaration: defaultAiUseDeclaration,
+      language: 'fil',
+      preparedByRole: 'Classroom Adviser',
+      checkedByRole: 'School Head',
     );
