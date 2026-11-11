@@ -626,6 +626,71 @@ class ReflectionSection extends StatelessWidget {
   }
 }
 
+/// Learning Experience section with learner context, materials, and references.
+class LearningExperienceSectionWidget extends StatelessWidget {
+  const LearningExperienceSectionWidget(
+      {super.key, required this.plan, this.onChange});
+  final LessonPlan plan;
+  final PlanChange? onChange;
+
+  @override
+  Widget build(BuildContext context) {
+    final canEdit = onChange != null;
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const SizedBox(height: 8),
+      const Text('Learner Context (Sang-panitikang Pangkatapat)',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+      const SizedBox(height: 4),
+      GestureDetector(
+        onTap: canEdit
+            ? () async {
+                final r = await showCellEditDialog(context,
+                    title: 'Edit Learner Context',
+                    initial: plan.learnerContext,
+                    maxLines: 8);
+                if (r != null && onChange != null)
+                  onChange!((p) => p.copyWith(learnerContext: r));
+              }
+            : null,
+        child: MouseRegion(
+          cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            color: canEdit ? Theme.of(context).hoverColor : null,
+            child: Text(plan.learnerContext, textAlign: TextAlign.center),
+          ),
+        ),
+      ),
+      const SizedBox(height: 12),
+      if (plan.materials.items.isEmpty && plan.materials.references.isEmpty)
+        const SizedBox.shrink(),
+      if (plan.materials.items.isNotEmpty ||
+          plan.materials.references.isNotEmpty) ...[
+        const Text('Materials (Mga Kagamitan)',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        for (final item in plan.materials.items) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Text('• $item', textAlign: TextAlign.center),
+          ),
+        ],
+        const SizedBox(height: 4),
+        const Text('References (Mga Sanggunian)',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        for (final ref in plan.materials.references) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Text('• $ref', textAlign: TextAlign.center),
+          ),
+        ],
+      ],
+    ]);
+  }
+}
+
 /// Footer section with editable notes and declarations.
 class FooterSection extends StatelessWidget {
   const FooterSection({super.key, required this.plan, this.onChange});

@@ -98,6 +98,7 @@ class IlawPlanView extends ConsumerWidget {
           _banner(context, ref, PlanSection.intentions),
           _intentionsSection(context, selectedGrade),
           _banner(context, ref, PlanSection.learningExperiences),
+          LearningExperienceSectionWidget(plan: plan, onChange: onChange),
           FlowTable(
             flow: plan.flow,
             gradeLabels: visibleGrades,
