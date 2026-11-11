@@ -36,48 +36,73 @@ class AssessmentTables extends StatelessWidget {
       children: [
         const TableRow(children: [
           Padding(
-              padding: EdgeInsets.all(8),
-              child:
-                  Text('Grade', style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Grade',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Formative',
-                  style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Formative',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Exit Task',
-                  style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Exit Task',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Success Criteria',
-                  style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Success Criteria',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
         ]),
         ...assessments.map((a) => TableRow(children: [
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(a.gradeLabel)),
+                padding: const EdgeInsets.all(8),
+                child: Text(a.gradeLabel, textAlign: TextAlign.center),
+              ),
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(a.formative)),
+                padding: const EdgeInsets.all(8),
+                child: Text(a.formative, textAlign: TextAlign.center),
+              ),
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(a.exitTask)),
+                padding: const EdgeInsets.all(8),
+                child: Text(a.exitTask, textAlign: TextAlign.center),
+              ),
               Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(a.successCriteria)),
+                padding: const EdgeInsets.all(8),
+                child: Text(a.successCriteria, textAlign: TextAlign.center),
+              ),
             ])),
       ],
     );
 
-    // On narrow screens, wrap in horizontal scroll
-    if (isNarrow && assessments.length > 0) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: table,
+    // On wide screens, wrap in Center to horizontally center within parent scroll view
+    if (!isNarrow && assessments.isNotEmpty) {
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [table],
+        ),
       );
     }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: table,
-    );
+    // On narrow screens, wrap in horizontal scroll
+    if (isNarrow && assessments.isNotEmpty) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [table],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }
 
@@ -109,40 +134,62 @@ class WaysForwardTables extends StatelessWidget {
       children: [
         const TableRow(children: [
           Padding(
-              padding: EdgeInsets.all(8),
-              child:
-                  Text('Grade', style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Grade',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Remediation',
-                  style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Remediation',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
           Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Enrichment',
-                  style: TextStyle(fontWeight: FontWeight.bold))),
+            padding: EdgeInsets.all(8),
+            child: Text('Enrichment',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center),
+          ),
         ]),
         ...waysForward.map((w) => TableRow(children: [
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(w.gradeLabel)),
+                padding: const EdgeInsets.all(8),
+                child: Text(w.gradeLabel, textAlign: TextAlign.center),
+              ),
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(w.remediation)),
+                padding: const EdgeInsets.all(8),
+                child: Text(w.remediation, textAlign: TextAlign.center),
+              ),
               Padding(
-                  padding: const EdgeInsets.all(8), child: Text(w.enrichment)),
+                padding: const EdgeInsets.all(8),
+                child: Text(w.enrichment, textAlign: TextAlign.center),
+              ),
             ])),
       ],
     );
 
-    // On narrow screens, wrap in horizontal scroll
-    if (isNarrow) {
-      return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: table,
+    // On wide screens, wrap in Center to horizontally center within parent scroll view
+    if (!isNarrow && waysForward.isNotEmpty) {
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [table],
+        ),
       );
     }
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: table,
-    );
+    // On narrow screens, wrap in horizontal scroll
+    if (isNarrow && waysForward.isNotEmpty) {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [table],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }

@@ -3,7 +3,6 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'package:ai_lesson_planner/core/utils.dart';
 
@@ -104,14 +103,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const _LanguageSection(),
             const SizedBox(height: 24),
-            _DataFolderSection(),
+            const _DataFolderSection(),
             const SizedBox(height: 24),
             _DatabaseSection(
               databasePath: _databasePath,

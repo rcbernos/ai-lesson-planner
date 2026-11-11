@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 
 /// Displays a card for inputting grade-specific data.
-/// On narrow screens (isExpanded: false), shows a condensed summary.
+/// Shows all fields: Grade label, student counts, sub-theme, and competency.
 class GradeInputCard extends ConsumerStatefulWidget {
   const GradeInputCard({
     required this.index,
@@ -95,67 +95,91 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
               ],
             ),
             const SizedBox(height: 12),
-            // Full form when expanded (default)
-            if (widget.isExpanded)
-              Row(
-                children: [
-                  // Grade Label Dropdown
-                  Expanded(
-                    child: DropdownButtonFormField<String>(
-                      initialValue: _gradeLabel,
-                      decoration: const InputDecoration(
-                        labelText: '* Grade',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: [
-                        'Grade 1',
-                        'Grade 2',
-                        'Grade 3',
-                        'Grade 4',
-                        'Grade 5',
-                        'Grade 6'
-                      ]
-                          .map(
-                              (g) => DropdownMenuItem(value: g, child: Text(g)))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _gradeLabel = value;
-                          });
-                          _updateGrade();
-                        }
-                      },
+            // Grade label selector (full width)
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Theme.of(context).colorScheme.outlineVariant),
+                borderRadius: BorderRadius.circular(8),
+                color: Theme.of(context).colorScheme.surfaceVariant,
+              ),
+              child: DropdownButtonFormField<String>(
+                initialValue: _gradeLabel,
+                decoration: const InputDecoration(
+                  labelText: '* Grade',
+                  border: InputBorder.none,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+                items: [
+                  'Grade 1',
+                  'Grade 2',
+                  'Grade 3',
+                  'Grade 4',
+                  'Grade 5',
+                  'Grade 6'
+                ]
+                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() {
+                      _gradeLabel = value;
+                    });
+                    _updateGrade();
+                  }
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Male and Female counts on separate line
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Male Count
-                  Expanded(
                     child: TextFormField(
                       controller: _maleController,
                       decoration: const InputDecoration(
                         labelText: 'Male',
-                        border: OutlineInputBorder(),
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (_) => _updateGrade(),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  // Female Count
-                  Expanded(
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.outlineVariant),
+                      borderRadius: BorderRadius.circular(8),
+                      color: Theme.of(context).colorScheme.surfaceVariant,
+                    ),
                     child: TextFormField(
                       controller: _femaleController,
                       decoration: const InputDecoration(
                         labelText: 'Female',
-                        border: OutlineInputBorder(),
+                        border: InputBorder.none,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (_) => _updateGrade(),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
             // Always show sub-theme
             const SizedBox(height: 12),
             TextFormField(
@@ -168,20 +192,18 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
               maxLines: 2,
               onChanged: (_) => _updateGrade(),
             ),
-            // Competency only in expanded mode
-            if (widget.isExpanded) const SizedBox(height: 12),
-            if (widget.isExpanded)
-              TextFormField(
-                controller: _competencyController,
-                decoration: InputDecoration(
-                  labelText: '* Competency',
-                  border: const OutlineInputBorder(),
-                  errorText:
-                      widget.grade.competency.isEmpty ? 'Required' : null,
-                ),
-                maxLines: 2,
-                onChanged: (_) => _updateGrade(),
+            // Competency always visible
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _competencyController,
+              decoration: InputDecoration(
+                labelText: '* Competency',
+                border: const OutlineInputBorder(),
+                errorText: widget.grade.competency.isEmpty ? 'Required' : null,
               ),
+              maxLines: 2,
+              onChanged: (_) => _updateGrade(),
+            ),
           ],
         ),
       ),
