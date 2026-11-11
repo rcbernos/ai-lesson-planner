@@ -80,10 +80,12 @@ class IlawPlanView extends ConsumerWidget {
     final bool all = selectedGrade == null;
 
     final visibleGrades = all ? grades : [selectedGrade];
-    final visibleAssessments =
-        plan.assessments.where((a) => all || a.gradeLabel == selectedGrade).toList();
-    final visibleWaysForward =
-        plan.waysForward.where((w) => all || w.gradeLabel == selectedGrade).toList();
+    final visibleAssessments = plan.assessments
+        .where((a) => all || a.gradeLabel == selectedGrade)
+        .toList();
+    final visibleWaysForward = plan.waysForward
+        .where((w) => all || w.gradeLabel == selectedGrade)
+        .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),

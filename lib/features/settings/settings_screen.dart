@@ -4,6 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:ai_lesson_planner/core/utils.dart';
 
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
@@ -191,9 +193,9 @@ class _DataFolderSectionState extends State<_DataFolderSection> {
 
   Future<void> _loadDataFolderPath() async {
     try {
-      final docsDir = await getApplicationDocumentsDirectory();
+      final exportDir = await AppUtils.getExportDirPath();
       setState(() {
-        _dataFolderPath = '${docsDir.path}/LMS_Data/';
+        _dataFolderPath = p.dirname(exportDir); // .../LMS_Data
         _isLoading = false;
       });
     } catch (e) {

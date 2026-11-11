@@ -2,6 +2,7 @@
 library;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai_lesson_planner/core/drafts/draft_store.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/core/generation/mock_lesson_generator.dart';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
@@ -31,12 +32,18 @@ final planRepositoryProvider = Provider<PlanRepository>((ref) {
   return PlanRepository();
 });
 
+/// Provides the on-disk store for the unsaved plan draft
+/// (`<app support dir>/drafts/current_draft.json`).
+final draftStoreProvider = Provider<DraftStore>((ref) {
+  return DraftStore.inSupportDir();
+});
+
 /// Provides the plan editor state with undo history.
 /// Survives tab switches (no auto-dispose).
 final planEditorProvider =
     StateNotifierProvider<PlanEditorNotifier, PlanEditorState?>(
   (ref) {
     ref.keepAlive();
-    return PlanEditorNotifier();
+    return PlanEditorNotifier(drafts: ref.read(draftStoreProvider));
   },
 );

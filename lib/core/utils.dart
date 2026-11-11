@@ -1,65 +1,45 @@
-// ignore_for_file: dangling_library_doc_comments, prefer_const_declarations
-/// Utility functions for the application
+/// Utility functions for the application.
+library;
+
 import 'dart:io';
 
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import 'app_config.dart';
 
 class AppUtils {
-  /// Get the application support directory for storing model files and data
+  /// App-private support directory (database, models, drafts).
   static Future<String> getAppSupportDir() async {
     final dir = await getApplicationSupportDirectory();
     return dir.path;
   }
 
-  /// Get the absolute path for the GGUF model file
+  /// Absolute path for the GGUF model file.
   static Future<String> getModelFilePath() async {
     final appDir = await getAppSupportDir();
-    return '$appDir/models/${AppConfig.modelFileName}';
+    return p.join(appDir, 'models', AppConfig.modelFileName);
   }
 
-  /// Ensure required directories exist
+  /// Export folder: <documents>/LMS_Data/Exports.
+  static Future<String> getExportDirPath() async {
+    final docs = await getApplicationDocumentsDirectory();
+    return p.join(docs.path, 'LMS_Data', 'Exports');
+  }
+
+  /// Ensure required directories exist (no-op if they already do).
   static Future<void> ensureDirectoriesExist() async {
-    final appDir = await getAppSupportDir();
-    final modelDir = Directory('$appDir/models');
-
-    // Use path_provider to get the application documents directory
-    final docsDir = await getApplicationDocumentsDirectory();
-    final exportDir = Directory('$docsDir/LMS_Data/Exports');
-
-    if (!await modelDir.exists()) {
-      await modelDir.create(recursive: true);
-    }
-
-    if (!await exportDir.exists()) {
-      await exportDir.create(recursive: true);
-    }
+    final modelDir = p.dirname(await getModelFilePath());
+    await Directory(modelDir).create(recursive: true);
+    await Directory(await getExportDirPath()).create(recursive: true);
   }
 
-  /// Interpolate template placeholders with actual values
-  ///
-  /// [template] is the ILAW template string with placeholders like ____,
-  /// [values] is a map of placeholder names to their replacement values
-  ///
-  /// Example:
-  /// ```dart
-  /// final lessonPlan = AppUtils.interpolateTemplate(
-  ///   AppConfig.ilawFormat,
-  ///   {
-  ///     'GRADE LEVEL': 'Grade 3',
-  ///     'LEARNING AREA': 'FILIPINO',
-  ///     'Time': '5 min',
-  ///   },
-  /// );
-  /// ```
+  /// Replace placeholder keys in [template] with the matching [values].
   static String interpolateTemplate(
       String template, Map<String, String> values) {
     var result = template;
     for (final entry in values.entries) {
-      final placeholder = entry.key;
-      final value = entry.value;
-      result = result.replaceAll(placeholder, value);
+      result = result.replaceAll(entry.key, entry.value);
     }
     return result;
   }
