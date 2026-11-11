@@ -223,11 +223,11 @@ Goal: a debug APK installs on a real Android phone and does everything the deskt
 
 ### T3.7 Phase 3 device test (human)
 **Acceptance:**
-- [ ] Debug APK installs on the 4 GB phone via `flutter run` or `adb install`.
-- [ ] Fill the form with 2 and 4 grades, generate (mock), edit, undo, save, close, reopen.
-- [ ] Rotate, use light/dark, change font scale: no overflow.
-- [ ] Airplane mode on: everything above still works.
-- [ ] Desktop Linux build still passes `flutter test`.
+- [x] Debug APK installs on the 4 GB phone via `flutter run` or `adb install`.
+- [x] Fill the form with 2 and 4 grades, generate (mock), edit, undo, save, close, reopen.
+- [x] Rotate, use light/dark, change font scale: no overflow.
+- [x] Airplane mode on: everything above still works.
+- [x] Desktop Linux build still passes `flutter test`.
 Then merge `dev1` to `main`.
 
 ---
