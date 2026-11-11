@@ -37,4 +37,12 @@
 - Tests: no overflow at 360×640 with 2, 4, and 6 grades.
 - Header table stacks to two columns on narrow screens.
 
+### T3.5 (Complete)
+- Created `GradeSelectorNotifier` (Riverpod StateNotifier) with `gradeSelectorProvider`.
+- `GradeSelectorChip` widget: "All Grades" + individual grade chips in Wrap layout.
+- `effectiveGrade()` normalizes selections to valid plan grades.
+- `ilaw_plan_view.dart` uses chip, filters `visibleGrades`, assessments, ways forward.
+- Tests: 5 widget tests (selection, deselect, invalid grade, 6 grades at 360dp).
+- All tests passing.
+
 ---
