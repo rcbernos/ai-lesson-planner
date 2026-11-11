@@ -11,6 +11,9 @@ import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
 import 'package:ai_lesson_planner/features/plan_view/plan_workspace.dart';
 
+/// Width threshold for switching between desktop and phone layouts.
+const double _phoneBreakpoint = 600.0;
+
 GradeInput emptyGradeInput() => GradeInput(
     gradeLabel: 'Grade 1', male: 0, female: 0, subTheme: '', competency: '');
 
@@ -27,14 +30,14 @@ class GeneratorScreen extends ConsumerStatefulWidget {
 }
 
 class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
-  late final TextEditingController _schoolCtrl,
-      _teacherCtrl,
-      _learningAreaCtrl,
-      _dateCtrl,
-      _termCtrl,
-      _sessionsCtrl,
-      _minutesCtrl,
-      _sharedSubThemeCtrl;
+  late final TextEditingController _schoolCtrl;
+  late final TextEditingController _teacherCtrl;
+  late final TextEditingController _learningAreaCtrl;
+  late final TextEditingController _dateCtrl;
+  late final TextEditingController _termCtrl;
+  late final TextEditingController _sessionsCtrl;
+  late final TextEditingController _minutesCtrl;
+  late final TextEditingController _sharedSubThemeCtrl;
 
   @override
   void initState() {
@@ -111,6 +114,7 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
   Widget _buildFormView(BuildContext context, GeneratorFormState formState,
       GeneratorFormNotifier formNotifier) {
     final textTheme = Theme.of(context).textTheme;
+    final isPhone = MediaQuery.of(context).size.width < _phoneBreakpoint;
     return Scaffold(
       appBar: AppBar(title: const Text('Generator'), actions: [
         IconButton(
@@ -118,23 +122,29 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
             tooltip: 'Reset Form',
             onPressed: () => formNotifier.reset()),
       ]),
-      body: SizedBox(
-          width: 1024,
-          child: SingleChildScrollView(
+      resizeToAvoidBottomInset: true,
+      body: LayoutBuilder(builder: (context, constraints) {
+        return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              _buildHeaderSection(formState, formNotifier),
-              const SizedBox(height: 24),
-              _buildSessionDetails(formState, formNotifier),
-              const SizedBox(height: 16),
-              _buildOutputOptions(formState, formNotifier),
-              const SizedBox(height: 24),
-              _buildGradesSection(formState, formNotifier),
-              const SizedBox(height: 16),
-              _buildGenerateButton(textTheme, formState),
-            ]),
-          )),
+            child: ConstrainedBox(
+                constraints: BoxConstraints(minWidth: constraints.minWidth),
+                child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildHeaderSection(formState, formNotifier),
+                          const SizedBox(height: 24),
+                          _buildSessionDetails(formState, formNotifier),
+                          const SizedBox(height: 16),
+                          _buildOutputOptions(formState, formNotifier),
+                          const SizedBox(height: 24),
+                          _buildGradesSection(
+                              context, formState, formNotifier, isPhone),
+                          const SizedBox(height: 16),
+                          _buildGenerateButton(textTheme, formState),
+                        ]))));
+      }),
     );
   }
 
@@ -273,8 +283,8 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
     ]);
   }
 
-  Widget _buildGradesSection(
-      GeneratorFormState state, GeneratorFormNotifier notifier) {
+  Widget _buildGradesSection(BuildContext context, GeneratorFormState state,
+      GeneratorFormNotifier notifier, bool isPhone) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text('Grades (${state.grades.length} of 2-6)',
           style: Theme.of(context).textTheme.titleMedium),
@@ -284,7 +294,8 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
             index: i,
             grade: state.grades[i],
             onChanged: (u) => notifier.updateGrade(i, u),
-            onRemove: () => notifier.removeGrade(i)),
+            onRemove: () => notifier.removeGrade(i),
+            isExpanded: !isPhone),
       TextButton.icon(
           onPressed: state.grades.length >= 6
               ? null

@@ -6,12 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 
 /// Displays a card for inputting grade-specific data.
+/// On narrow screens (isExpanded: false), shows a condensed summary.
 class GradeInputCard extends ConsumerStatefulWidget {
   const GradeInputCard({
     required this.index,
     required this.grade,
     required this.onChanged,
     required this.onRemove,
+    this.isExpanded = true,
     super.key,
   });
 
@@ -19,6 +21,7 @@ class GradeInputCard extends ConsumerStatefulWidget {
   final GradeInput grade;
   final ValueChanged<GradeInput> onChanged;
   final VoidCallback onRemove;
+  final bool isExpanded;
 
   @override
   ConsumerState<GradeInputCard> createState() => _GradeInputCardState();
@@ -92,66 +95,69 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
               ],
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                // Grade Label Dropdown
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _gradeLabel,
-                    decoration: const InputDecoration(
-                      labelText: '* Grade',
-                      border: OutlineInputBorder(),
+            // Full form when expanded (default)
+            if (widget.isExpanded)
+              Row(
+                children: [
+                  // Grade Label Dropdown
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      initialValue: _gradeLabel,
+                      decoration: const InputDecoration(
+                        labelText: '* Grade',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: [
+                        'Grade 1',
+                        'Grade 2',
+                        'Grade 3',
+                        'Grade 4',
+                        'Grade 5',
+                        'Grade 6'
+                      ]
+                          .map(
+                              (g) => DropdownMenuItem(value: g, child: Text(g)))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            _gradeLabel = value;
+                          });
+                          _updateGrade();
+                        }
+                      },
                     ),
-                    items: [
-                      'Grade 1',
-                      'Grade 2',
-                      'Grade 3',
-                      'Grade 4',
-                      'Grade 5',
-                      'Grade 6'
-                    ]
-                        .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          _gradeLabel = value;
-                        });
-                        _updateGrade();
-                      }
-                    },
                   ),
-                ),
-                const SizedBox(width: 8),
-                // Male Count
-                Expanded(
-                  child: TextFormField(
-                    controller: _maleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Male',
-                      border: OutlineInputBorder(),
+                  const SizedBox(width: 8),
+                  // Male Count
+                  Expanded(
+                    child: TextFormField(
+                      controller: _maleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Male',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: (_) => _updateGrade(),
                     ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _updateGrade(),
                   ),
-                ),
-                const SizedBox(width: 8),
-                // Female Count
-                Expanded(
-                  child: TextFormField(
-                    controller: _femaleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Female',
-                      border: OutlineInputBorder(),
+                  const SizedBox(width: 8),
+                  // Female Count
+                  Expanded(
+                    child: TextFormField(
+                      controller: _femaleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Female',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                      onChanged: (_) => _updateGrade(),
                     ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _updateGrade(),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+            // Always show sub-theme
             const SizedBox(height: 12),
-            // Sub-theme
             TextFormField(
               controller: _subThemeController,
               decoration: InputDecoration(
@@ -162,18 +168,20 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
               maxLines: 2,
               onChanged: (_) => _updateGrade(),
             ),
-            const SizedBox(height: 12),
-            // Competency
-            TextFormField(
-              controller: _competencyController,
-              decoration: InputDecoration(
-                labelText: '* Competency',
-                border: const OutlineInputBorder(),
-                errorText: widget.grade.competency.isEmpty ? 'Required' : null,
+            // Competency only in expanded mode
+            if (widget.isExpanded) const SizedBox(height: 12),
+            if (widget.isExpanded)
+              TextFormField(
+                controller: _competencyController,
+                decoration: InputDecoration(
+                  labelText: '* Competency',
+                  border: const OutlineInputBorder(),
+                  errorText:
+                      widget.grade.competency.isEmpty ? 'Required' : null,
+                ),
+                maxLines: 2,
+                onChanged: (_) => _updateGrade(),
               ),
-              maxLines: 2,
-              onChanged: (_) => _updateGrade(),
-            ),
           ],
         ),
       ),

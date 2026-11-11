@@ -23,6 +23,22 @@ class GradeInput {
   final int female;
   final String subTheme;
   final String competency;
+
+  GradeInput copyWith({
+    String? gradeLabel,
+    int? male,
+    int? female,
+    String? subTheme,
+    String? competency,
+  }) {
+    return GradeInput(
+      gradeLabel: gradeLabel ?? this.gradeLabel,
+      male: male ?? this.male,
+      female: female ?? this.female,
+      subTheme: subTheme ?? this.subTheme,
+      competency: competency ?? this.competency,
+    );
+  }
 }
 
 /// Request object for lesson plan generation.
