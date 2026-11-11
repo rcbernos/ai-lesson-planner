@@ -27,8 +27,9 @@ dependencies:
   archive: ^4.0.2
   pdf: ^3.13.1
   docs_gee: ^1.5.0
-  file_picker: ^8.0.0
-  
+  # file_picker: ^9.0.0  // Temporarily removed due to SDK compatibility issue (T7.1)
+  # File import/export will be implemented with an alternative approach
+
   # Model Download & Verification
   http: ^1.1.0
   crypto: ^3.0.0
