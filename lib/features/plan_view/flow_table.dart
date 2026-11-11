@@ -33,9 +33,9 @@ class FlowTable extends StatelessWidget {
       0: const FixedColumnWidth(55), // Minutes column
       1: const FixedColumnWidth(110), // Stage name column
       2: const FixedColumnWidth(80), // Whole-class indicator column
-      // Give each grade column a guaranteed minimum width (e.g., 180px)
+      // Give each grade column a guaranteed minimum width (e.g., 220dp)
       for (int i = 0; i < gradeLabels.length; i++)
-        (i + 3): const FixedColumnWidth(180),
+        (i + 3): const FixedColumnWidth(220),
       // Refresh icon columns only when regeneration is enabled
       if (hasRegen)
         for (int i = 0; i < gradeLabels.length; i++)
@@ -43,7 +43,7 @@ class FlowTable extends StatelessWidget {
     };
 
     // Calculate total width for the SizedBox wrapper
-    double totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 180.0);
+    double totalWidth = 55.0 + 110.0 + 80.0 + (gradeLabels.length * 220.0);
     if (hasRegen) {
       totalWidth += gradeLabels.length * 40.0;
     }

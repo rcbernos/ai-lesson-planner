@@ -8,6 +8,7 @@ import 'package:ai_lesson_planner/core/providers.dart';
 import 'flow_table.dart'; // for RegenCallback typedef
 import 'plan_sections.dart'; // for PlanChange typedef
 import 'header_table.dart' as header;
+import 'assessment_tables.dart'; // for AssessmentTables, WaysForwardTables
 
 // Reference ILAW banner colors (from reference DLPs)
 const Color _bannerNavy = Color(0xFF1F3864); // Intentions (I)
@@ -50,9 +51,12 @@ class SectionBanner extends StatelessWidget {
       color: color,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Row(children: [
-        Text(labels[section] ?? section.name,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.white)),
+        Expanded(
+            child: Text(labels[section] ?? section.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.white))),
         const Spacer(),
         ...actions,
       ]),
@@ -102,14 +106,14 @@ class IlawPlanView extends ConsumerWidget {
               ? [_buildRegenerateButton(context, ref, PlanSection.assessment)]
               : [],
         ),
-        _assessmentsSection(),
+        AssessmentTables(assessments: plan.assessments),
         SectionBanner(
           PlanSection.waysForward,
           actions: isEditable
               ? [_buildRegenerateButton(context, ref, PlanSection.waysForward)]
               : [],
         ),
-        _waysForwardSection(),
+        WaysForwardTables(waysForward: plan.waysForward),
         _reflectionSection(),
         _footer(),
       ]),
@@ -259,96 +263,6 @@ class IlawPlanView extends ConsumerWidget {
             ])));
   }
 
-  Widget _assessmentsSection() {
-    if (plan.assessments.isEmpty) return const SizedBox.shrink();
-
-    return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Table(
-            columnWidths: const {
-              0: FixedColumnWidth(80), // Grade label
-              1: FixedColumnWidth(170), // Formative Assessment
-              2: FixedColumnWidth(170), // Exit Task
-              3: FixedColumnWidth(170), // Success Criteria
-            },
-            border: TableBorder.all(color: Colors.grey.shade400),
-            children: [
-              const TableRow(children: [
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Grade',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Formative',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Exit Task',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Success Criteria',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-              ]),
-              ...plan.assessments.map((a) => TableRow(children: [
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(a.gradeLabel)),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(a.formative)),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(a.exitTask)),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(a.successCriteria)),
-                  ]))
-            ]));
-  }
-
-  Widget _waysForwardSection() {
-    if (plan.waysForward.isEmpty) return const SizedBox.shrink();
-
-    return SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Table(
-            columnWidths: const {
-              0: FixedColumnWidth(80), // Grade label
-              1: FixedColumnWidth(210), // Remediation
-              2: FixedColumnWidth(210), // Enrichment
-            },
-            border: TableBorder.all(color: Colors.grey.shade400),
-            children: [
-              const TableRow(children: [
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Grade',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Remediation',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-                Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Text('Enrichment',
-                        style: TextStyle(fontWeight: FontWeight.bold))),
-              ]),
-              ...plan.waysForward.map((w) => TableRow(children: [
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(w.gradeLabel)),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(w.remediation)),
-                    Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(w.enrichment)),
-                  ]))
-            ]));
-  }
-
   Widget _reflectionSection() {
     if (plan.reflectionQuestions.isEmpty) return const SizedBox.shrink();
 
@@ -360,28 +274,49 @@ class IlawPlanView extends ConsumerWidget {
       for (final q in plan.reflectionQuestions)
         Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(children: [
-              if (q.gradeLabel != null)
-                SizedBox(
-                    width: 80,
-                    child: Text('${q.gradeLabel}:',
-                        style: const TextStyle(fontWeight: FontWeight.bold))),
-              Expanded(child: Text(q.text)),
-            ]))
+            child: Row(
+              children: [
+                if (q.gradeLabel != null)
+                  Expanded(
+                      flex: 2,
+                      child: Text('${q.gradeLabel}:',
+                          style: const TextStyle(fontWeight: FontWeight.bold))),
+                Expanded(flex: 3, child: Text(q.text)),
+              ],
+            )),
     ]);
   }
 
   Widget _footer() => Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Prepared by: ${plan.preparedBy}',
-              style: const TextStyle(fontWeight: FontWeight.w500)),
-          Text('Checked by: ${plan.checkedBy}')
-        ]),
-        Expanded(
-            child: Text(plan.aiUseDeclaration,
-                textAlign: TextAlign.right,
-                style: const TextStyle(fontStyle: FontStyle.italic)))
-      ]));
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isNarrow = constraints.maxWidth < 600;
+          if (isNarrow) {
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Prepared by: ${plan.preparedBy}',
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Checked by: ${plan.checkedBy}'),
+                  const SizedBox(height: 8),
+                  Text(plan.aiUseDeclaration,
+                      style: const TextStyle(fontStyle: FontStyle.italic)),
+                ]);
+          }
+          return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Prepared by: ${plan.preparedBy}',
+                      style: const TextStyle(fontWeight: FontWeight.w500)),
+                  Text('Checked by: ${plan.checkedBy}')
+                ]),
+                Expanded(
+                    child: Text(plan.aiUseDeclaration,
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(fontStyle: FontStyle.italic)))
+              ]);
+        },
+      ));
 }

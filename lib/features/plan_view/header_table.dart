@@ -47,6 +47,7 @@ class HeaderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEditable = onChange != null;
+    final isNarrow = MediaQuery.of(context).size.width < 600;
     final gradeLevelsDisplay = plan.header.gradeLevels.isNotEmpty
         ? plan.header.gradeLevels
         : _toRoman(plan.grades.length);
@@ -70,25 +71,80 @@ class HeaderSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Table(
-              border: TableBorder.all(color: Colors.grey.shade400),
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              columnWidths: const {
-                0: FixedColumnWidth(120), // Label column
-                1: FlexColumnWidth(), // Value column 1
-                2: FixedColumnWidth(120), // Label column
-                3: FlexColumnWidth(), // Value column 2
-              },
-              children: [
-                _buildSchoolRow(context, isEditable, gradeLevelsDisplay),
-                _buildTeacherRow(context, isEditable),
-                _buildDateRow(context, isEditable),
-                _buildTimeLearnerRow(sessionString, learnerCountStr),
-                _buildMultigradeRow(context, isEditable),
-              ],
-            ),
+            // On narrow screens (<600dp), stack to 2 columns
+            if (isNarrow)
+              _buildNarrowLayout(context, isEditable, sessionString,
+                  learnerCountStr, gradeLevelsDisplay)
+            else
+              Table(
+                border: TableBorder.all(color: Colors.grey.shade400),
+                defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+                columnWidths: const {
+                  0: FixedColumnWidth(120), // Label column
+                  1: FlexColumnWidth(), // Value column 1
+                  2: FixedColumnWidth(120), // Label column
+                  3: FlexColumnWidth(), // Value column 2
+                },
+                children: [
+                  _buildSchoolRow(context, isEditable, gradeLevelsDisplay),
+                  _buildTeacherRow(context, isEditable),
+                  _buildDateRow(context, isEditable),
+                  _buildTimeLearnerRow(sessionString, learnerCountStr),
+                  _buildMultigradeRow(context, isEditable),
+                ],
+              ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Build a 2-column layout for narrow screens.
+  Widget _buildNarrowLayout(BuildContext context, bool isEditable,
+      String sessionString, String learnerCountStr, String gradeLevelsDisplay) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildNarrowLabelValueRow('School',
+            _editableCell(context, 'School', plan.header.school, isEditable)),
+        _buildNarrowLabelValueRow(
+            'Grade Levels',
+            _editableCell(
+                context, 'Grade Levels', gradeLevelsDisplay, isEditable)),
+        _buildNarrowLabelValueRow('Teacher',
+            _editableCell(context, 'Teacher', plan.header.teacher, isEditable)),
+        _buildNarrowLabelValueRow(
+            'Learning Area',
+            _editableCell(context, 'Learning Area', plan.header.learningArea,
+                isEditable)),
+        _buildNarrowLabelValueRow('Teaching Date',
+            _editableCell(context, 'Date', plan.header.date, isEditable)),
+        _buildNarrowLabelValueRow('Quarter/Term',
+            _editableCell(context, 'Term', plan.header.term, isEditable)),
+        _buildNarrowLabelValueRow('Time / Sessions', _valueCell(sessionString)),
+        _buildNarrowLabelValueRow(
+            'No. of Learners', _valueCell(learnerCountStr)),
+        _buildNarrowLabelValueRow(
+            'Multigrade Model',
+            _editableCell(context, 'Multigrade Model',
+                plan.header.multigradeModel, isEditable)),
+      ],
+    );
+  }
+
+  Widget _buildNarrowLabelValueRow(String label, Widget value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+              padding: const EdgeInsets.all(8),
+              child: Text(label,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: _navy))),
+          Expanded(child: value),
+        ],
       ),
     );
   }

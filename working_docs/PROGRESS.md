@@ -25,9 +25,16 @@
 - GradeInputCard: supports collapsed/expanded mode via isExpanded parameter.
 - Added copyWith to GradeInput for partial updates.
 - Widget tests verify no overflow at 360×640; Generate button reachable.
-
 ### Notes
 - file_picker temporarily removed due to Flutter 3.47.6 / AGP 9.x compatibility issue (plugin AAR built against SDK 34).
 - Will be reintroduced before T7.1 export implementation.
+
+### T3.4 (Complete)
+- Flow table grade columns use minimum 220dp width on narrow screens.
+- Assessment and ways-forward tables use 220dp minimum column width on narrow screens.
+- Header table stacks to two columns on screens < 600dp.
+- Banners stay full width.
+- Tests: no overflow at 360×640 with 2, 4, and 6 grades.
+- Header table stacks to two columns on narrow screens.
 
 ---
