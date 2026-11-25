@@ -110,3 +110,12 @@
 - Added fallback to `getApplicationSupportDirectory()` on non-Android platforms (Linux tests)
 - Updated debug screen to show "No model found. Import via file_picker." when model is missing
 - Widget tests updated and passing
+
+### T4.6 Model manifest (Complete)
+- Created `lib/services/llm/model_manifest.dart` with ModelManifest class
+- Added `assets/models.json` with default model info: `{ "version": "1", "model": "qwen4b-sea-lion-q4_k_m.gguf" }`
+- Implemented `load()`, `loadFromFile()`, `save()`, `isCurrentModelAvailable()` methods
+- Added `getExternalFilesDir()` helper for Android file access
+- Created `test/model_manifest_test.dart` with 11 tests for serialization, equality, and defaults
+- All tests pass, flutter analyze clean
+- Debug APK builds successfully (~167 MB)
