@@ -90,4 +90,11 @@
   - On wide screens: Return `Column(crossAxisAlignment.center)` → `table` directly
 - Commit: `fix(plan_view): center tables in landscape by removing redundant inner scroll view`
 
+### T4.5 LocalLlamaEngine (Complete)
+- Fixed `GenerationParams`: changed `temperature` to `temp`, added `stopSequences` and `seed` parameters for llamadart 0.21.0 API compatibility.
+- Fixed cancellation handling: replaced invalid `controller.onCancel()` with proper subscription tracking via `_currentSubscription` field.
+- Fixed `dispose()` method: unload before closing state controller to avoid "Cannot add new events after calling close" error.
+- All tests pass: 4 local_llama_engine tests pass (2 skipped for integration tests gated by LMS_TEST_GGUF).
+- Commit: `feat(core): implement LocalLlamaEngine with llamadart 0.21.0 API`
+
 ---
