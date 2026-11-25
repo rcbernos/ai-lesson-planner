@@ -131,3 +131,13 @@
 - Added "Download Model" button to llm_debug_screen.dart
 - All tests pass, flutter analyze clean
 - Debug APK builds successfully (~167 MB)
+
+### T4.9 Import model file (Complete)
+- Added `_importModel()` method to llm_debug_screen.dart using file_picker (v12.0.0)
+- Added "Import Model File" button to debug screen UI
+- Validates .gguf extension and file size (> 100 MB)
+- Copies selected file to app-private storage
+- Shows progress dialog during import
+- Widget tests updated to verify button presence
+- All tests pass, flutter analyze clean
+- Commit: `feat(prototype): model import button`

@@ -27,6 +27,7 @@ void main() {
       expect(find.text('Check Model'), findsOneWidget);
       expect(find.text('Download Model'), findsOneWidget);
       expect(find.text('Load Model'), findsOneWidget);
+      expect(find.text('Import Model File'), findsOneWidget);
       expect(find.text('Generate'), findsOneWidget);
     });
 

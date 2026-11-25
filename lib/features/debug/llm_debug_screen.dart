@@ -3,8 +3,10 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
@@ -190,6 +192,105 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
     }
   }
 
+  /// Imports a GGUF model file selected by the user via file picker.
+  Future<void> _importModel() async {
+    // Allow only .gguf files
+    const allowedExtensions = ['gguf'];
+
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: allowedExtensions,
+    );
+
+    if (result.isEmpty) {
+      // User cancelled the picker
+      return;
+    }
+
+    final selectedFile = result.first;
+    final selectedPath = selectedFile.path;
+
+    if (selectedPath == null || selectedPath.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not access file path')),
+      );
+      return;
+    }
+
+    final file = File(selectedPath);
+
+    // Check file size (must be at least 100 MB)
+    try {
+      final fileSize = await file.length();
+      const minSize = 100 * 1024 * 1024; // 100 MB
+
+      if (fileSize < minSize) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content:
+                Text('File too small. Model file must be at least 100 MB.'),
+          ),
+        );
+        return;
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to read file: $e')),
+      );
+      return;
+    }
+
+    // Get destination path
+    final destPath = await ModelPaths.getExpectedModelPath();
+
+    // Show loading indicator during copy
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('Importing model file...'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    try {
+      // Copy the file to app-private storage
+      await file.copy(destPath);
+
+      if (!mounted) {
+        Navigator.of(context).pop(); // Dismiss loading dialog
+        return;
+      }
+      Navigator.of(context).pop(); // Dismiss loading dialog
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Model imported successfully')),
+      );
+
+      // Check model status
+      await _checkModelStatus();
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pop(); // Dismiss loading dialog
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Import failed: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!kDebugMode) {
@@ -295,6 +396,18 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
                     onPressed: _isLoading ? null : _loadModel,
                     icon: const Icon(Icons.upload_file),
                     label: const Text('Load Model'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _importModel,
+                    icon: const Icon(Icons.file_copy),
+                    label: const Text('Import Model File'),
                   ),
                 ),
               ],
