@@ -306,28 +306,48 @@ abstract class LlmEngine {
 **Do:** Simple rule: check `getExternalFilesDir(null)/model.gguf` exists and is > 100 MB. If missing, T4.5b debug screen shows "No model found. Import via file_picker."
 **Commit:** `feat(prototype): model installed check`
 
-### T4.6 Model manifest [9B]
-**DEFERRED FOR PROTOTYPE.** Manual import needs no manifest. (file_picker required for import)
+### T4.6 Model manifest
+**FILES:** `lib/services/llm/model_downloader.dart`
+**Do:** A simple `models.json` manifest (model file name and version) in `files/` directory for future model rotation. Minimal: `{ "version": "1", "model": "qwen4b-sea-lion-q4_k_m.gguf" }`. For prototype, downloader (T4.7) writes this after successful download. Check manifest before download to avoid re-downloading.
+**Verify:** File exists and can be read; app checks it before download.
+**Commit:** `feat(prototype): model manifest`
 
-### T4.7 Model downloader (strong)
-**DEFERRED FOR PROTOTYPE.** Manual `adb push` replaces the downloader.
+### T4.7 Model downloader
+**FILES:** `lib/services/llm/model_downloader.dart`, `lib/features/debug/download_dialog.dart`, `test/model_downloader_test.dart`
+**Deps:** `http: ^1.1.0` (already in pubspec), `crypto: ^3.0.0` (already in pubspec), `path_provider: ^2.1.0` (already in pubspec)
+
+**Do:** A basic in-app downloader for the prototype model:
+1. Download button in debug screen → shows progress dialog
+2. Download from `https://huggingface.co/.../Qwen-SEA-LION-v4-4B-VL.Q4_K_M.gguf`
+3. Stream download with progress indicator (bytes / total)
+4. SHA-256 checksum verification (hardcoded expected hash)
+5. Save to `getExternalFilesDir(null)/models/` directory
+6. Update `models.json` manifest after successful download
+7. Auto-load and verify model after download completes
+
+**Verify test:** mock download completes with correct hash; progress updates; saves to correct path.
+**By hand:** download on phone, verify file exists, generate tokens.
+
+**Commit:** `feat(prototype): in-app model downloader`
 
 ### T4.8 Device capability check (strong)
 **DEFERRED FOR PROTOTYPE.** No RAM gating needed on 12 GB phone; no 4 GB device available for testing.
 
-### T4.9 Import model file (partial, prototype only)
-**Files:** `lib/features/debug/llm_debug_screen.dart` (added import button)
-**Do:** Debug-only "Import model file" button using `file_picker` to select GGUF → copy to app-private files/. Required for prototype APK to work. Full downloader (T4.7) is deferred.
+### T4.9 Import model file (strong)
+**FILES:** `lib/features/debug/llm_debug_screen.dart` (added import button)
+**Do:** Debug-only "Import model file" button using `file_picker` to select GGUF → copy to app-private files/. **Required as fallback if downloader fails.** Primary flow uses in-app downloader (T4.7).
 **Commit:** `feat(prototype): model import button`
 
 ### T4.10 Memory pressure handling (strong)
 **DEFERRED FOR PROTOTYPE.** No memory-pressure handling needed on 12 GB phone.
 
 ### Phase 4 acceptance (human, on the phone)
-- [ ] file_picker conflict resolved in pubspec.yaml.
+- [x] file_picker conflict resolved in pubspec.yaml.
 - [ ] APK builds for release (`flutter build apk --release`).
 - [ ] APK installs on phone.
-- [ ] Tap "Import model file" on fresh install → select GGUF → app loads it (or: adb push GGUF to files/ then app finds it).
+- [ ] **Model downloader available in debug screen** (T4.7)
+- [ ] **Download model from in-app button → progress shows → model loads automatically**
+- [ ] Download completes with checksum verification
 - [ ] Debug screen loads model, streams tokens.
 - [ ] Cancel stops generation; UI never freezes.
 - [ ] Rough tok/s recorded in `PROGRESS.md` with note: "12 GB phone only, 4 GB untested."
