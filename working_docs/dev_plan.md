@@ -358,35 +358,30 @@ abstract class LlmEngine {
 
 Goal: a real plan generates from the form, on the phone, offline, and passes validation most of the time. All prompt design uses `ilaw_ai_scaffold.md` as the source.
 
-### T5.1 Token budget estimator and prompt pieces [9B]
+### T5.1 Token budget estimator and prompt pieces [DEFERRED TO PHASE 6]
 **Files:** `lib/core/generation/prompts/shared_prompt.dart`, `lib/core/generation/token_budget.dart`, `test/token_budget_test.dart`.
-**Do:** shared system block from scaffold section 5.0 (output language rules, no invented codes, JSON only). A conservative `estimateTokens(String)` (about chars/3 for Filipino) and `fitsBudget(parts, nCtx, outputReserve)`.
-**Verify test:** a worst-case 6-grade request fails `fitsBudget` at 2048 and passes at 4096 with the shortest prompts; shared block under a stated token count.
-**Commit:** `feat(core): shared prompt and token budget`
+**Do:** [DEFERRED] Shared system block and token budget estimator. Will use placeholder constants for prototype.
+**Commit:** (deferred)
 
-### T5.2 Section prompts [9B]
+### T5.2 Section prompts [DEFERRED TO PHASE 6]
 **Files:** `lib/core/generation/prompts/intentions_prompt.dart`, `lib/core/generation/prompts/learning_prompt.dart`, `test/prompts_test.dart`.
-**Do:** builders returning `List<ChatMsg>` for Intentions and Learning Experience, from scaffold sections 5.1 and 5.2. Earlier sections go in as fixed context. Include one cleaned few-shot example with fictional names (the human supplies the example text).
-**Verify test:** the prompt contains each grade label, each competency once, the exact minute total; no prompt exceeds the budget for 2 and 4 grades.
-**Commit:** `feat(core): intentions and learning experience prompts`
+**Do:** [DEFERRED] Will use inline string templates for prototype.
+**Commit:** (deferred)
 
-### T5.3 Assessment and Ways Forward prompts [9B]
+### T5.3 Assessment and Ways Forward prompts [DEFERRED TO PHASE 6]
 **Files:** `lib/core/generation/prompts/assessment_prompt.dart`, `lib/core/generation/prompts/ways_forward_prompt.dart`, `test/prompts_test.dart`.
-**Do:** scaffold sections 5.3 to 5.5, including single-grade regeneration variants.
-**Verify test:** per-grade variant mentions only that grade; the other grades appear only as fixed context.
-**Commit:** `feat(core): assessment and ways forward prompts`
+**Do:** [DEFERRED] Will inline for prototype.
+**Commit:** (deferred)
 
-### T5.4 Section JSON schemas [9B]
+### T5.4 Section JSON schemas [DEFERRED TO PHASE 6]
 **Files:** `lib/core/generation/schemas/section_schemas.dart`, `test/section_schemas_test.dart`.
-**Do:** a JSON Schema (as a Dart `Map`) for each section, taken from the scaffold's JSON skeleton. Intentions may only contain `objectives`, `bothGradesObjective`, `sharedSubTheme` text; **no** standards or competencies (H1).
-**Verify test:** the mock generator's output for each section validates against the matching schema.
-**Commit:** `feat(core): per-section json schemas`
+**Do:** [DEFERRED] Will use the schema constants directly in the generator for prototype.
+**Commit:** (deferred)
 
-### T5.5 Tolerant JSON extraction [9B]
+### T5.5 Tolerant JSON extraction [DEFERRED TO PHASE 6]
 **Files:** `lib/core/generation/json_extract.dart`, `lib/core/generation/partial_json.dart`, `test/json_extract_test.dart`.
-**Do:** extract the first JSON object from model text (strip code fences, preamble, trailing text), repair trailing commas, and a best-effort partial parser for the live preview while tokens stream.
-**Verify test:** fenced JSON, preamble plus JSON, truncated JSON (partial result, flagged incomplete), and garbage (typed failure).
-**Commit:** `feat(core): tolerant json extraction`
+**Do:** [DEFERRED] Will use simple `jsonDecode` with basic validation for prototype.
+**Commit:** (deferred)
 
 ### T5.6 `LlmLessonGenerator`: Intentions and Learning Experience (strong)
 **Files:** `lib/core/generation/llm_lesson_generator.dart`, `lib/core/generation/section_runner.dart`, `test/llm_generator_test.dart`.
@@ -400,11 +395,10 @@ Goal: a real plan generates from the form, on the phone, offline, and passes val
 **Verify test:** full plan from scripted responses passes `PlanValidator` with zero errors; per-grade regeneration changes only that grade.
 **Commit:** `feat(core): LLM generator for assessment, ways forward and section regeneration`
 
-### T5.8 Backend selection and live preview [9B]
+### T5.8 Backend selection and live preview [DEFERRED TO PHASE 6]
 **Files:** `lib/core/providers.dart`, `lib/features/settings/settings_screen.dart`, `lib/features/generator/generation_controller.dart`.
-**Do:** a setting "Demo / Local model / (debug only) dev endpoint". Local model is the default when a model is installed. Show streamed text and the section name during generation. Show a clear "Generating may take several minutes on this phone" estimate once the benchmark number exists. Keep the screen on during generation.
-**Verify:** with `FakeEngine`, the controller emits the expected events. By hand: toggle backends.
-**Commit:** `feat(ui): backend selection and live generation preview`
+**Do:** [DEFERRED] Backend selection UI. Will hardcode LocalLlamaEngine for prototype.
+**Commit:** (deferred)
 
 ### T5.9 Evaluation harness (strong)
 **Files:** `tool/eval.dart`, `test/eval/requests.json`, `working_docs/eval_results.md`.
@@ -412,9 +406,8 @@ Goal: a real plan generates from the form, on the phone, offline, and passes val
 **Verify:** the script runs against `FakeEngine` and prints a table.
 **Commit:** `feat(tool): evaluation harness`
 
-### T5.10 Prompt tuning rounds (human with agent)
-Run the eval, change **one** prompt thing at a time, rerun. Keep a change log in `eval_results.md`. Target: at least 8 of 10 requests pass with zero validation errors on the production model. Then rerun the same 10 on the phone once, to confirm the device matches the desktop.
-**Teacher review:** a real teacher rates three plans (usable / light edits / unusable) and notes what they change. Record it.
+### T5.10 Prompt tuning rounds (human with agent) [DEFERRED TO PHASE 6]
+[DEFERRED] This is prompt tuning work after initial verification on the phone. Will be done after T5.9 evaluation harness confirms baseline quality.
 
 ### Phase 5 acceptance (human, on the phone)
 - [ ] A 2-grade and a 4-grade plan generate offline on the phone, in Filipino and in English.
