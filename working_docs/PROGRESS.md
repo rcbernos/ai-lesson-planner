@@ -1,12 +1,19 @@
 # Progress
 
-## Phase 4 - On-device Engine (T4.1 Complete)
+## Phase 4 - On-device Engine (T4.1-4.3 Complete)
 ### T4.1 Engine selection (Complete)
 - Added `llamadart: 0.21.0` with pinned exact version to `pubspec.yaml`.
 - Updated SDK constraint from `>=3.0.0 <4.0.0` to `>=3.10.0 <4.0.0` to match llamadart requirements.
 - `flutter pub get` succeeded.
 - `flutter build apk --debug` succeeded (~167 MB).
 - Commit: `feat(core): add llamadart engine dependency`
+
+### T4.3 LlmEngine interface and FakeEngine (Complete)
+- Created `lib/core/llm/llm_engine.dart` with ChatMsg, GenParams, ModelSpec, EngineState, EngineException, and LlmEngine interface.
+- Created `lib/core/llm/fake_engine.dart` with FakeEngine implementation for testing.
+- Created `test/fake_engine_test.dart` with 13 tests covering lifecycle, load failure, token streaming, cancel, and serialization.
+- All tests pass.
+- Commit: `feat(core): LlmEngine interface and fake engine`
 
 ## Phase 0 - Repository Reconciliation (dev1)
 - Dependencies fixed, fonts, path resolution, Drift/SQLite layer complete.
