@@ -141,3 +141,16 @@
 - Widget tests updated to verify button presence
 - All tests pass, flutter analyze clean
 - Commit: `feat(prototype): model import button`
+
+## Phase 5 - AI Generation
+
+### T5.6 LlmLessonGenerator: Intentions and Learning Experience (Complete)
+- Fixed `replaceSection` calls to use positional arguments instead of named `section` parameter.
+- Fixed `buildSystemBlock` and prompt functions to accept `OutputLanguage` enum and `List<String>` grade labels.
+- Fixed `_streamTokens` to use local subscription variable for proper cancellation.
+- Removed unused `_tokenSub` field and `_emitSectionPlan` method.
+- Added missing import for `dart:async` in `llm_lesson_generator.dart`.
+- Fixed `section_runner.dart`: corrected type mismatch in `gradeLabels` parameter (String vs List<String>).
+- Created `test/llm_generator_test.dart` with basic tests for cancel and header section generation.
+- All tests pass, flutter analyze clean.
+- Commit: `feat(core): LLM generator for intentions and learning experience`
