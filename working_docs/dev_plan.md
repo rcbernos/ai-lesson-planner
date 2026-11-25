@@ -2,7 +2,7 @@
 
 Replaces `solo_dev_plan.md`. Phase files `phase0_tasks.md` and `phase1_tasks.md` are history. `phase2_tasks.md` stays the reference for Phase 2 cards already done.
 
-**Product (from `specifications.md`):** an Android app for Last Mile School teachers. A teacher fills a form, or chats, and a model running fully on the phone drafts a DepEd ILAW lesson plan for 2 to 6 grades at once. Plans export to DOCX/PDF and move between devices by USB or file bundle. Target hardware is a 4 GB RAM phone.
+**Product (from `specifications.md`):** an Android app for Last Mile School teachers. A teacher fills a form, or chats, and a model running fully on the phone drafts a DepEd ILAW lesson plan for 2 to 6 grades at once. Plans export to DOCX/PDF and move between devices by USB or file bundle. Target hardware is a 4 GB RAM phone. **Prototype target: 12 GB phone. 4 GB feasibility unproven, deferred to Phase 8.**
 
 **How to read this plan:** this file is for you. The coding agent reads only `AGENTS.md` plus the one card (or phase file) it is working on.
 
@@ -31,8 +31,8 @@ Decisions marked **CHANGED** replace the old solo plan.
 | D2 **CHANGED** | **No `llama-server` sidecar.** Android cannot reliably launch a bundled server executable. The model runs **in-process through an FFI binding**, inside a background isolate. |
 | D3 | The model outputs **JSON**. The app draws the ILAW layout. |
 | D4 | **One section at a time**, with the anti-hallucination measures H1 to H10 from the old plan (still valid, see section 5). |
-| D5 **CHANGED** | **Model tiers by device RAM**, not one default (section 4). The default is **chosen by Spike M on a real 4 GB phone**, not by the spec. |
-| D6 | The model is not in the APK. The app downloads it on first run from your website, then runs offline. The model lives in **app-private storage**. |
+| D5 **CHANGED** | **Model tiers by device RAM**, not one default (section 4). **Prototype runs `llamadart` + Gemma-SEA-LION-v4-4B-VL Q4_K_M at defaults on a 12 GB phone; no Spike M; 4 GB viability open.** |
+| D6 | The model is not in the APK. For prototype, the app uses a debug-only "Import model file" button via `file_picker` to copy a GGUF from system storage into app-private files/. **file_picker must be resolved before this.** Release APK needs downloader (T4.7) later. |
 | D7 | DOCX via `docs_gee` (pure Dart, works on Android). PDF via the `pdf` package with a bundled font. |
 | D8 **CHANGED** | **One `LlmEngine` interface, three implementations:** `LocalLlamaEngine` (FFI, production), `HttpLlmEngine` (OpenAI-compatible, dev only: your desktop Qwen server or the same SEA-LION GGUF served by `llama-server`), `FakeEngine` (tests). |
 | D9 **CHANGED** | **Chat mode = guided slot-filling.** The chat collects the form fields in conversation and feeds the same generation pipeline. It is not free-form lesson writing (section 7, Phase 6). |
@@ -40,6 +40,21 @@ Decisions marked **CHANGED** replace the old solo plan.
 | D11 **CHANGED** | **Windows is demoted to optional.** It was Phase 6 of the old plan. The target is Android now. Confirm this (section 11). |
 | D12 | Validation never blocks saving. It only blocks export, with an override. |
 | D13 | Competency references are zero-based indexes into that grade's `competencies` list. |
+
+---
+
+## 2. PRIORITY TASK: Resolve file_picker blocker
+
+**File:** `pubspec.yaml`
+
+**Do:** The package is blocked by Flutter 3.47.6 / AGP 9.x / SDK-34 conflict. Options:
+- Pin an older compatible version (e.g., file_picker: 6.1.0)
+- Wait for a fix in AGP 9.1+
+- Replace with path_provider + open_file or similar
+
+**This is REQUIRED for prototype APK to work.**
+
+**Commit:** `fix(deps): resolve file_picker compatibility issue`
 
 ---
 
@@ -97,15 +112,15 @@ Caveats of D8:
 
 ## 4. Model tiers (4 GB constraint)
 
-RAM numbers below are **estimates to be replaced by Spike M**. A "4 GB" phone usually leaves well under 4 GB for your app once Android and its services are running.
+RAM numbers below are **estimates**. The prototype runs on a 12 GB phone with a single model at **package defaults**; settings change only if the model fails to load, uses impractical memory, or is too slow. **Tier A (3 to 4 GB) is untested.** A "4 GB" phone usually leaves well under 4 GB for your app once Android and its services are running.
 
 | Tier | Device RAM | Model class | Notes |
 |---|---|---|---|
-| A | 3 to 4 GB | Smallest usable model (about 1 to 2B class, or a 4B at an aggressive quant if quality holds) | **Not selected yet.** Spike M must find one that writes acceptable Filipino. If none does, say so plainly: the 4 GB MVP goal is at risk. |
-| B | 6 GB | 4B Q4_K_M. Candidates: `Gemma-SEA-LION-v4-4B-VL` (official GGUF, Gemma licence), `Qwen-SEA-LION-v4-4B-VL`. | Context 3072 to 4096. |
-| C | 8 GB and up | `Apertus-SEA-LION-v4-8B-IT` Q4_K_M (about 5 GB). | Better quality. Needs a flagship phone. |
+| A | 3 to 4 GB | Smallest usable model (about 1 to 2B class, or a 4B at an aggressive quant if quality holds) | **Not selected yet. Untested — prototype uses 12 GB phone.** If none fits 4 GB, say so plainly. |
+| B | 6 GB | 4B Q4_K_M. **Prototype uses `Gemma-SEA-LION-v4-4B-VL` Q4_K_M (official GGUF, Gemma licence).** | Context 2048 for first run; only increase if needed. |
+| C | 8 GB and up | `Apertus-SEA-LION-v4-8B-IT` Q4_K_M (about 5 GB). | Try only after the 4B works end to end on the phone. |
 
-Runtime settings to tune in Spike M (names depend on the engine): context size (start 2048, test 3072 and 4096), threads (physical performance cores, usually 4), KV cache type (q8_0 if the engine allows), memory-mapped weights, batch size, **no GPU/Vulkan** by default (the `llamadart` docs mark Android Vulkan as experimental and exclude a known bad Adreno 750 driver).
+Runtime settings: **defaults first.** Change a setting only if loading fails, RAM is impractical, or generation is too slow — in that order: drop context (2048 → 1024 → 512), then threads (physical perf cores), then smaller quant. **No GPU/Vulkan** (the `llamadart` docs mark Android Vulkan as experimental). Prompt budget at n_ctx 2048: system block + section prompt + earlier sections + output reserve must fit (T5.1 builds the estimator).
 
 Prompt token budget at n_ctx 4096: system block plus section prompt plus earlier sections plus output reserve must fit. Card T5.1 builds a token estimator and tests it.
 
@@ -234,31 +249,16 @@ Then merge `dev1` to `main`.
 
 ## Phase 4: On-device engine, model manager (the core risk)
 
-Goal: the phone loads a real GGUF and streams tokens through `LlmEngine`. No lesson-plan prompts yet. **This phase decides whether the 4 GB goal is realistic.**
+Goal: the phone loads a real GGUF and streams tokens through `LlmEngine`. No lesson-plan prompts yet. **Validate the pipeline streams tokens on a 12 GB phone. 4 GB feasibility remains open (R1, R2 — unmitigated for 4 GB; Phase 8 must not claim 4 GB support).**
 
-### T4.1 Engine selection spike (human with agent) (strong)
-**Files:** `working_docs/engine_spike.md` (new).
-**Do:** compare these packages **by reading their current README and API, not from memory**:
-- `llamadart` (current line `^0.16.x`)
-- `lib_llama_cpp` (`^0.7.x`) with its Android and Linux federated packages
-- `llama_cpp_dart` (`0.9.0-dev.N` prerelease)
-
-Score each on: builds for Android arm64 **and** Linux; streaming tokens; cancel mid-generation; runs off the UI thread (isolate); grammar or JSON-schema constrained sampling; chat template handling; context, thread and KV-cache controls; memory-mapped loading; minimum Android SDK; licence; last release date; maintenance activity; prerelease risk. Build a 30-line sample app with the front-runner and load a tiny GGUF on Linux and on the phone.
-**Verify:** `engine_spike.md` names one engine and one fallback with reasons, plus the pinned version and `minSdk`.
-**Deps:** none yet.
-**Commit:** `docs: engine selection spike`
+### T4.1 Engine selection (collapsed for prototype) (strong)
+**Files:** `pubspec.yaml` (add `llamadart`), `android/app/build.gradle` (minSdk).
+**Do:** pick `llamadart` (confirmed Android + Linux support). Read its README and example in the pub cache; record the exact version and `minSdk`. Add `llamadart` with a **pinned exact version** (e.g., `llamadart: 0.16.3`, no caret range) to `pubspec.yaml`. Update `android/app/build.gradle` `minSdk` to match the package requirement. **No sample app, no comparison matrix, no fallback scoring.** The first on-phone run of `LocalLlamaEngine` (T4.5) is the spike.
+**Verify:** `pubspec.yaml` has pinned `llamadart`; `minSdk` matches; `flutter pub get` succeeds.
+**Commit:** `feat(core): add llamadart engine dependency`
 
 ### T4.2 Spike M: model, memory and speed on the phone (human)
-Use the chosen engine's sample app or a throwaway test screen. For each candidate model file, at context 2048, 3072 and 4096:
-- load time, time to first token, tokens per second, 500-token generation time
-- peak memory: `adb shell dumpsys meminfo <package>` (total PSS) while generating; `adb logcat` for low-memory-killer kills
-- thermal throttling after 3 runs in a row
-- quality: the Filipino test prompt from the old plan ("Gumawa ng detalyadong daloy ng aralin para sa Grade 3 at 4, 90 minuto, paksa: ulat-panahon") and one English prompt
-
-Candidates: Gemma-SEA-LION-v4-4B-VL Q4_K_M (official), Qwen-SEA-LION-v4-4B-VL Q4_K_M (check source), one 1 to 2B model for tier A, the E2B model only if the file exists. Record all numbers in `PROGRESS.md`.
-**Gate (decide before T4.4):**
-- Pass: a model with peak PSS comfortably under what the 4 GB phone can give and acceptable Filipino → tier A is real.
-- Fail: tell the user plainly that 4 GB devices need a smaller, weaker model or a lower-quality plan, or that the MVP's minimum should be 6 GB. Update `specifications.md` accordingly.
+**DELETED FOR PROTOTYPE.** No memory or speed measurement. The prototype runs on a 12 GB phone and records rough tokens-per-second only, for reference. No pass/fail gate. (Superseded by the working-prototype plan: T4.5 + T4.5b + manual import.)
 
 ### T4.3 `LlmEngine` interface and `FakeEngine` [9B]
 **Files:** `lib/core/llm/llm_engine.dart`, `lib/core/llm/fake_engine.dart`, `test/fake_engine_test.dart`.
@@ -282,7 +282,7 @@ abstract class LlmEngine {
 **Commit:** `feat(core): LlmEngine interface and fake engine`
 
 ### T4.4 `HttpLlmEngine` (dev only) (strong)
-**Files:** `lib/core/llm/http_llm_engine.dart`, `lib/core/llm/sse_parser.dart`, `test/http_llm_engine_test.dart`.
+**DEFERRED FOR PROTOTYPE.** Desktop dev uses the same `LocalLlamaEngine` on Linux (same GGUF), so this is not needed to make the phone work. Build it only if Linux iteration becomes painful. (Note: `T5.9`'s evaluation harness is written around `HttpLlmEngine`; adjust it when this is un-deferred.)
 **Do:** speak the OpenAI-compatible `/v1/chat/completions` stream protocol (base URL, optional key, model name). Parse server-sent events. Pass `temperature`, `seed`, `max_tokens`, `response_format` or `grammar` when set. Guard with `kDebugMode` and an `assert` so release builds cannot select it. Test against a local `HttpServer` in the test.
 **Deps:** none (`http` is already present).
 **Verify test:** deltas stream; `cancel()` closes the connection; a malformed event does not crash the stream.
@@ -291,48 +291,46 @@ abstract class LlmEngine {
 ### T4.5 `LocalLlamaEngine` (strong)
 **Files:** `lib/core/llm/local_llama_engine.dart`, `lib/core/llm/llama_isolate.dart`, `test/local_llama_engine_test.dart`.
 **Deps:** the engine picked in T4.1 (human approves the exact version).
-**Do:** implement `LlmEngine` over the chosen package. The model runs in a background isolate. `cancel()` must stop generation within about a second. `unload()` frees the native memory. Gate the test that needs a real model behind an env var (`LMS_TEST_GGUF=/path`) so CI-less runs stay green.
+**Do:** implement `LlmEngine` over the chosen package (pinned `llamadart`). The model runs in a background isolate. `cancel()` stops generation within ~1 s. `unload()` frees native memory. **Reactive defaults:** start at context 2048; drop only if it won't load or uses impractical RAM; reduce threads after measuring speed. Gate the test behind `LMS_TEST_GGUF=/path`. Use the package's **built-in chat template handling** and set its stop tokens — don't hand-build prompts. For the prototype, push the model manually (see T4.5b) instead of downloading via downloader. **Manual import:** `adb shell mkdir -p /sdcard/Android/data/<package>/files && adb push Gemma-SEA-LION-v4-4B-VL-Q4_K_M.gguf /sdcard/Android/data/<package>/files/model.gguf`, then app reads via `getExternalFilesDir(null)` (no permissions). Fallback debuggable build: `adb push ... /data/local/tmp/ && run-as cp`. **Linux smoke test:** gate with `LMS_TEST_GGUF`, load tiny GGUF, stream 50 tokens, cancel works.
 **Verify:** with `LMS_TEST_GGUF` set, load a small model on Linux and stream 50 tokens; cancel works. Then by hand on the phone.
 **Commit:** `feat(core): local llama engine`
 
+### T4.5b Throwaway LLM debug screen (new, prototype only)
+**Files:** `lib/features/debug/llm_debug_screen.dart`.
+**Do:** one screen (debug builds only, `kDebugMode` guard) that lets you *see* tokens on the phone: "Load model" button reading `getExternalFilesDir(null)/model.gguf`; prompt box pre-filled with a short Filipino test prompt; "Generate" streaming `engine.complete()` with defaults (`temp 0.3`, `maxTokens 512`); streamed text area; "Cancel" button calling `engine.cancel()`; tokens-per-second readout at the end (tokens ÷ seconds). Register in debug shell route. Remove before Phase 5.
+**Verify:** phone run streams real tokens offline; Cancel stops generation; UI never freezes. Rough tok/s recorded in `PROGRESS.md`.
+**Commit:** `feat(prototype): throwaway LLM debug screen`
+
+### T4.5c Model installed check (prototype)
+**Files:** `lib/core/llm/model_paths.dart`
+**Do:** Simple rule: check `getExternalFilesDir(null)/model.gguf` exists and is > 100 MB. If missing, T4.5b debug screen shows "No model found. Import via file_picker."
+**Commit:** `feat(prototype): model installed check`
+
 ### T4.6 Model manifest [9B]
-**Files:** `lib/core/models/model_manifest.dart`, `test/model_manifest_test.dart`, `assets/models.sample.json`.
-**Do:** `models.json` (hosted on your website): `id`, `displayName`, `tier`, `fileName`, `url`, `sizeBytes`, `sha256`, `minRamMb`, `contextSize`, `language`, `licenseUrl`. Parse tolerantly, ignore unknown fields. Never ship real URLs or hashes in the sample.
-**Verify test:** parse the sample; unknown fields ignored; missing required field throws a typed error.
-**Commit:** `feat(core): model manifest`
+**DEFERRED FOR PROTOTYPE.** Manual import needs no manifest. (file_picker required for import)
 
 ### T4.7 Model downloader (strong)
-**Files:** `lib/services/models/model_downloader.dart`, `lib/services/models/model_store.dart`, `test/model_downloader_test.dart`.
-**Do:** HTTP **Range** resume with a `.part` file; streaming SHA-256 verify; free-disk check (need file size plus margin); progress and cancel; exponential backoff on network timeouts; a verified file is never re-downloaded; store in `getApplicationSupportDirectory()/models/`. `ModelStore` lists installed models and deletes one.
-**Deps:** none (`http` and `crypto` are present).
-**Verify test (local `HttpServer` serving a fake 5 MB file):** resume after an interrupted download; a wrong hash deletes the file and reports an error; insufficient disk space refuses before downloading; cancel leaves a resumable `.part`.
-**Commit:** `feat(services): resumable model downloader with checksum`
+**DEFERRED FOR PROTOTYPE.** Manual `adb push` replaces the downloader.
 
 ### T4.8 Device capability check (strong)
-**Files:** `android/app/src/main/kotlin/.../MainActivity.kt`, `lib/services/device/device_capability.dart`, `test/device_capability_test.dart`.
-**Do:** a platform channel returns total RAM, currently available RAM, low-RAM flag and CPU ABI (`ActivityManager.MemoryInfo`, `Build.SUPPORTED_ABIS`). `DeviceCapability.recommendTier(manifest)` picks the best tier for the device and returns warnings. On Linux the channel is absent and the class uses `/proc/meminfo`.
-**Verify test:** `recommendTier` with fake RAM values; a 32-bit-only device gets a clear "not supported" result.
-**Commit:** `feat(android): device RAM check and model tier recommendation`
+**DEFERRED FOR PROTOTYPE.** No RAM gating needed on 12 GB phone; no 4 GB device available for testing.
 
-### T4.9 Setup and model screen [9B]
-**Files:** `lib/features/settings/model_setup_screen.dart`, `lib/features/settings/settings_screen.dart`, `test/model_setup_screen_test.dart`.
-**Do:** a first-run card "Download AI model (about N GB)" with the recommended tier, a Wi-Fi warning, progress, pause/resume, "Delete model", and **"Import model file"** (system file picker, copy into app-private storage, verify the hash). Settings AI status card shows the installed model and engine state. Keep the screen awake while downloading (needs `wakelock_plus`; the human approves that dependency). Resume automatically on relaunch.
-**Verify:** widget test with a fake downloader: progress renders, cancel works. By hand on the phone: interrupt the download with airplane mode, reconnect, it resumes.
-**Commit:** `feat(ui): model setup screen`
+### T4.9 Import model file (partial, prototype only)
+**Files:** `lib/features/debug/llm_debug_screen.dart` (added import button)
+**Do:** Debug-only "Import model file" button using `file_picker` to select GGUF → copy to app-private files/. Required for prototype APK to work. Full downloader (T4.7) is deferred.
+**Commit:** `feat(prototype): model import button`
 
 ### T4.10 Memory pressure handling (strong)
-**Files:** `lib/services/llm/engine_lifecycle.dart`, `lib/core/providers.dart`, `test/engine_lifecycle_test.dart`.
-**Do:** a controller that loads the model only when generation starts, unloads after an idle timeout (default 60 s), refuses to load below a minimum available-RAM threshold with a friendly message, and unloads on `didHaveMemoryPressure` and `AppLifecycleState.paused`. Typed `OutOfMemoryException` → one retry with a smaller context, then a clear error.
-**Verify test:** with `FakeEngine`: idle unload fires; low-RAM load is refused; pressure event unloads.
-**Commit:** `feat(core): engine lifecycle and memory pressure handling`
+**DEFERRED FOR PROTOTYPE.** No memory-pressure handling needed on 12 GB phone.
 
 ### Phase 4 acceptance (human, on the phone)
-- [ ] The chosen model downloads, survives a mid-download interruption, passes its hash check.
-- [ ] A throwaway test screen streams real tokens from the model offline.
-- [ ] Cancel stops generation. The UI never freezes.
-- [ ] No low-memory kill in 10 generations in a row (check `logcat`).
-- [ ] The model file sits in app-private storage and the app has no storage permission.
-- [ ] Spike M numbers and the tier decision are in `PROGRESS.md`.
+- [ ] file_picker conflict resolved in pubspec.yaml.
+- [ ] APK builds for release (`flutter build apk --release`).
+- [ ] APK installs on phone.
+- [ ] Tap "Import model file" on fresh install → select GGUF → app loads it (or: adb push GGUF to files/ then app finds it).
+- [ ] Debug screen loads model, streams tokens.
+- [ ] Cancel stops generation; UI never freezes.
+- [ ] Rough tok/s recorded in `PROGRESS.md` with note: "12 GB phone only, 4 GB untested."
 
 ---
 
@@ -440,6 +438,11 @@ Spec feature 3 asks for "chat with an offline AI assistant". With a 4B model on 
 - [ ] A teacher describes a class in chat (Filipino and English) and gets a filled form.
 - [ ] Generated plan from chat passes validation like form mode.
 - [ ] Chat history persists across restarts. History is capped so the prompt stays within budget.
+
+### file_picker blocker (must resolve before Phase 7)
+**Files:** `pubspec.yaml`.
+**Do:** `file_picker` is commented out due to a Flutter/AGP 9 / SDK-34 conflict. Resolve it (fix the conflict, pin a compatible version, or pick a replacement) before Phase 7 — Phase 7 needs it for `.lms` import and export save dialogs, and the deferred model-import button depends on it. This blocks spec feature 6.
+**Commit:** `chore(deps): resolve file_picker conflict`
 
 ---
 
@@ -557,15 +560,16 @@ Each item needs a go decision from you first.
 
 | # | Risk | Likelihood | Mitigation |
 |---|---|---|---|
-| R1 | No model fits a 4 GB phone with acceptable Filipino quality. | High | Spike M early (Phase 4, before any prompt work). Decide tiers or raise the minimum. |
-| R2 | Full-plan generation takes minutes on budget CPUs. | High | Generate stage by stage, show live preview, keep screen on, set honest expectations. Measure in Spike M. |
+| R1 | No model fits a 4 GB phone with acceptable Filipino quality. | High | Spike M early (Phase 4, before any prompt work). **Prototype runs on 12 GB.** Decide tiers or raise the minimum. |
+| R2 | Full-plan generation takes minutes on budget CPUs. | High | Generate stage by stage, show live preview, keep screen on, set honest expectations. Measure in Spike M. **Prototype on 12 GB only; R2 unmitigated for 4 GB.** |
 | R3 | Chosen FFI package is a prerelease or is abandoned. | Medium | `LlmEngine` boundary keeps the choice swappable. Pin the version. Keep a fallback from T4.1. |
 | R4 | Android kills the app mid-generation or mid-download. | High | Draft autosave (T3.6), resumable downloads (T4.7), unload on pressure (T4.10). |
 | R5 | Desktop prompt results do not match the phone. | Medium | Same GGUF on both, same seed and params. Phone spot check at the end of Phase 5. |
 | R6 | Model licence or hosting limits redistribution. | Medium | Check each licence before hosting. Manifest allows replacing the model without an app update. |
 | R7 | Small agent model loses track on cards that touch Gradle or Kotlin. | Medium | Those cards are tagged (strong). Keep cards at 3 files. |
 | R8 | 32-bit-only budget phones cannot run the arm64 library. | Medium | T4.8 detects it and reports clearly. |
-| R9 | The model writes wrong curriculum content. | High | H1 to H10, teacher review, grounded fields never generated. |
+| R9 | file_picker blocked by Flutter/AGP 9.1+ incompatibility. | High | Resolve before Phase 4 (PRIORITY TASK). Fallback to hardcoded path or alternative picker if needed. |
+| R10 | The model writes wrong curriculum content. | High | H1 to H10, teacher review, grounded fields never generated. |
 
 ---
 
@@ -577,8 +581,7 @@ Each item needs a go decision from you first.
 | Q2 | What does "IMS packages" mean: IMS Common Cartridge, or just a file bundle? | Phase 7 |
 | Q3 | Are "worksheets" a required MVP output? If yes, from what input and in what format? | Phase 7 |
 | Q4 | Is guided slot-filling enough for "chat", or do you want broader chat about the plan? | Phase 6 |
-| Q5 | Where will `models.json` and the model file be hosted, and who pays for bandwidth? | Phase 4 (T4.6) |
-| Q6 | Which exact 4 GB phone is the reference device? Is a second, larger phone available? | Phase 3 (T3.0) |
+| Q5 | Where will `models.json` and the model file be hosted, and who pays for bandwidth? | Phase 4 (T4.6) | **file_picker must work first.** |
 | Q7 | Who is the teacher reviewer for Phase 5? Who reviews Filipino text and IPEd content? | Phase 5 |
 | Q8 | Exact wording required for the AI use declaration? | Phase 7 |
 | Q9 | Minimum Android version of the teachers' phones? (sets `minSdk`) | Phase 3 (T3.1) |
