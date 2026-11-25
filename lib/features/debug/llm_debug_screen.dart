@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:ai_lesson_planner/core/llm/llm_engine.dart';
 import 'package:ai_lesson_planner/core/llm/local_llama_engine.dart';
 import 'package:ai_lesson_planner/core/llm/model_paths.dart';
+import 'package:ai_lesson_planner/features/debug/download_dialog.dart';
+import 'package:ai_lesson_planner/services/llm/model_downloader.dart';
 
 /// Debug screen for testing LLM generation on device.
 class LlmDebugScreen extends StatefulWidget {
@@ -144,6 +146,50 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
     });
   }
 
+  Future<void> _downloadModel() async {
+    final downloader = ModelDownloader();
+    final progressStream = downloader.download();
+
+    // Show the download dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => DownloadProgressDialog(
+        progressStream: progressStream,
+        onCancel: () {
+          downloader.cancel();
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+
+    // Wait for download to complete
+    await for (final progress in progressStream) {
+      if (progress.isComplete) {
+        if (!mounted) break;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Model downloaded successfully')),
+        );
+
+        // Check model status
+        await _checkModelStatus();
+        Navigator.of(context).pop();
+        break;
+      }
+
+      if (progress.error != null) {
+        if (!mounted) break;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Download failed: ${progress.error}')),
+        );
+        Navigator.of(context).pop();
+        break;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!kDebugMode) {
@@ -232,6 +278,18 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isLoading ? null : _downloadModel,
+                    icon: const Icon(Icons.download),
+                    label: const Text('Download Model'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: _isLoading ? null : _loadModel,

@@ -25,6 +25,7 @@ void main() {
       );
       expect(find.text('Filipino Test Prompt'), findsOneWidget);
       expect(find.text('Check Model'), findsOneWidget);
+      expect(find.text('Download Model'), findsOneWidget);
       expect(find.text('Load Model'), findsOneWidget);
       expect(find.text('Generate'), findsOneWidget);
     });

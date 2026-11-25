@@ -119,3 +119,15 @@
 - Created `test/model_manifest_test.dart` with 11 tests for serialization, equality, and defaults
 - All tests pass, flutter analyze clean
 - Debug APK builds successfully (~167 MB)
+
+### T4.7 Model downloader (Complete)
+- Created `lib/services/llm/model_downloader.dart` with ModelDownloader class
+- Created `lib/features/debug/download_dialog.dart` with DownloadProgressDialog widget
+- Created `test/model_downloader_test.dart` with 9 tests for DownloadProgress, SHA-256, percentage, URL generation
+- Implements streaming download with progress tracking via DownloadProgress class
+- SHA-256 checksum verification support (placeholder checksum for prototype)
+- Saves model to app-private storage via getExternalStorageDirectory()
+- Updates models.json manifest after successful download
+- Added "Download Model" button to llm_debug_screen.dart
+- All tests pass, flutter analyze clean
+- Debug APK builds successfully (~167 MB)
