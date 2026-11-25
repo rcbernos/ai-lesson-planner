@@ -1,5 +1,13 @@
 # Progress
 
+## Phase 4 - On-device Engine (T4.1 Complete)
+### T4.1 Engine selection (Complete)
+- Added `llamadart: 0.21.0` with pinned exact version to `pubspec.yaml`.
+- Updated SDK constraint from `>=3.0.0 <4.0.0` to `>=3.10.0 <4.0.0` to match llamadart requirements.
+- `flutter pub get` succeeded.
+- `flutter build apk --debug` succeeded (~167 MB).
+- Commit: `feat(core): add llamadart engine dependency`
+
 ## Phase 0 - Repository Reconciliation (dev1)
 - Dependencies fixed, fonts, path resolution, Drift/SQLite layer complete.
 - Domain model, app shell/theme, generator mock, library, settings done. Tests: 117 pass (was 108).
