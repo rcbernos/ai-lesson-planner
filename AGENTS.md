@@ -2,8 +2,6 @@
 
 Project: offline Flutter desktop app that drafts DepEd ILAW lesson plans for multigrade classes (local LLM comes in Phase 3). Work on branch `dev1`. Never commit.
 
-**Current phase file:** `working_docs/phase2_tasks.md`
-
 ## Every session
 1. Read `working_docs/PROGRESS.md`, then ONLY your task card in the current phase file. Do not read other plan files.
 2. Do exactly one card. Touch only the files it lists (max 3). Generated files (`*.g.dart`, Drift schema dumps, generated migration helpers) don't count. If you need more files, stop and say so.
