@@ -104,3 +104,9 @@
 - Added debug link in Settings screen (only visible in kDebugMode) via bolt icon
 - All tests pass, flutter analyze clean
 - Commit: `feat(prototype): throwaway LLM debug screen`
+
+### T4.5c Model installed check (Complete)
+- Updated `model_paths.dart` to use `getExternalStorageDirectory()` on Android (matches `getExternalFilesDir(null)`)
+- Added fallback to `getApplicationSupportDirectory()` on non-Android platforms (Linux tests)
+- Updated debug screen to show "No model found. Import via file_picker." when model is missing
+- Widget tests updated and passing

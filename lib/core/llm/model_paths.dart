@@ -11,11 +11,21 @@ class ModelPaths {
   /// Checks if a model file exists and meets minimum size requirements.
   /// Returns the model file path if valid, null otherwise.
   static Future<String?> checkModelInstalled() async {
-    // Use application support directory as a fallback
-    // On Android, this resolves to: getApplicationSupportDirectory()
-    // which is: /data/user/0/<package>/files/
-    // For prototype, we check for model.gguf in this location
-    final appDir = await getApplicationSupportDirectory();
+    // Use external storage directory (app-specific external files dir)
+    // On Android, this resolves to: getExternalFilesDir(null)
+    // which is: /sdcard/Android/data/<package>/files/
+    // No storage permission needed for this directory.
+    // Falls back to application support directory on non-Android platforms.
+    Directory? appDir;
+    try {
+      appDir = await getExternalStorageDirectory();
+    } on UnsupportedError {
+      // getExternalStorageDirectory is not supported on this platform (e.g., Linux tests)
+      appDir = null;
+    }
+
+    appDir ??= await getApplicationSupportDirectory();
+
     final modelPath = p.join(appDir.path, 'model.gguf');
     final file = File(modelPath);
 
@@ -32,7 +42,15 @@ class ModelPaths {
 
   /// Gets the expected model file path for loading.
   static Future<String> getExpectedModelPath() async {
-    final appDir = await getApplicationSupportDirectory();
+    Directory? appDir;
+    try {
+      appDir = await getExternalStorageDirectory();
+    } on UnsupportedError {
+      appDir = null;
+    }
+
+    appDir ??= await getApplicationSupportDirectory();
+
     return p.join(appDir.path, 'model.gguf');
   }
 

@@ -189,7 +189,9 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _isModelLoaded ? 'Model Loaded' : 'No Model Found',
+                            _isModelLoaded
+                                ? 'Model Loaded'
+                                : 'No model found. Import via file_picker.',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           if (_modelPath != null)
