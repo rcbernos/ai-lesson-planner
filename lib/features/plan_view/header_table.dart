@@ -19,7 +19,7 @@ String _toRoman(int n) {
     'VII',
     'VIII',
     'IX',
-    'X'
+    'X',
   ];
   return n >= 1 && n <= 10 ? numerals[n - 1] : '$n';
 }
@@ -66,15 +66,22 @@ class HeaderSection extends StatelessWidget {
             Center(
               child: Text(
                 'DAILY LESSON PLAN FOR GRADE $gradeLevelsDisplay',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             // On narrow screens (<600dp), stack to 2 columns
             if (isNarrow)
-              _buildNarrowLayout(context, isEditable, sessionString,
-                  learnerCountStr, gradeLevelsDisplay)
+              _buildNarrowLayout(
+                context,
+                isEditable,
+                sessionString,
+                learnerCountStr,
+                gradeLevelsDisplay,
+              )
             else
               Table(
                 border: TableBorder.all(color: Colors.grey.shade400),
@@ -100,34 +107,64 @@ class HeaderSection extends StatelessWidget {
   }
 
   /// Build a 2-column layout for narrow screens.
-  Widget _buildNarrowLayout(BuildContext context, bool isEditable,
-      String sessionString, String learnerCountStr, String gradeLevelsDisplay) {
+  Widget _buildNarrowLayout(
+    BuildContext context,
+    bool isEditable,
+    String sessionString,
+    String learnerCountStr,
+    String gradeLevelsDisplay,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildNarrowLabelValueRow('School',
-            _editableCell(context, 'School', plan.header.school, isEditable)),
         _buildNarrowLabelValueRow(
+          'School',
+          _editableCell(context, 'School', plan.header.school, isEditable),
+        ),
+        _buildNarrowLabelValueRow(
+          'Grade Levels',
+          _editableCell(
+            context,
             'Grade Levels',
-            _editableCell(
-                context, 'Grade Levels', gradeLevelsDisplay, isEditable)),
-        _buildNarrowLabelValueRow('Teacher',
-            _editableCell(context, 'Teacher', plan.header.teacher, isEditable)),
+            gradeLevelsDisplay,
+            isEditable,
+          ),
+        ),
         _buildNarrowLabelValueRow(
+          'Teacher',
+          _editableCell(context, 'Teacher', plan.header.teacher, isEditable),
+        ),
+        _buildNarrowLabelValueRow(
+          'Learning Area',
+          _editableCell(
+            context,
             'Learning Area',
-            _editableCell(context, 'Learning Area', plan.header.learningArea,
-                isEditable)),
-        _buildNarrowLabelValueRow('Teaching Date',
-            _editableCell(context, 'Date', plan.header.date, isEditable)),
-        _buildNarrowLabelValueRow('Quarter/Term',
-            _editableCell(context, 'Term', plan.header.term, isEditable)),
+            plan.header.learningArea,
+            isEditable,
+          ),
+        ),
+        _buildNarrowLabelValueRow(
+          'Teaching Date',
+          _editableCell(context, 'Date', plan.header.date, isEditable),
+        ),
+        _buildNarrowLabelValueRow(
+          'Quarter/Term',
+          _editableCell(context, 'Term', plan.header.term, isEditable),
+        ),
         _buildNarrowLabelValueRow('Time / Sessions', _valueCell(sessionString)),
         _buildNarrowLabelValueRow(
-            'No. of Learners', _valueCell(learnerCountStr)),
+          'No. of Learners',
+          _valueCell(learnerCountStr),
+        ),
         _buildNarrowLabelValueRow(
+          'Multigrade Model',
+          _editableCell(
+            context,
             'Multigrade Model',
-            _editableCell(context, 'Multigrade Model',
-                plan.header.multigradeModel, isEditable)),
+            plan.header.multigradeModel,
+            isEditable,
+          ),
+        ),
       ],
     );
   }
@@ -139,10 +176,12 @@ class HeaderSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(label,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, color: _navy))),
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: _navy),
+            ),
+          ),
           Expanded(child: value),
         ],
       ),
@@ -150,71 +189,101 @@ class HeaderSection extends StatelessWidget {
   }
 
   TableRow _buildSchoolRow(
-      BuildContext context, bool isEditable, String gradeLevels) {
-    return TableRow(children: [
-      _labelCell('School'),
-      _editableCell(context, 'School', plan.header.school, isEditable),
-      _labelCell('Grade Levels'),
-      _editableCell(context, 'Grade Levels', gradeLevels, isEditable),
-    ]);
+    BuildContext context,
+    bool isEditable,
+    String gradeLevels,
+  ) {
+    return TableRow(
+      children: [
+        _labelCell('School'),
+        _editableCell(context, 'School', plan.header.school, isEditable),
+        _labelCell('Grade Levels'),
+        _editableCell(context, 'Grade Levels', gradeLevels, isEditable),
+      ],
+    );
   }
 
   TableRow _buildTeacherRow(BuildContext context, bool isEditable) {
-    return TableRow(children: [
-      _labelCell('Teacher'),
-      _editableCell(context, 'Teacher', plan.header.teacher, isEditable),
-      _labelCell('Learning Area'),
-      _editableCell(
-          context, 'Learning Area', plan.header.learningArea, isEditable),
-    ]);
+    return TableRow(
+      children: [
+        _labelCell('Teacher'),
+        _editableCell(context, 'Teacher', plan.header.teacher, isEditable),
+        _labelCell('Learning Area'),
+        _editableCell(
+          context,
+          'Learning Area',
+          plan.header.learningArea,
+          isEditable,
+        ),
+      ],
+    );
   }
 
   TableRow _buildDateRow(BuildContext context, bool isEditable) {
-    return TableRow(children: [
-      _labelCell('Teaching Date'),
-      _editableCell(context, 'Date', plan.header.date, isEditable),
-      _labelCell('Quarter/Term'),
-      _editableCell(context, 'Term', plan.header.term, isEditable),
-    ]);
+    return TableRow(
+      children: [
+        _labelCell('Teaching Date'),
+        _editableCell(context, 'Date', plan.header.date, isEditable),
+        _labelCell('Quarter/Term'),
+        _editableCell(context, 'Term', plan.header.term, isEditable),
+      ],
+    );
   }
 
   TableRow _buildTimeLearnerRow(String sessionString, String learnerCountStr) {
-    return TableRow(children: [
-      _labelCell('Time / Sessions'),
-      _valueCell(sessionString),
-      _labelCell('No. of Learners'),
-      _valueCell(learnerCountStr),
-    ]);
+    return TableRow(
+      children: [
+        _labelCell('Time / Sessions'),
+        _valueCell(sessionString),
+        _labelCell('No. of Learners'),
+        _valueCell(learnerCountStr),
+      ],
+    );
   }
 
   TableRow _buildMultigradeRow(BuildContext context, bool isEditable) {
     // Row 5: Multigrade Model label in col 0, value spanning cols 1-3
-    return TableRow(children: [
-      _labelCell('Multigrade Model'),
-      _editableCell(
-          context, 'Multigrade Model', plan.header.multigradeModel, isEditable),
-      const SizedBox.shrink(), // placeholder for col 2
-      const SizedBox.shrink(), // placeholder for col 3
-    ]);
+    return TableRow(
+      children: [
+        _labelCell('Multigrade Model'),
+        _editableCell(
+          context,
+          'Multigrade Model',
+          plan.header.multigradeModel,
+          isEditable,
+        ),
+        const SizedBox.shrink(), // placeholder for col 2
+        const SizedBox.shrink(), // placeholder for col 3
+      ],
+    );
   }
 
   Widget _labelCell(String label) {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: Text(label,
-          style: const TextStyle(fontWeight: FontWeight.bold, color: _navy)),
+      child: Text(
+        label,
+        style: const TextStyle(fontWeight: FontWeight.bold, color: _navy),
+      ),
     );
   }
 
   Widget _editableCell(
-      BuildContext context, String label, String value, bool isEditable) {
+    BuildContext context,
+    String label,
+    String value,
+    bool isEditable,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: GestureDetector(
         onTap: isEditable
             ? () async {
-                final result = await showCellEditDialog(context,
-                    title: 'Edit $label', initial: value);
+                final result = await showCellEditDialog(
+                  context,
+                  title: 'Edit $label',
+                  initial: value,
+                );
                 if (result != null && onChange != null) {
                   _applyHeaderChange(label, result);
                 }
@@ -225,7 +294,8 @@ class HeaderSection extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-                color: isEditable ? Theme.of(context).hoverColor : null),
+              color: isEditable ? Theme.of(context).hoverColor : null,
+            ),
             child: Text(value),
           ),
         ),
@@ -248,9 +318,6 @@ class HeaderSection extends StatelessWidget {
   }
 
   Widget _valueCell(String value) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Text(value),
-    );
+    return Padding(padding: const EdgeInsets.all(8), child: Text(value));
   }
 }

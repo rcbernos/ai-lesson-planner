@@ -67,8 +67,11 @@ class MockLessonGenerator implements LessonGenerator {
 
     // Build a fresh plan and apply the section replacement
     final freshPlan = _buildPlan(request);
-    final mergedPlan =
-        current.replaceSection(section, freshPlan, gradeLabel: gradeLabel);
+    final mergedPlan = current.replaceSection(
+      section,
+      freshPlan,
+      gradeLabel: gradeLabel,
+    );
 
     // Apply variant marker for visibility
     final variantPlan = _applyVariantMarker(mergedPlan, section, gradeLabel);
@@ -86,7 +89,10 @@ class MockLessonGenerator implements LessonGenerator {
 
   /// Applies a "(variant N)" marker to generated content for visibility.
   LessonPlan _applyVariantMarker(
-      LessonPlan plan, PlanSection section, String? gradeLabel) {
+    LessonPlan plan,
+    PlanSection section,
+    String? gradeLabel,
+  ) {
     final variant = _variantCounter++;
     final suffix = ' (variant $variant)';
 
@@ -111,8 +117,9 @@ class MockLessonGenerator implements LessonGenerator {
 
       case PlanSection.learningExperiences:
         final newFlow = plan.flow.asMap().values.map((s) {
-          final newActivityByGrade =
-              Map<String, String>.from(s.activityByGrade);
+          final newActivityByGrade = Map<String, String>.from(
+            s.activityByGrade,
+          );
           if (gradeLabel != null &&
               newActivityByGrade.containsKey(gradeLabel)) {
             newActivityByGrade[gradeLabel] =
@@ -159,7 +166,9 @@ class MockLessonGenerator implements LessonGenerator {
           return r;
         }).toList();
         return plan.copyWith(
-            waysForward: newWaysForward, reflectionQuestions: newReflections);
+          waysForward: newWaysForward,
+          reflectionQuestions: newReflections,
+        );
     }
   }
 
@@ -179,19 +188,21 @@ class MockLessonGenerator implements LessonGenerator {
     final header = request.header;
 
     final gradeBlocks = grades
-        .map((g) => GradeBlock(
-              gradeLabel: g.gradeLabel,
-              learnersMale: g.male,
-              learnersFemale: g.female,
-              subTheme: g.subTheme,
-              contentStandard: _contentStandard(g.gradeLabel),
-              performanceStandard: _performanceStandard(g.gradeLabel),
-              competencies: [g.competency],
-              objectives: [
-                'Natutukoy ang ${g.subTheme.split(' ').first}.',
-                'Nakapagpapahayag ng ideya.'
-              ],
-            ))
+        .map(
+          (g) => GradeBlock(
+            gradeLabel: g.gradeLabel,
+            learnersMale: g.male,
+            learnersFemale: g.female,
+            subTheme: g.subTheme,
+            contentStandard: _contentStandard(g.gradeLabel),
+            performanceStandard: _performanceStandard(g.gradeLabel),
+            competencies: [g.competency],
+            objectives: [
+              'Natutukoy ang ${g.subTheme.split(' ').first}.',
+              'Nakapagpapahayag ng ideya.',
+            ],
+          ),
+        )
         .toList();
 
     return LessonPlan(
@@ -206,8 +217,10 @@ class MockLessonGenerator implements LessonGenerator {
       ),
       flow: _buildFlow(header.sessionMinutes, grades),
       assessments: _buildAssessments(grades),
-      reflectionQuestions:
-          _buildReflectionQuestions(grades, request.sharedSubTheme),
+      reflectionQuestions: _buildReflectionQuestions(
+        grades,
+        request.sharedSubTheme,
+      ),
       waysForward: _buildWaysForward(grades),
       notesNextSession: 'Ipatuloy sa susunod.',
       preparedBy: header.teacher,
@@ -230,27 +243,34 @@ class MockLessonGenerator implements LessonGenerator {
 
   List<GradeAssessment> _buildAssessments(List<GradeInput> grades) {
     return grades
-        .map((g) => GradeAssessment(
-              gradeLabel: g.gradeLabel,
-              formative: 'Obserbahan ang pakikilahok.',
-              exitTask: 'Isulat ang sumusunod.',
-              successCriteria: 'Nailalarawan at nakapagpapahayag.',
-              competencyIndex: 0,
-            ))
+        .map(
+          (g) => GradeAssessment(
+            gradeLabel: g.gradeLabel,
+            formative: 'Obserbahan ang pakikilahok.',
+            exitTask: 'Isulat ang sumusunod.',
+            successCriteria: 'Nailalarawan at nakapagpapahayag.',
+            competencyIndex: 0,
+          ),
+        )
         .toList();
   }
 
   List<ReflectionQuestion> _buildReflectionQuestions(
-      List<GradeInput> grades, String sharedSubTheme) {
+    List<GradeInput> grades,
+    String sharedSubTheme,
+  ) {
     final questions = <ReflectionQuestion>[];
     for (final g in grades) {
-      questions.add(ReflectionQuestion(
-        gradeLabel: g.gradeLabel,
-        text: 'Ano ang natutuhan sa ${_firstWord(sharedSubTheme)}?',
-      ));
+      questions.add(
+        ReflectionQuestion(
+          gradeLabel: g.gradeLabel,
+          text: 'Ano ang natutuhan sa ${_firstWord(sharedSubTheme)}?',
+        ),
+      );
     }
-    questions
-        .add(ReflectionQuestion(gradeLabel: null, text: 'Kumusta ang aralin?'));
+    questions.add(
+      ReflectionQuestion(gradeLabel: null, text: 'Kumusta ang aralin?'),
+    );
     return questions;
   }
 
@@ -260,11 +280,13 @@ class MockLessonGenerator implements LessonGenerator {
 
   List<GradeWaysForward> _buildWaysForward(List<GradeInput> grades) {
     return grades
-        .map((g) => GradeWaysForward(
-              gradeLabel: g.gradeLabel,
-              remediation: 'Muling basahin.',
-              enrichment: 'Maghanap ng iba pang halimbawa.',
-            ))
+        .map(
+          (g) => GradeWaysForward(
+            gradeLabel: g.gradeLabel,
+            remediation: 'Muling basahin.',
+            enrichment: 'Maghanap ng iba pang halimbawa.',
+          ),
+        )
         .toList();
   }
 
@@ -277,48 +299,57 @@ class MockLessonGenerator implements LessonGenerator {
     final w = total - m - d - p - a;
 
     // Build competency index map for non-whole-class stages
-    final competencyIndexByGrade =
-        Map.fromEntries(grades.map((g) => MapEntry(g.gradeLabel, 0)));
+    final competencyIndexByGrade = Map.fromEntries(
+      grades.map((g) => MapEntry(g.gradeLabel, 0)),
+    );
 
     return [
       FlowStage(
-          minutes: m,
-          stage: 'Motivation',
-          wholeClass: true,
-          activityByGrade: {},
-          wholeClassActivity: 'Ipakita ang larawan.',
-          competencyIndexByGrade: const {}),
+        minutes: m,
+        stage: 'Motivation',
+        wholeClass: true,
+        activityByGrade: {},
+        wholeClassActivity: 'Ipakita ang larawan.',
+        competencyIndexByGrade: const {},
+      ),
       FlowStage(
-          minutes: d,
-          stage: 'Direct Teaching',
-          wholeClass: false,
-          activityByGrade: Map.fromEntries(grades
-              .map((g) => MapEntry(g.gradeLabel, 'Basahin at ilarawan.'))),
-          wholeClassActivity: '',
-          competencyIndexByGrade: competencyIndexByGrade),
+        minutes: d,
+        stage: 'Direct Teaching',
+        wholeClass: false,
+        activityByGrade: Map.fromEntries(
+          grades.map((g) => MapEntry(g.gradeLabel, 'Basahin at ilarawan.')),
+        ),
+        wholeClassActivity: '',
+        competencyIndexByGrade: competencyIndexByGrade,
+      ),
       FlowStage(
-          minutes: p,
-          stage: 'Practice',
-          wholeClass: false,
-          activityByGrade: Map.fromEntries(grades
-              .map((g) => MapEntry(g.gradeLabel, 'Gawin ang worksheet.'))),
-          wholeClassActivity: '',
-          competencyIndexByGrade: competencyIndexByGrade),
+        minutes: p,
+        stage: 'Practice',
+        wholeClass: false,
+        activityByGrade: Map.fromEntries(
+          grades.map((g) => MapEntry(g.gradeLabel, 'Gawin ang worksheet.')),
+        ),
+        wholeClassActivity: '',
+        competencyIndexByGrade: competencyIndexByGrade,
+      ),
       FlowStage(
-          minutes: a,
-          stage: 'Activity',
-          wholeClass: false,
-          activityByGrade: Map.fromEntries(
-              grades.map((g) => MapEntry(g.gradeLabel, 'Gumawa ng guhit.'))),
-          wholeClassActivity: '',
-          competencyIndexByGrade: competencyIndexByGrade),
+        minutes: a,
+        stage: 'Activity',
+        wholeClass: false,
+        activityByGrade: Map.fromEntries(
+          grades.map((g) => MapEntry(g.gradeLabel, 'Gumawa ng guhit.')),
+        ),
+        wholeClassActivity: '',
+        competencyIndexByGrade: competencyIndexByGrade,
+      ),
       FlowStage(
-          minutes: w,
-          stage: 'Wrap-up',
-          wholeClass: true,
-          activityByGrade: {},
-          wholeClassActivity: 'Ipagpakita ang huling gawa.',
-          competencyIndexByGrade: const {}),
+        minutes: w,
+        stage: 'Wrap-up',
+        wholeClass: true,
+        activityByGrade: {},
+        wholeClassActivity: 'Ipagpakita ang huling gawa.',
+        competencyIndexByGrade: const {},
+      ),
     ];
   }
 }

@@ -8,18 +8,14 @@ import 'fixtures/sample_plan.dart';
 
 void main() {
   group('plan_sections edit tests', () {
-    testWidgets('read-only mode shows no edit hints',
-        (WidgetTester tester) async {
+    testWidgets('read-only mode shows no edit hints', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: HeaderSection(
-              plan: plan,
-              onChange: null,
-            ),
-          ),
+          home: Scaffold(body: HeaderSection(plan: plan, onChange: null)),
         ),
       );
 
@@ -29,18 +25,14 @@ void main() {
       expect(find.text('Edit School'), findsNothing);
     });
 
-    testWidgets('AssessmentSection renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('AssessmentSection renders without errors', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: AssessmentSection(
-              plan: plan,
-              onChange: null,
-            ),
-          ),
+          home: Scaffold(body: AssessmentSection(plan: plan, onChange: null)),
         ),
       );
 
@@ -48,18 +40,14 @@ void main() {
       expect(find.text('Exit Task'), findsOneWidget);
     });
 
-    testWidgets('WaysForwardSection renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('WaysForwardSection renders without errors', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: WaysForwardSection(
-              plan: plan,
-              onChange: null,
-            ),
-          ),
+          home: Scaffold(body: WaysForwardSection(plan: plan, onChange: null)),
         ),
       );
 
@@ -67,36 +55,28 @@ void main() {
       expect(find.text('Enrichment'), findsOneWidget);
     });
 
-    testWidgets('ReflectionSection renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('ReflectionSection renders without errors', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: ReflectionSection(
-              plan: plan,
-              onChange: null,
-            ),
-          ),
+          home: Scaffold(body: ReflectionSection(plan: plan, onChange: null)),
         ),
       );
 
       expect(find.text('Reflection Questions'), findsOneWidget);
     });
 
-    testWidgets('FooterSection renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('FooterSection renders without errors', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: FooterSection(
-              plan: plan,
-              onChange: null,
-            ),
-          ),
+          home: Scaffold(body: FooterSection(plan: plan, onChange: null)),
         ),
       );
 

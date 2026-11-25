@@ -32,9 +32,9 @@ class PlanEditorNotifier extends StateNotifier<PlanEditorState?> {
   PlanEditorNotifier({
     DraftStore? drafts,
     Duration draftDelay = const Duration(seconds: 2),
-  })  : _drafts = drafts,
-        _draftDelay = draftDelay,
-        super(null);
+  }) : _drafts = drafts,
+       _draftDelay = draftDelay,
+       super(null);
 
   static const int _maxHistory = 20;
   final List<PlanEditorState> _history = [];
@@ -74,13 +74,15 @@ class PlanEditorNotifier extends StateNotifier<PlanEditorState?> {
       _history.add(current);
     }
 
-    _emit(PlanEditorState(
-      plan: newPlan,
-      issues: newIssues,
-      dirty: true,
-      savedId: current.savedId,
-      canUndo: _history.isNotEmpty,
-    ));
+    _emit(
+      PlanEditorState(
+        plan: newPlan,
+        issues: newIssues,
+        dirty: true,
+        savedId: current.savedId,
+        canUndo: _history.isNotEmpty,
+      ),
+    );
   }
 
   void applyRegenerated(LessonPlan plan) {
@@ -95,13 +97,15 @@ class PlanEditorNotifier extends StateNotifier<PlanEditorState?> {
     }
     _history.add(current);
 
-    _emit(PlanEditorState(
-      plan: plan,
-      issues: newIssues,
-      dirty: true,
-      savedId: current.savedId,
-      canUndo: _history.isNotEmpty,
-    ));
+    _emit(
+      PlanEditorState(
+        plan: plan,
+        issues: newIssues,
+        dirty: true,
+        savedId: current.savedId,
+        canUndo: _history.isNotEmpty,
+      ),
+    );
   }
 
   void undo() {
@@ -109,26 +113,30 @@ class PlanEditorNotifier extends StateNotifier<PlanEditorState?> {
     if (current == null || _history.isEmpty) return;
 
     final previous = _history.removeLast();
-    _emit(PlanEditorState(
-      plan: previous.plan,
-      issues: previous.issues,
-      dirty: previous.dirty,
-      savedId: previous.savedId,
-      canUndo: _history.isNotEmpty,
-    ));
+    _emit(
+      PlanEditorState(
+        plan: previous.plan,
+        issues: previous.issues,
+        dirty: previous.dirty,
+        savedId: previous.savedId,
+        canUndo: _history.isNotEmpty,
+      ),
+    );
   }
 
   void markSaved(int id) {
     final current = state;
     if (current == null) return;
 
-    _emit(PlanEditorState(
-      plan: current.plan,
-      issues: current.issues,
-      dirty: false,
-      savedId: id,
-      canUndo: current.canUndo,
-    ));
+    _emit(
+      PlanEditorState(
+        plan: current.plan,
+        issues: current.issues,
+        dirty: false,
+        savedId: id,
+        canUndo: current.canUndo,
+      ),
+    );
   }
 
   void clear() {

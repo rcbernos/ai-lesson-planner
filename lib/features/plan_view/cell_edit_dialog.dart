@@ -25,9 +25,7 @@ Future<String?> showCellEditDialog(
         controller: controller,
         maxLines: maxLines,
         keyboardType: numeric ? TextInputType.number : TextInputType.multiline,
-        decoration: InputDecoration(
-          errorText: error,
-        ),
+        decoration: InputDecoration(errorText: error),
         autofocus: true,
       ),
       actions: [

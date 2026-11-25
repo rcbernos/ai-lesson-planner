@@ -176,5 +176,5 @@ class GeneratorFormNotifier extends StateNotifier<GeneratorFormState> {
 /// Provider for the generator form state.
 final generatorFormProvider =
     StateNotifierProvider<GeneratorFormNotifier, GeneratorFormState>((ref) {
-  return GeneratorFormNotifier();
-});
+      return GeneratorFormNotifier();
+    });

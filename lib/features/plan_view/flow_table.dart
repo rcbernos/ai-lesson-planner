@@ -51,19 +51,25 @@ class FlowTable extends StatelessWidget {
     // Build header row: Minutes, Stage, Whole-class, then one column per grade [+ refresh icons]
     final headerCells = [
       const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Min', style: TextStyle(fontWeight: FontWeight.bold))),
+        padding: EdgeInsets.all(8.0),
+        child: Text('Min', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
       const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Stage', style: TextStyle(fontWeight: FontWeight.bold))),
+        padding: EdgeInsets.all(8.0),
+        child: Text('Stage', style: TextStyle(fontWeight: FontWeight.bold)),
+      ),
       const Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Text('Whole Class',
-              style: TextStyle(fontWeight: FontWeight.bold))),
+        padding: EdgeInsets.all(8.0),
+        child: Text(
+          'Whole Class',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
       for (final label in gradeLabels)
         Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(label, style: TextStyle(fontWeight: FontWeight.bold))),
+          padding: const EdgeInsets.all(8.0),
+          child: Text(label, style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
       // Refresh icon cells only when onRegenerate is provided
       if (hasRegen)
         for (final label in gradeLabels)
@@ -87,8 +93,14 @@ class FlowTable extends StatelessWidget {
           context,
           '${stage.minutes}',
           onTap: onChange != null
-              ? () => _editField(context, 'minutes', stageIndex,
-                  '${stage.minutes}', true, stage)
+              ? () => _editField(
+                  context,
+                  'minutes',
+                  stageIndex,
+                  '${stage.minutes}',
+                  true,
+                  stage,
+                )
               : null,
           isEditable: onChange != null,
         ),
@@ -97,7 +109,13 @@ class FlowTable extends StatelessWidget {
           stage.stage,
           onTap: onChange != null
               ? () => _editField(
-                  context, 'stage', stageIndex, stage.stage, false, stage)
+                  context,
+                  'stage',
+                  stageIndex,
+                  stage.stage,
+                  false,
+                  stage,
+                )
               : null,
           isEditable: onChange != null,
         ),
@@ -116,35 +134,40 @@ class FlowTable extends StatelessWidget {
         final activity = isWholeClassStage
             ? stage.wholeClassActivity
             : (stage.activityByGrade[grade] ?? '-');
-        children.add(_buildCell(
-          context,
-          activity,
-          onTap: onChange != null
-              ? () => _editField(
-                  context,
-                  isWholeClassStage ? 'wholeClass' : 'grade_$grade',
-                  stageIndex,
-                  activity,
-                  false,
-                  stage,
-                  grade: isWholeClassStage ? null : grade)
-              : null,
-          isEditable: onChange != null,
-        ));
+        children.add(
+          _buildCell(
+            context,
+            activity,
+            onTap: onChange != null
+                ? () => _editField(
+                    context,
+                    isWholeClassStage ? 'wholeClass' : 'grade_$grade',
+                    stageIndex,
+                    activity,
+                    false,
+                    stage,
+                    grade: isWholeClassStage ? null : grade,
+                  )
+                : null,
+            isEditable: onChange != null,
+          ),
+        );
       }
 
       // Add refresh icon cells for each grade (only when onRegenerate is provided)
       if (hasRegen) {
         for (final grade in gradeLabels) {
-          children.add(_buildCell(
-            context,
-            Icons.refresh,
-            icon: true,
-            onTap: !stage.wholeClass
-                ? () => _showRegenerateConfirm(context, grade)
-                : null, // Whole-class stages don't have per-grade refresh
-            isEditable: true,
-          ));
+          children.add(
+            _buildCell(
+              context,
+              Icons.refresh,
+              icon: true,
+              onTap: !stage.wholeClass
+                  ? () => _showRegenerateConfirm(context, grade)
+                  : null, // Whole-class stages don't have per-grade refresh
+              isEditable: true,
+            ),
+          );
         }
       }
 
@@ -160,9 +183,11 @@ class FlowTable extends StatelessWidget {
           columnWidths: columnWidths,
           children: [
             TableRow(
-                decoration:
-                    BoxDecoration(color: Theme.of(context).primaryColorLight),
-                children: headerCells),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColorLight,
+              ),
+              children: headerCells,
+            ),
             ...rows,
           ],
         ),
@@ -177,7 +202,8 @@ class FlowTable extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Regenerate Cell'),
         content: Text(
-            'This replaces your edits in this section for $gradeLabel. Continue?'),
+          'This replaces your edits in this section for $gradeLabel. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -196,8 +222,13 @@ class FlowTable extends StatelessWidget {
     }
   }
 
-  Widget _buildCell(BuildContext context, dynamic content,
-      {VoidCallback? onTap, bool isEditable = false, bool icon = false}) {
+  Widget _buildCell(
+    BuildContext context,
+    dynamic content, {
+    VoidCallback? onTap,
+    bool isEditable = false,
+    bool icon = false,
+  }) {
     final widget = GestureDetector(
       onTap: onTap,
       child: MouseRegion(
@@ -207,12 +238,14 @@ class FlowTable extends StatelessWidget {
           color: isEditable ? Theme.of(context).hoverColor : null,
           child: icon
               ? (content != null
-                  ? Icon(content as IconData,
-                      color: content == Icons.group_work
-                          ? Colors.green
-                          : Colors.blue,
-                      size: 16)
-                  : const SizedBox.shrink())
+                    ? Icon(
+                        content as IconData,
+                        color: content == Icons.group_work
+                            ? Colors.green
+                            : Colors.blue,
+                        size: 16,
+                      )
+                    : const SizedBox.shrink())
               : Text(content.toString(), textAlign: TextAlign.center),
         ),
       ),
@@ -220,9 +253,15 @@ class FlowTable extends StatelessWidget {
     return widget;
   }
 
-  void _editField(BuildContext context, String field, int stageIndex,
-      String initialValue, bool numeric, FlowStage stage,
-      {String? grade}) async {
+  void _editField(
+    BuildContext context,
+    String field,
+    int stageIndex,
+    String initialValue,
+    bool numeric,
+    FlowStage stage, {
+    String? grade,
+  }) async {
     String title;
     if (field == 'minutes') {
       title = 'Edit Minutes';
@@ -262,8 +301,9 @@ class FlowTable extends StatelessWidget {
     } else if (field == 'wholeClass') {
       updatedStage = stage.copyWith(wholeClassActivity: result);
     } else if (field.startsWith('grade_') && grade != null) {
-      updatedStage = stage
-          .copyWith(activityByGrade: {...stage.activityByGrade, grade: result});
+      updatedStage = stage.copyWith(
+        activityByGrade: {...stage.activityByGrade, grade: result},
+      );
     } else {
       return;
     }

@@ -59,15 +59,19 @@ class _AppShellState extends ConsumerState<AppShell>
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         title: const Text('Recover unsaved plan?'),
-        content: Text('An unsaved plan from your last session was found: '
-            '"${draft.plan.sharedSubTheme}".'),
+        content: Text(
+          'An unsaved plan from your last session was found: '
+          '"${draft.plan.sharedSubTheme}".',
+        ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Discard')),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Discard'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Recover')),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Recover'),
+          ),
         ],
       ),
     );
@@ -77,8 +81,9 @@ class _AppShellState extends ConsumerState<AppShell>
       ref
           .read(planEditorProvider.notifier)
           .load(draft.plan, savedId: draft.savedId, dirty: true);
-      Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => const PlanWorkspace()));
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute<void>(builder: (_) => const PlanWorkspace()));
     } else {
       await store.clear();
     }
@@ -141,10 +146,7 @@ class _AppShellState extends ConsumerState<AppShell>
               ),
             ],
           ),
-          const VerticalDivider(
-            width: 1,
-            thickness: 1,
-          ),
+          const VerticalDivider(width: 1, thickness: 1),
           Expanded(child: _buildStage()),
         ],
       ),
@@ -158,10 +160,12 @@ class _AppShellState extends ConsumerState<AppShell>
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
-        indicatorColor:
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
-        backgroundColor:
-            Theme.of(context).colorScheme.surface.withOpacity(0.95),
+        indicatorColor: Theme.of(
+          context,
+        ).colorScheme.primaryContainer.withOpacity(0.3),
+        backgroundColor: Theme.of(
+          context,
+        ).colorScheme.surface.withOpacity(0.95),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.library_books_rounded),

@@ -61,7 +61,8 @@ class AIServiceState {
   }
 
   @override
-  String toString() => 'AIServiceState('
+  String toString() =>
+      'AIServiceState('
       'isInitialized: $isInitialized, '
       'modelPath: $modelPath, '
       'isDownloading: $isDownloading, '
@@ -86,8 +87,10 @@ class AIServiceNotifier extends StateNotifier<AIServiceState> {
         onProgress: (received, total) {
           state = state.copyWith(
             isDownloading: true,
-            downloadProgress:
-                DownloadProgress(received: received, total: total),
+            downloadProgress: DownloadProgress(
+              received: received,
+              total: total,
+            ),
           );
         },
         onError: (error) {
@@ -149,19 +152,16 @@ class AIServiceNotifier extends StateNotifier<AIServiceState> {
   /// Cleanup model
   Future<void> cleanup() async {
     await _aiService.cleanup();
-    state = state.copyWith(
-      isInitialized: false,
-      modelPath: null,
-    );
+    state = state.copyWith(isInitialized: false, modelPath: null);
   }
 }
 
 /// Provider for AI Service State
 final aiServiceStateProvider =
     StateNotifierProvider<AIServiceNotifier, AIServiceState>((ref) {
-  final aiService = ref.watch(aiServiceProvider);
-  return AIServiceNotifier(aiService);
-});
+      final aiService = ref.watch(aiServiceProvider);
+      return AIServiceNotifier(aiService);
+    });
 
 /// Convenience provider for checking if model is available
 final isModelAvailableProvider = Provider<bool>((ref) {

@@ -57,13 +57,15 @@ void main() {
     expect(await store.read(), isNull);
   });
 
-  test('a clear issued right after a write wins (operations are ordered)',
-      () async {
-    final plan = createSamplePlan();
-    final w = store.write(plan);
-    final c = store.clear();
-    await Future.wait([w, c]);
+  test(
+    'a clear issued right after a write wins (operations are ordered)',
+    () async {
+      final plan = createSamplePlan();
+      final w = store.write(plan);
+      final c = store.clear();
+      await Future.wait([w, c]);
 
-    expect(await store.read(), isNull);
-  });
+      expect(await store.read(), isNull);
+    },
+  );
 }

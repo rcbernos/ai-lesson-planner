@@ -22,7 +22,8 @@ void main() {
 
     test('header.required: empty school', () {
       final issues = validator.validate(
-          validPlan.copyWith(header: validPlan.header.copyWith(school: '')));
+        validPlan.copyWith(header: validPlan.header.copyWith(school: '')),
+      );
       expect(issues.first.code, 'header.required');
       expect(issues.first.path, 'header.school');
     });

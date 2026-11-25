@@ -50,16 +50,23 @@ class SectionBanner extends StatelessWidget {
       width: double.infinity,
       color: color,
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Row(children: [
-        Expanded(
-            child: Text(labels[section] ?? section.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, color: Colors.white))),
-        const Spacer(),
-        ...actions,
-      ]),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              labels[section] ?? section.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const Spacer(),
+          ...actions,
+        ],
+      ),
     );
   }
 }
@@ -75,8 +82,10 @@ class IlawPlanView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // null means "All Grades". effectiveGrade also returns null when the
     // stored selection is not a grade of this plan.
-    final selectedGrade =
-        effectiveGrade(plan, ref.watch(gradeSelectorProvider));
+    final selectedGrade = effectiveGrade(
+      plan,
+      ref.watch(gradeSelectorProvider),
+    );
     final bool all = selectedGrade == null;
 
     final visibleGrades = all ? grades : [selectedGrade];
@@ -127,7 +136,10 @@ class IlawPlanView extends ConsumerWidget {
 
   /// Builds a refresh button for regenerating a section.
   Widget _buildRegenerateButton(
-      BuildContext context, WidgetRef ref, PlanSection section) {
+    BuildContext context,
+    WidgetRef ref,
+    PlanSection section,
+  ) {
     return IconButton(
       icon: const Icon(Icons.refresh),
       tooltip: 'Regenerate ${section.eventName}',
@@ -137,13 +149,17 @@ class IlawPlanView extends ConsumerWidget {
 
   /// Shows confirmation dialog before regenerating a section.
   void _showRegenerateConfirmation(
-      BuildContext context, WidgetRef ref, PlanSection section) {
+    BuildContext context,
+    WidgetRef ref,
+    PlanSection section,
+  ) {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Regenerate Section'),
-        content:
-            const Text('This replaces your edits in this section. Continue?'),
+        content: const Text(
+          'This replaces your edits in this section. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -165,8 +181,9 @@ class IlawPlanView extends ConsumerWidget {
 
   Widget _intentionsSection(BuildContext context, String? selectedGrade) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final headerColor =
-        isDark ? const Color(0xFF333333) : const Color(0xFFEEEEEE);
+    final headerColor = isDark
+        ? const Color(0xFF333333)
+        : const Color(0xFFEEEEEE);
     final borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade400;
     final textColor = isDark ? Colors.white70 : Colors.black87;
 
@@ -195,20 +212,28 @@ class IlawPlanView extends ConsumerWidget {
                   ),
                 ),
               ),
-            Text(plan.sharedSubTheme,
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textColor)),
+            Text(
+              plan.sharedSubTheme,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
             const SizedBox(height: 8),
-            Text(plan.bothGradesObjective,
-                style: TextStyle(fontSize: 14, color: textColor)),
+            Text(
+              plan.bothGradesObjective,
+              style: TextStyle(fontSize: 14, color: textColor),
+            ),
             const SizedBox(height: 8),
-            Text(plan.learnerContext,
-                style: TextStyle(
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                    color: textColor)),
+            Text(
+              plan.learnerContext,
+              style: TextStyle(
+                fontSize: 13,
+                fontStyle: FontStyle.italic,
+                color: textColor,
+              ),
+            ),
             const SizedBox(height: 16),
             // Standards & Objectives matrix table
             SingleChildScrollView(
@@ -225,55 +250,77 @@ class IlawPlanView extends ConsumerWidget {
                     decoration: BoxDecoration(color: headerColor),
                     children: [
                       const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Standard / Objective',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'Standard / Objective',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
                       for (final grade in filteredGrades)
                         Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(grade.gradeLabel,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        isDark ? Colors.white : Colors.black))),
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            grade.gradeLabel,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
-                  TableRow(children: [
-                    const Padding(
+                  TableRow(
+                    children: [
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Content Standard')),
-                    for (final grade in filteredGrades)
-                      Padding(
+                        child: Text('Content Standard'),
+                      ),
+                      for (final grade in filteredGrades)
+                        Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(grade.contentStandard)),
-                  ]),
-                  TableRow(children: [
-                    const Padding(
+                          child: Text(grade.contentStandard),
+                        ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Performance Standard')),
-                    for (final grade in filteredGrades)
-                      Padding(
+                        child: Text('Performance Standard'),
+                      ),
+                      for (final grade in filteredGrades)
+                        Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(grade.performanceStandard)),
-                  ]),
-                  TableRow(children: [
-                    const Padding(
+                          child: Text(grade.performanceStandard),
+                        ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Competencies')),
-                    for (final grade in filteredGrades)
-                      Padding(
+                        child: Text('Competencies'),
+                      ),
+                      for (final grade in filteredGrades)
+                        Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(grade.competencies.join(', '))),
-                  ]),
-                  TableRow(children: [
-                    const Padding(
+                          child: Text(grade.competencies.join(', ')),
+                        ),
+                    ],
+                  ),
+                  TableRow(
+                    children: [
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
-                        child: Text('Objectives')),
-                    for (final grade in filteredGrades)
-                      Padding(
+                        child: Text('Objectives'),
+                      ),
+                      for (final grade in filteredGrades)
+                        Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(grade.objectives.join(', '))),
-                  ]),
+                          child: Text(grade.objectives.join(', ')),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -286,64 +333,90 @@ class IlawPlanView extends ConsumerWidget {
   Widget _reflectionSection(String? selectedGrade) {
     // Whole-class questions (gradeLabel == null) always show.
     final questions = plan.reflectionQuestions
-        .where((q) =>
-            selectedGrade == null ||
-            q.gradeLabel == null ||
-            q.gradeLabel == selectedGrade)
+        .where(
+          (q) =>
+              selectedGrade == null ||
+              q.gradeLabel == null ||
+              q.gradeLabel == selectedGrade,
+        )
         .toList();
     if (questions.isEmpty) return const SizedBox.shrink();
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const SizedBox(height: 16),
-      Text('Reflection Questions',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 8),
-      for (final q in questions)
-        Padding(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          'Reflection Questions',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        for (final q in questions)
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: [
                 if (q.gradeLabel != null)
                   Expanded(
-                      flex: 2,
-                      child: Text('${q.gradeLabel}:',
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
+                    flex: 2,
+                    child: Text(
+                      '${q.gradeLabel}:',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 Expanded(flex: 3, child: Text(q.text)),
               ],
-            )),
-    ]);
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _footer() => Padding(
-      padding: const EdgeInsets.all(16),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isNarrow = constraints.maxWidth < 600;
-          if (isNarrow) {
-            return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Prepared by: ${plan.preparedBy}',
-                      style: const TextStyle(fontWeight: FontWeight.w500)),
-                  Text('Checked by: ${plan.checkedBy}'),
-                  const SizedBox(height: 8),
-                  Text(plan.aiUseDeclaration,
-                      style: const TextStyle(fontStyle: FontStyle.italic)),
-                ]);
-          }
-          return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    padding: const EdgeInsets.all(16),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 600;
+        if (isNarrow) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Prepared by: ${plan.preparedBy}',
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+              Text('Checked by: ${plan.checkedBy}'),
+              const SizedBox(height: 8),
+              Text(
+                plan.aiUseDeclaration,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ],
+          );
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Prepared by: ${plan.preparedBy}',
-                      style: const TextStyle(fontWeight: FontWeight.w500)),
-                  Text('Checked by: ${plan.checkedBy}')
-                ]),
-                Expanded(
-                    child: Text(plan.aiUseDeclaration,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(fontStyle: FontStyle.italic)))
-              ]);
-        },
-      ));
+                Text(
+                  'Prepared by: ${plan.preparedBy}',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+                Text('Checked by: ${plan.checkedBy}'),
+              ],
+            ),
+            Expanded(
+              child: Text(
+                plan.aiUseDeclaration,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ),
+          ],
+        );
+      },
+    ),
+  );
 }

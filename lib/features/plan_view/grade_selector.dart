@@ -13,8 +13,8 @@ class GradeSelectorNotifier extends StateNotifier<String?> {
 /// Lives in this file on purpose: nothing in core/providers.dart changes.
 final gradeSelectorProvider =
     StateNotifierProvider<GradeSelectorNotifier, String?>(
-  (_) => GradeSelectorNotifier(),
-);
+      (_) => GradeSelectorNotifier(),
+    );
 
 /// The selection is global, so it can name a grade the current plan does not
 /// have (for example after opening another plan). Treat that as "All Grades".

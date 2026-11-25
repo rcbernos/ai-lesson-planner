@@ -36,7 +36,9 @@ class AppUtils {
 
   /// Replace placeholder keys in [template] with the matching [values].
   static String interpolateTemplate(
-      String template, Map<String, String> values) {
+    String template,
+    Map<String, String> values,
+  ) {
     var result = template;
     for (final entry in values.entries) {
       result = result.replaceAll(entry.key, entry.value);

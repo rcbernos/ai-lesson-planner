@@ -121,9 +121,9 @@ class DownloadService {
       final request = http.Request('GET', url);
 
       // Send request with timeout
-      final response = await client.send(request).timeout(
-            const Duration(seconds: 30),
-          );
+      final response = await client
+          .send(request)
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode != 200) {
         client.close();

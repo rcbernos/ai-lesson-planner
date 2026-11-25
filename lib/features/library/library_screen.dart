@@ -11,8 +11,9 @@ import 'package:ai_lesson_planner/services/database/plan_repository.dart'
     show SavedPlanInfo;
 
 /// Provider for the list of saved plans.
-final savedPlansProvider =
-    FutureProvider.autoDispose<List<SavedPlanInfo>>((ref) {
+final savedPlansProvider = FutureProvider.autoDispose<List<SavedPlanInfo>>((
+  ref,
+) {
   final repository = ref.watch(planRepositoryProvider);
   return repository.getAllSavedPlans();
 });
@@ -26,9 +27,7 @@ class LibraryScreen extends ConsumerWidget {
     final asyncPlans = ref.watch(savedPlansProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Library'),
-      ),
+      appBar: AppBar(title: const Text('Library')),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Reset generator state for a fresh start
@@ -36,9 +35,7 @@ class LibraryScreen extends ConsumerWidget {
           ref.read(planEditorProvider.notifier).clear();
 
           Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const GeneratorScreen(),
-            ),
+            MaterialPageRoute(builder: (context) => const GeneratorScreen()),
           );
         },
         child: const Icon(Icons.add),
@@ -66,9 +63,8 @@ class LibraryScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text('Error loading plans: $error'),
-        ),
+        error: (error, stack) =>
+            Center(child: Text('Error loading plans: $error')),
       ),
     );
   }
@@ -97,14 +93,12 @@ class LibraryScreen extends ConsumerWidget {
               // Trigger refresh by invalidating the provider
               ref.invalidate(savedPlansProvider);
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Plan deleted')),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Plan deleted')));
               }
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -115,10 +109,7 @@ class LibraryScreen extends ConsumerWidget {
 
 /// A list item displaying plan metadata with navigation to view.
 class _PlanListItem extends ConsumerWidget {
-  const _PlanListItem({
-    required this.plan,
-    required this.onDelete,
-  });
+  const _PlanListItem({required this.plan, required this.onDelete});
 
   final SavedPlanInfo plan;
   final VoidCallback onDelete;
@@ -128,8 +119,10 @@ class _PlanListItem extends ConsumerWidget {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListTile(
-        title: Text(plan.title,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          plan.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Text(
           'Grade: ${plan.gradeLevels} | Subject: ${plan.subject}\nCreated: ${plan.date}',
         ),
@@ -145,23 +138,24 @@ class _PlanListItem extends ConsumerWidget {
   }
 
   Future<void> _openPlanView(
-      BuildContext context, WidgetRef ref, int planId) async {
+    BuildContext context,
+    WidgetRef ref,
+    int planId,
+  ) async {
     final repository = ref.read(planRepositoryProvider);
     final plan = await repository.getPlanById(planId);
     if (plan == null) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Plan not found')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Plan not found')));
       return;
     }
     // Load the plan into editor state with savedId for editing
     ref.read(planEditorProvider.notifier).load(plan, savedId: planId);
     if (!context.mounted) return;
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const PlanWorkspace(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const PlanWorkspace()));
   }
 }

@@ -30,13 +30,15 @@ void main() {
       expect(notifier.state.grades.length, equals(0));
 
       for (var i = 0; i < 12; i++) {
-        notifier.addGrade(GradeInput(
-          gradeLabel: 'Grade ${i + 1}',
-          male: 10,
-          female: 10,
-          subTheme: 'Test Theme',
-          competency: 'Test Competency',
-        ));
+        notifier.addGrade(
+          GradeInput(
+            gradeLabel: 'Grade ${i + 1}',
+            male: 10,
+            female: 10,
+            subTheme: 'Test Theme',
+            competency: 'Test Competency',
+          ),
+        );
       }
 
       expect(notifier.state.grades.length, equals(12));
@@ -44,36 +46,42 @@ void main() {
 
     test('cannot add grade beyond 12', () {
       for (var i = 0; i < 12; i++) {
-        notifier.addGrade(GradeInput(
-          gradeLabel: 'Grade ${i + 1}',
-          male: 10,
-          female: 10,
-          subTheme: 'Test Theme',
-          competency: 'Test Competency',
-        ));
+        notifier.addGrade(
+          GradeInput(
+            gradeLabel: 'Grade ${i + 1}',
+            male: 10,
+            female: 10,
+            subTheme: 'Test Theme',
+            competency: 'Test Competency',
+          ),
+        );
       }
 
       final initialLength = notifier.state.grades.length;
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 13',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 13',
+          male: 10,
+          female: 10,
+          subTheme: 'Test',
+          competency: 'Test',
+        ),
+      );
 
       expect(notifier.state.grades.length, equals(initialLength));
     });
 
     test('removing grade below 1 is blocked', () {
       // Add 1 grade first (monograde plans are allowed)
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 2',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 2',
+          male: 10,
+          female: 10,
+          subTheme: 'Test',
+          competency: 'Test',
+        ),
+      );
 
       expect(notifier.state.grades.length, equals(1));
 
@@ -85,27 +93,33 @@ void main() {
     });
 
     test('removing grade when 3+ works', () {
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 2',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 3',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 4',
-        male: 10,
-        female: 10,
-        subTheme: 'Test',
-        competency: 'Test',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 2',
+          male: 10,
+          female: 10,
+          subTheme: 'Test',
+          competency: 'Test',
+        ),
+      );
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 3',
+          male: 10,
+          female: 10,
+          subTheme: 'Test',
+          competency: 'Test',
+        ),
+      );
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 4',
+          male: 10,
+          female: 10,
+          subTheme: 'Test',
+          competency: 'Test',
+        ),
+      );
 
       expect(notifier.state.grades.length, equals(3));
 
@@ -116,20 +130,24 @@ void main() {
 
     test('canGenerate becomes true when all fields filled', () {
       // Add 2 grades
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 2',
-        male: 10,
-        female: 10,
-        subTheme: 'Math',
-        competency: 'M5NS-Ia-1',
-      ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 3',
-        male: 10,
-        female: 10,
-        subTheme: 'Math',
-        competency: 'M5NS-Ia-2',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 2',
+          male: 10,
+          female: 10,
+          subTheme: 'Math',
+          competency: 'M5NS-Ia-1',
+        ),
+      );
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 3',
+          male: 10,
+          female: 10,
+          subTheme: 'Math',
+          competency: 'M5NS-Ia-2',
+        ),
+      );
 
       // Fill header fields
       notifier.updateSchool('Test Elementary');
@@ -145,20 +163,24 @@ void main() {
 
     test('canGenerate is false when required fields missing', () {
       // Add 2 grades but no other fields
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 2',
-        male: 10,
-        female: 10,
-        subTheme: 'Math',
-        competency: '',
-      ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 3',
-        male: 10,
-        female: 10,
-        subTheme: 'Math',
-        competency: 'Competency',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 2',
+          male: 10,
+          female: 10,
+          subTheme: 'Math',
+          competency: '',
+        ),
+      );
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 3',
+          male: 10,
+          female: 10,
+          subTheme: 'Math',
+          competency: 'Competency',
+        ),
+      );
 
       // Missing required fields
       expect(notifier.state.canGenerate, isFalse);
@@ -166,20 +188,24 @@ void main() {
 
     test('buildGenerationRequest creates valid request', () {
       // Fill all fields
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 2',
-        male: 10,
-        female: 10,
-        subTheme: 'Math',
-        competency: 'M5NS-Ia-1',
-      ));
-      notifier.addGrade(GradeInput(
-        gradeLabel: 'Grade 3',
-        male: 15,
-        female: 15,
-        subTheme: 'Math',
-        competency: 'M5NS-Ia-2',
-      ));
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 2',
+          male: 10,
+          female: 10,
+          subTheme: 'Math',
+          competency: 'M5NS-Ia-1',
+        ),
+      );
+      notifier.addGrade(
+        GradeInput(
+          gradeLabel: 'Grade 3',
+          male: 15,
+          female: 15,
+          subTheme: 'Math',
+          competency: 'M5NS-Ia-2',
+        ),
+      );
       notifier.updateSchool('Test School');
       notifier.updateTeacher('Test Teacher');
       notifier.updateLearningArea('Mathematics');

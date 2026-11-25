@@ -15,14 +15,14 @@ import 'ways_forward_validator.dart';
 class PlanValidator {
   /// Validates the entire plan and returns all issues found.
   List<ValidationIssue> validate(LessonPlan plan) => [
-        ...validateHeader(plan),
-        ...validateGrades(plan),
-        ...validateIntentions(plan),
-        ...validateFlow(plan),
-        ...validateAssessment(plan),
-        ...validateWaysForward(plan),
-        ...validateReflection(plan),
-      ];
+    ...validateHeader(plan),
+    ...validateGrades(plan),
+    ...validateIntentions(plan),
+    ...validateFlow(plan),
+    ...validateAssessment(plan),
+    ...validateWaysForward(plan),
+    ...validateReflection(plan),
+  ];
 
   /// Returns only the issues that belong to the given section.
   List<ValidationIssue> validateSection(LessonPlan plan, PlanSection section) =>

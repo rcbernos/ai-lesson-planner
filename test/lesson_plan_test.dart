@@ -27,13 +27,13 @@ void main() {
         expect(header.sessions, equals(samplePlan.header.sessions));
         expect(header.sessionMinutes, equals(samplePlan.header.sessionMinutes));
         expect(
-            header.multigradeModel, equals(samplePlan.header.multigradeModel));
+          header.multigradeModel,
+          equals(samplePlan.header.multigradeModel),
+        );
       });
 
       test('copyWith creates modified copy', () {
-        final updated = samplePlan.header.copyWith(
-          teacher: 'Juan Dela Cruz',
-        );
+        final updated = samplePlan.header.copyWith(teacher: 'Juan Dela Cruz');
         expect(updated.teacher, equals('Juan Dela Cruz'));
         expect(updated.school, equals(samplePlan.header.school));
       });
@@ -133,8 +133,10 @@ void main() {
 
     group('ReflectionQuestion', () {
       test('supports null gradeLabel for whole-class questions', () {
-        final question =
-            ReflectionQuestion(gradeLabel: null, text: 'General question');
+        final question = ReflectionQuestion(
+          gradeLabel: null,
+          text: 'General question',
+        );
         expect(question.gradeLabel, isNull);
         expect(question.text, equals('General question'));
       });
@@ -161,28 +163,31 @@ void main() {
       });
 
       test(
-          'copyWith with gradeLabel and clearGradeLabel=false keeps new gradeLabel',
-          () {
-        final question = ReflectionQuestion(
-          gradeLabel: 'Grade 3',
-          text: 'Test question',
-        );
-        final updated = question.copyWith(
-          gradeLabel: 'Grade 4',
-          clearGradeLabel: false,
-        );
+        'copyWith with gradeLabel and clearGradeLabel=false keeps new gradeLabel',
+        () {
+          final question = ReflectionQuestion(
+            gradeLabel: 'Grade 3',
+            text: 'Test question',
+          );
+          final updated = question.copyWith(
+            gradeLabel: 'Grade 4',
+            clearGradeLabel: false,
+          );
 
-        expect(updated.gradeLabel, equals('Grade 4'));
-        expect(updated.text, equals('Test question'));
-      });
+          expect(updated.gradeLabel, equals('Grade 4'));
+          expect(updated.text, equals('Test question'));
+        },
+      );
     });
 
     group('PlanSection', () {
       test('eventName matches MockLessonGenerator section names', () {
         expect(PlanSection.header.eventName, equals(''));
         expect(PlanSection.intentions.eventName, equals('Intentions'));
-        expect(PlanSection.learningExperiences.eventName,
-            equals('Learning Experiences'));
+        expect(
+          PlanSection.learningExperiences.eventName,
+          equals('Learning Experiences'),
+        );
         expect(PlanSection.assessment.eventName, equals('Assessment'));
         expect(PlanSection.waysForward.eventName, equals('Ways Forward'));
       });

@@ -16,25 +16,29 @@ List<ValidationIssue> validateGrades(LessonPlan plan) {
   final grades = plan.grades;
 
   if (grades.length < minGrades) {
-    issues.add(ValidationIssue(
-      code: 'grades.count',
-      severity: IssueSeverity.error,
-      section: PlanSection.header,
-      path: 'grades',
-      message:
-          'Plan must have at least $minGrades grades (found ${grades.length}).',
-    ));
+    issues.add(
+      ValidationIssue(
+        code: 'grades.count',
+        severity: IssueSeverity.error,
+        section: PlanSection.header,
+        path: 'grades',
+        message:
+            'Plan must have at least $minGrades grades (found ${grades.length}).',
+      ),
+    );
   }
 
   if (grades.length > maxGrades) {
-    issues.add(ValidationIssue(
-      code: 'grades.count',
-      severity: IssueSeverity.error,
-      section: PlanSection.header,
-      path: 'grades',
-      message:
-          'Plan must have at most $maxGrades grades (found ${grades.length}).',
-    ));
+    issues.add(
+      ValidationIssue(
+        code: 'grades.count',
+        severity: IssueSeverity.error,
+        section: PlanSection.header,
+        path: 'grades',
+        message:
+            'Plan must have at most $maxGrades grades (found ${grades.length}).',
+      ),
+    );
   }
 
   final labels = <String>[];
@@ -44,31 +48,37 @@ List<ValidationIssue> validateGrades(LessonPlan plan) {
 
     if (labels.indexOf(g.gradeLabel) !=
         labels.lastIndexWhere((l) => l == g.gradeLabel)) {
-      issues.add(ValidationIssue(
-        code: 'grades.duplicate_label',
-        severity: IssueSeverity.error,
-        section: PlanSection.header,
-        path: 'grades[$i]',
-        message: 'Duplicate grade label: ${g.gradeLabel}.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'grades.duplicate_label',
+          severity: IssueSeverity.error,
+          section: PlanSection.header,
+          path: 'grades[$i]',
+          message: 'Duplicate grade label: ${g.gradeLabel}.',
+        ),
+      );
     }
 
     if (g.learnersMale < 0 || g.learnersFemale < 0) {
-      issues.add(ValidationIssue(
-        code: 'grades.learners',
-        severity: IssueSeverity.error,
-        section: PlanSection.header,
-        path: 'grades[$i]',
-        message: 'Learner counts cannot be negative.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'grades.learners',
+          severity: IssueSeverity.error,
+          section: PlanSection.header,
+          path: 'grades[$i]',
+          message: 'Learner counts cannot be negative.',
+        ),
+      );
     } else if (g.learnersMale + g.learnersFemale == 0) {
-      issues.add(ValidationIssue(
-        code: 'grades.learners',
-        severity: IssueSeverity.warning,
-        section: PlanSection.header,
-        path: 'grades[$i]',
-        message: 'Total learner count is zero.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'grades.learners',
+          severity: IssueSeverity.warning,
+          section: PlanSection.header,
+          path: 'grades[$i]',
+          message: 'Total learner count is zero.',
+        ),
+      );
     }
   }
 

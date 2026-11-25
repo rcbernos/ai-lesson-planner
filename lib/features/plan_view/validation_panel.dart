@@ -24,10 +24,12 @@ class ValidationPanelContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final errorCount =
-        issues.where((i) => i.severity == IssueSeverity.error).length;
-    final warningCount =
-        issues.where((i) => i.severity == IssueSeverity.warning).length;
+    final errorCount = issues
+        .where((i) => i.severity == IssueSeverity.error)
+        .length;
+    final warningCount = issues
+        .where((i) => i.severity == IssueSeverity.warning)
+        .length;
     final hasIssues = errorCount > 0 || warningCount > 0;
     final theme = Theme.of(context);
 
@@ -84,25 +86,32 @@ class ValidationPanelContent extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 8),
           child: ExpansionTile(
             initiallyExpanded: true,
-            title: Text(section.eventName,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              section.eventName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             children: sectionIssues
-                .map((issue) => ListTile(
-                      dense: true,
-                      leading: Icon(
-                        issue.severity == IssueSeverity.error
-                            ? Icons.error
-                            : Icons.warning,
-                        color: issue.severity == IssueSeverity.error
-                            ? theme.colorScheme.error
-                            : theme.colorScheme.onSurfaceVariant,
+                .map(
+                  (issue) => ListTile(
+                    dense: true,
+                    leading: Icon(
+                      issue.severity == IssueSeverity.error
+                          ? Icons.error
+                          : Icons.warning,
+                      color: issue.severity == IssueSeverity.error
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                    title: Text(issue.message),
+                    subtitle: Text(
+                      _humanPath(issue.path),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
                       ),
-                      title: Text(issue.message),
-                      subtitle: Text(_humanPath(issue.path),
-                          style: TextStyle(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 12)),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         );

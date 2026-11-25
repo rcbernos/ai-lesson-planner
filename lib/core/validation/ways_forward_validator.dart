@@ -19,34 +19,40 @@ List<ValidationIssue> validateWaysForward(LessonPlan plan) {
     }
 
     if (wf == null) {
-      issues.add(ValidationIssue(
-        code: 'ways_forward.missing_grade',
-        severity: IssueSeverity.error,
-        section: PlanSection.waysForward,
-        path: 'waysForward[$gradeLabel]',
-        message: 'No ways forward entry for $gradeLabel.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'ways_forward.missing_grade',
+          severity: IssueSeverity.error,
+          section: PlanSection.waysForward,
+          path: 'waysForward[$gradeLabel]',
+          message: 'No ways forward entry for $gradeLabel.',
+        ),
+      );
       continue;
     }
 
     if (wf.remediation.isEmpty) {
-      issues.add(ValidationIssue(
-        code: 'ways_forward.missing_remediation',
-        severity: IssueSeverity.warning,
-        section: PlanSection.waysForward,
-        path: 'waysForward[$gradeLabel].remediation',
-        message: 'Remediation is not defined for $gradeLabel.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'ways_forward.missing_remediation',
+          severity: IssueSeverity.warning,
+          section: PlanSection.waysForward,
+          path: 'waysForward[$gradeLabel].remediation',
+          message: 'Remediation is not defined for $gradeLabel.',
+        ),
+      );
     }
 
     if (wf.enrichment.isEmpty) {
-      issues.add(ValidationIssue(
-        code: 'ways_forward.missing_enrichment',
-        severity: IssueSeverity.warning,
-        section: PlanSection.waysForward,
-        path: 'waysForward[$gradeLabel].enrichment',
-        message: 'Enrichment is not defined for $gradeLabel.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'ways_forward.missing_enrichment',
+          severity: IssueSeverity.warning,
+          section: PlanSection.waysForward,
+          path: 'waysForward[$gradeLabel].enrichment',
+          message: 'Enrichment is not defined for $gradeLabel.',
+        ),
+      );
     }
   }
 
@@ -57,13 +63,15 @@ List<ValidationIssue> validateReflection(LessonPlan plan) {
   final issues = <ValidationIssue>[];
 
   if (plan.reflectionQuestions.isEmpty) {
-    issues.add(const ValidationIssue(
-      code: 'reflection.empty',
-      severity: IssueSeverity.warning,
-      section: PlanSection.waysForward,
-      path: 'reflectionQuestions',
-      message: 'No reflection questions defined.',
-    ));
+    issues.add(
+      const ValidationIssue(
+        code: 'reflection.empty',
+        severity: IssueSeverity.warning,
+        section: PlanSection.waysForward,
+        path: 'reflectionQuestions',
+        message: 'No reflection questions defined.',
+      ),
+    );
   }
 
   return issues;

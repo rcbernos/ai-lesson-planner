@@ -19,16 +19,15 @@ void main() {
           originalPlan.grades[0].copyWith(
             objectives: ['Modified objective 1', 'Modified objective 2'],
           ),
-          originalPlan.grades[1].copyWith(
-            objectives: ['Modified objective A'],
-          ),
+          originalPlan.grades[1].copyWith(objectives: ['Modified objective A']),
         ],
       );
       modifiedFlowPlan = originalPlan.copyWith(
         flow: originalPlan.flow.asMap().entries.map((e) {
           final stage = e.value;
-          final newActivityByGrade =
-              Map<String, String>.from(stage.activityByGrade);
+          final newActivityByGrade = Map<String, String>.from(
+            stage.activityByGrade,
+          );
           newActivityByGrade['Grade 3'] =
               'Modified activity for stage ${e.key + 1}';
           return FlowStage(
@@ -71,7 +70,9 @@ void main() {
         ],
         reflectionQuestions: [
           ReflectionQuestion(
-              gradeLabel: 'Grade 3', text: 'Modified reflection for Grade 3'),
+            gradeLabel: 'Grade 3',
+            text: 'Modified reflection for Grade 3',
+          ),
           ReflectionQuestion(gradeLabel: 'Grade 4', text: 'Anong pangatnig?'),
           ReflectionQuestion(gradeLabel: null, text: 'Kumusta ang aralin?'),
         ],
@@ -92,13 +93,19 @@ void main() {
         PlanSection.intentions,
         modifiedPlan,
       );
-      expect(result.grades[0].objectives,
-          equals(['Modified objective 1', 'Modified objective 2']));
-      expect(result.grades[1].objectives, equals(['Modified objective A']));
-      expect(result.grades[0].contentStandard,
-          equals(originalPlan.grades[0].contentStandard));
       expect(
-          result.grades[0].subTheme, equals(originalPlan.grades[0].subTheme));
+        result.grades[0].objectives,
+        equals(['Modified objective 1', 'Modified objective 2']),
+      );
+      expect(result.grades[1].objectives, equals(['Modified objective A']));
+      expect(
+        result.grades[0].contentStandard,
+        equals(originalPlan.grades[0].contentStandard),
+      );
+      expect(
+        result.grades[0].subTheme,
+        equals(originalPlan.grades[0].subTheme),
+      );
     });
 
     test('intentions grade slice replacement', () {
@@ -107,10 +114,14 @@ void main() {
         modifiedPlan,
         gradeLabel: 'Grade 3',
       );
-      expect(result.grades[0].objectives,
-          equals(['Modified objective 1', 'Modified objective 2']));
-      expect(result.grades[1].objectives,
-          equals(originalPlan.grades[1].objectives));
+      expect(
+        result.grades[0].objectives,
+        equals(['Modified objective 1', 'Modified objective 2']),
+      );
+      expect(
+        result.grades[1].objectives,
+        equals(originalPlan.grades[1].objectives),
+      );
     });
 
     test('learningExperiences full section replacement', () {
@@ -135,13 +146,17 @@ void main() {
         expect(result.flow[i].minutes, equals(originalPlan.flow[i].minutes));
         expect(result.flow[i].stage, equals(originalPlan.flow[i].stage));
         expect(
-            result.flow[i].wholeClass, equals(originalPlan.flow[i].wholeClass));
+          result.flow[i].wholeClass,
+          equals(originalPlan.flow[i].wholeClass),
+        );
       }
       for (var i = 0; i < result.flow.length; i++) {
         if (originalPlan.flow[i].wholeClass) continue;
         final newActivity = result.flow[i].activityByGrade['Grade 3'] ?? '';
-        expect(newActivity,
-            equals(modifiedFlowPlan.flow[i].activityByGrade['Grade 3']));
+        expect(
+          newActivity,
+          equals(modifiedFlowPlan.flow[i].activityByGrade['Grade 3']),
+        );
       }
     });
 
@@ -151,10 +166,14 @@ void main() {
         modifiedAssessmentPlan,
       );
       expect(result.assessments.length, equals(2));
-      expect(result.assessments[0].formative,
-          equals('Modified formative assessment'));
       expect(
-          result.assessments[1].formative, equals('Obserbahan ang pangatnig.'));
+        result.assessments[0].formative,
+        equals('Modified formative assessment'),
+      );
+      expect(
+        result.assessments[1].formative,
+        equals('Obserbahan ang pangatnig.'),
+      );
       expect(result.header.school, equals(originalPlan.header.school));
     });
 
@@ -164,10 +183,14 @@ void main() {
         modifiedAssessmentPlan,
         gradeLabel: 'Grade 3',
       );
-      expect(result.assessments[0].formative,
-          equals('Modified formative assessment'));
-      expect(result.assessments[1].formative,
-          equals(originalPlan.assessments[1].formative));
+      expect(
+        result.assessments[0].formative,
+        equals('Modified formative assessment'),
+      );
+      expect(
+        result.assessments[1].formative,
+        equals(originalPlan.assessments[1].formative),
+      );
     });
 
     test('waysForward full section replacement', () {
@@ -181,26 +204,31 @@ void main() {
       expect(result.header.school, equals(originalPlan.header.school));
     });
 
-    test('waysForward grade slice replacement preserves whole-class questions',
-        () {
-      final result = originalPlan.replaceSection(
-        PlanSection.waysForward,
-        modifiedWaysForwardPlan,
-        gradeLabel: 'Grade 3',
-      );
-      expect(result.waysForward[0].gradeLabel, equals('Grade 3'));
-      expect(result.waysForward[0].remediation, equals('Modified remediation'));
-      final wholeClassQ = result.reflectionQuestions
-          .where((q) => q.gradeLabel == null)
-          .toList();
-      expect(wholeClassQ.length, equals(1));
-      expect(wholeClassQ[0].text, equals('Kumusta ang aralin?'));
-      final grade3Q = result.reflectionQuestions
-          .where((q) => q.gradeLabel == 'Grade 3')
-          .toList();
-      expect(grade3Q.length, equals(1));
-      expect(grade3Q[0].text, equals('Modified reflection for Grade 3'));
-    });
+    test(
+      'waysForward grade slice replacement preserves whole-class questions',
+      () {
+        final result = originalPlan.replaceSection(
+          PlanSection.waysForward,
+          modifiedWaysForwardPlan,
+          gradeLabel: 'Grade 3',
+        );
+        expect(result.waysForward[0].gradeLabel, equals('Grade 3'));
+        expect(
+          result.waysForward[0].remediation,
+          equals('Modified remediation'),
+        );
+        final wholeClassQ = result.reflectionQuestions
+            .where((q) => q.gradeLabel == null)
+            .toList();
+        expect(wholeClassQ.length, equals(1));
+        expect(wholeClassQ[0].text, equals('Kumusta ang aralin?'));
+        final grade3Q = result.reflectionQuestions
+            .where((q) => q.gradeLabel == 'Grade 3')
+            .toList();
+        expect(grade3Q.length, equals(1));
+        expect(grade3Q[0].text, equals('Modified reflection for Grade 3'));
+      },
+    );
 
     test('unknown grade label throws ArgumentError', () {
       expect(
@@ -213,28 +241,30 @@ void main() {
       );
     });
 
-    test('flow stage count mismatch throws for learningExperiences grade slice',
-        () {
-      final planWithDifferentFlow = originalPlan.copyWith(
-        flow: [
-          FlowStage(
-            minutes: 10,
-            stage: 'Motivation',
-            wholeClass: true,
-            activityByGrade: {},
-            wholeClassActivity: 'Test',
+    test(
+      'flow stage count mismatch throws for learningExperiences grade slice',
+      () {
+        final planWithDifferentFlow = originalPlan.copyWith(
+          flow: [
+            FlowStage(
+              minutes: 10,
+              stage: 'Motivation',
+              wholeClass: true,
+              activityByGrade: {},
+              wholeClassActivity: 'Test',
+            ),
+          ],
+        );
+        expect(
+          () => originalPlan.replaceSection(
+            PlanSection.learningExperiences,
+            planWithDifferentFlow,
+            gradeLabel: 'Grade 3',
           ),
-        ],
-      );
-      expect(
-        () => originalPlan.replaceSection(
-          PlanSection.learningExperiences,
-          planWithDifferentFlow,
-          gradeLabel: 'Grade 3',
-        ),
-        throwsArgumentError,
-      );
-    });
+          throwsArgumentError,
+        );
+      },
+    );
 
     test('no mutation of original plan', () {
       final originalHeader = originalPlan.header;

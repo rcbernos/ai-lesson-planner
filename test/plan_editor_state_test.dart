@@ -46,8 +46,10 @@ void main() {
 
       // Undo again should restore original
       notifier.undo();
-      expect(notifier.state?.plan.sharedSubTheme,
-          equals('Ulat-panahon at paghahanda sa sakuna'));
+      expect(
+        notifier.state?.plan.sharedSubTheme,
+        equals('Ulat-panahon at paghahanda sa sakuna'),
+      );
     });
 
     test('history is capped at 20 steps', () {

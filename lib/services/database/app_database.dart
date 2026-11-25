@@ -60,10 +60,10 @@ class AppDatabase extends _$AppDatabase {
       into(referenceNotes).insert(entry);
 
   Future<List<ReferenceNote>> getReferenceNotesForLessonPlan(
-          int lessonPlanId) =>
-      (select(referenceNotes)
-            ..where((t) => t.lessonPlanId.equals(lessonPlanId)))
-          .get();
+    int lessonPlanId,
+  ) => (select(
+    referenceNotes,
+  )..where((t) => t.lessonPlanId.equals(lessonPlanId))).get();
 
   Future<bool> updateReferenceNote(ReferenceNote entry) =>
       update(referenceNotes).replace(entry);
@@ -77,9 +77,10 @@ class AppDatabase extends _$AppDatabase {
       into(bibliography).insert(entry);
 
   Future<List<BibliographyData>> getBibliographyForLessonPlan(
-          int lessonPlanId) =>
-      (select(bibliography)..where((t) => t.lessonPlanId.equals(lessonPlanId)))
-          .get();
+    int lessonPlanId,
+  ) => (select(
+    bibliography,
+  )..where((t) => t.lessonPlanId.equals(lessonPlanId))).get();
 
   Future<bool> updateBibliographyEntry(BibliographyData entry) =>
       update(bibliography).replace(entry);
@@ -91,24 +92,30 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> seed() async {
     // Guard against duplicate seeding
-    final existing =
-        await select(referenceNotes).get().then((r) => r.isNotEmpty);
+    final existing = await select(
+      referenceNotes,
+    ).get().then((r) => r.isNotEmpty);
     if (existing) return;
 
     await transaction(() async {
       // Sample reference note
-      await into(referenceNotes).insert(ReferenceNotesCompanion.insert(
-        title: 'DepEd K-12 Curriculum Guide',
-        content: const Value(
-            'Reference for curriculum standards and learning competencies across grade levels.'),
-      ));
+      await into(referenceNotes).insert(
+        ReferenceNotesCompanion.insert(
+          title: 'DepEd K-12 Curriculum Guide',
+          content: const Value(
+            'Reference for curriculum standards and learning competencies across grade levels.',
+          ),
+        ),
+      );
 
       // Sample bibliography entry
-      await into(bibliography).insert(BibliographyCompanion.insert(
-        author: 'Department of Education',
-        title: 'K to 12 Basic Education Curriculum Guide',
-        year: 2023,
-      ));
+      await into(bibliography).insert(
+        BibliographyCompanion.insert(
+          author: 'Department of Education',
+          title: 'K to 12 Basic Education Curriculum Guide',
+          year: 2023,
+        ),
+      );
     });
   }
 }

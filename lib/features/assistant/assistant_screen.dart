@@ -10,9 +10,7 @@ class AssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Assistant'),
-      ),
+      appBar: AppBar(title: const Text('Assistant')),
       body: const Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(

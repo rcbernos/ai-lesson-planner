@@ -17,9 +17,11 @@ class LessonPlans extends Table {
 /// Custom teacher reference notes attached to a lesson plan.
 class ReferenceNotes extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get lessonPlanId => integer()
-      .nullable()
-      .references(LessonPlans, #id, onDelete: KeyAction.setNull)();
+  IntColumn get lessonPlanId => integer().nullable().references(
+    LessonPlans,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   TextColumn get title => text()();
   TextColumn get content => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
@@ -29,9 +31,11 @@ class ReferenceNotes extends Table {
 /// Structured bibliography metadata (Author, Title, Year) per ILAW spec.
 class Bibliography extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get lessonPlanId => integer()
-      .nullable()
-      .references(LessonPlans, #id, onDelete: KeyAction.setNull)();
+  IntColumn get lessonPlanId => integer().nullable().references(
+    LessonPlans,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
   TextColumn get author => text()();
   TextColumn get title => text()();
   IntColumn get year => integer()();

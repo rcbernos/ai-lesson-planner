@@ -5,25 +5,27 @@ import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/features/plan_view/grade_selector.dart';
 // Fixture path assumes the test sits in test/ (same level as fixtures/).
 import 'fixtures/sample_plan.dart';
+
 // GradeBlock and PlanHeader are `part` files of lesson_plan.dart, so they
 // cannot be imported on their own. Importing lesson_plan.dart is enough.
 
 /// Only the grade labels matter to the chip, so reuse the fixture and swap
 /// its grades.
-LessonPlan createMockPlan(List<String> labels) =>
-    createSamplePlan().copyWith(grades: [
-      for (final l in labels)
-        GradeBlock(
-          gradeLabel: l,
-          learnersMale: 1,
-          learnersFemale: 1,
-          subTheme: '',
-          contentStandard: '',
-          performanceStandard: '',
-          competencies: const [],
-          objectives: const [],
-        ),
-    ]);
+LessonPlan createMockPlan(List<String> labels) => createSamplePlan().copyWith(
+  grades: [
+    for (final l in labels)
+      GradeBlock(
+        gradeLabel: l,
+        learnersMale: 1,
+        learnersFemale: 1,
+        subTheme: '',
+        contentStandard: '',
+        performanceStandard: '',
+        competencies: const [],
+        objectives: const [],
+      ),
+  ],
+);
 
 Widget _host(LessonPlan plan, ProviderContainer container) =>
     UncontrolledProviderScope(
@@ -52,8 +54,9 @@ void main() {
     expect(_isSelected(tester, 'Grade 4'), isFalse);
   });
 
-  testWidgets('tapping a grade selects it and updates the provider',
-      (tester) async {
+  testWidgets('tapping a grade selects it and updates the provider', (
+    tester,
+  ) async {
     final plan = createMockPlan(['Grade 3', 'Grade 4']);
     await tester.pumpWidget(_host(plan, container));
 
@@ -78,8 +81,9 @@ void main() {
     expect(container.read(gradeSelectorProvider), isNull);
   });
 
-  testWidgets('a grade that is not in the plan counts as All Grades',
-      (tester) async {
+  testWidgets('a grade that is not in the plan counts as All Grades', (
+    tester,
+  ) async {
     final plan = createMockPlan(['Grade 3', 'Grade 4']);
     container.read(gradeSelectorProvider.notifier).selectGrade('Grade 9');
     await tester.pumpWidget(_host(plan, container));
@@ -93,8 +97,14 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    final plan = createMockPlan(
-        ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6']);
+    final plan = createMockPlan([
+      'Grade 1',
+      'Grade 2',
+      'Grade 3',
+      'Grade 4',
+      'Grade 5',
+      'Grade 6',
+    ]);
     await tester.pumpWidget(_host(plan, container));
 
     expect(tester.takeException(), isNull);

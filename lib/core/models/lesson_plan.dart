@@ -13,17 +13,17 @@ enum PlanSection {
   intentions,
   learningExperiences,
   assessment,
-  waysForward
+  waysForward,
 }
 
 extension PlanSectionName on PlanSection {
   String get eventName => switch (this) {
-        PlanSection.header => '',
-        PlanSection.intentions => 'Intentions',
-        PlanSection.learningExperiences => 'Learning Experiences',
-        PlanSection.assessment => 'Assessment',
-        PlanSection.waysForward => 'Ways Forward',
-      };
+    PlanSection.header => '',
+    PlanSection.intentions => 'Intentions',
+    PlanSection.learningExperiences => 'Learning Experiences',
+    PlanSection.assessment => 'Assessment',
+    PlanSection.waysForward => 'Ways Forward',
+  };
 }
 
 /// Exception thrown when a plan version is not supported
@@ -38,18 +38,12 @@ class PlanVersionException implements Exception {
 
 /// Instructional materials for a lesson plan.
 class Materials {
-  Materials({
-    this.items = const [],
-    this.references = const [],
-  });
+  Materials({this.items = const [], this.references = const []});
 
   final List<String> items;
   final List<String> references;
 
-  Map<String, dynamic> toJson() => {
-        'items': items,
-        'references': references,
-      };
+  Map<String, dynamic> toJson() => {'items': items, 'references': references};
 
   factory Materials.fromJson(Map<String, dynamic> json) {
     final items = (json['items'] as List<dynamic>?)?.cast<String>() ?? [];
@@ -58,10 +52,7 @@ class Materials {
     return Materials(items: items, references: references);
   }
 
-  Materials copyWith({
-    List<String>? items,
-    List<String>? references,
-  }) =>
+  Materials copyWith({List<String>? items, List<String>? references}) =>
       Materials(
         items: items ?? this.items,
         references: references ?? this.references,
@@ -116,26 +107,25 @@ class LessonPlan {
       flow.fold<int>(0, (sum, stage) => sum + stage.minutes);
 
   Map<String, dynamic> toJson() => {
-        'header': header.toJson(),
-        'grades': grades.map((g) => g.toJson()).toList(),
-        'sharedSubTheme': sharedSubTheme,
-        'bothGradesObjective': bothGradesObjective,
-        'learnerContext': learnerContext,
-        'materials': materials.toJson(),
-        'flow': flow.map((s) => s.toJson()).toList(),
-        'assessments': assessments.map((a) => a.toJson()).toList(),
-        'reflectionQuestions':
-            reflectionQuestions.map((r) => r.toJson()).toList(),
-        'waysForward': waysForward.map((w) => w.toJson()).toList(),
-        'notesNextSession': notesNextSession,
-        'preparedBy': preparedBy,
-        'checkedBy': checkedBy,
-        'aiUseDeclaration': aiUseDeclaration,
-        'language': language,
-        'preparedByRole': preparedByRole,
-        'checkedByRole': checkedByRole,
-        'schemaVersion': currentSchemaVersion,
-      };
+    'header': header.toJson(),
+    'grades': grades.map((g) => g.toJson()).toList(),
+    'sharedSubTheme': sharedSubTheme,
+    'bothGradesObjective': bothGradesObjective,
+    'learnerContext': learnerContext,
+    'materials': materials.toJson(),
+    'flow': flow.map((s) => s.toJson()).toList(),
+    'assessments': assessments.map((a) => a.toJson()).toList(),
+    'reflectionQuestions': reflectionQuestions.map((r) => r.toJson()).toList(),
+    'waysForward': waysForward.map((w) => w.toJson()).toList(),
+    'notesNextSession': notesNextSession,
+    'preparedBy': preparedBy,
+    'checkedBy': checkedBy,
+    'aiUseDeclaration': aiUseDeclaration,
+    'language': language,
+    'preparedByRole': preparedByRole,
+    'checkedByRole': checkedByRole,
+    'schemaVersion': currentSchemaVersion,
+  };
 
   factory LessonPlan.fromJson(Map<String, dynamic> json) {
     final schemaVersion = json['schemaVersion'] as int? ?? 1;
@@ -149,8 +139,9 @@ class LessonPlan {
     if (materialsValue is List<dynamic>) {
       // Old format: materials is a List<String>
       final oldMaterials = List<String>.from(materialsValue);
-      final oldReferences =
-          List<String>.from(json['references'] as List<dynamic>? ?? []);
+      final oldReferences = List<String>.from(
+        json['references'] as List<dynamic>? ?? [],
+      );
       materials = Materials(items: oldMaterials, references: oldReferences);
     } else if (materialsValue is Map<String, dynamic>) {
       // New format: materials is an object with items and references
@@ -172,16 +163,20 @@ class LessonPlan {
       flow: (json['flow'] as List<dynamic>)
           .map((s) => FlowStage.fromJson(s as Map<String, dynamic>))
           .toList(),
-      assessments: (json['assessments'] as List<dynamic>?)
+      assessments:
+          (json['assessments'] as List<dynamic>?)
               ?.map((a) => GradeAssessment.fromJson(a as Map<String, dynamic>))
               .toList() ??
           [],
-      reflectionQuestions: (json['reflectionQuestions'] as List<dynamic>?)
+      reflectionQuestions:
+          (json['reflectionQuestions'] as List<dynamic>?)
               ?.map(
-                  (r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>))
+                (r) => ReflectionQuestion.fromJson(r as Map<String, dynamic>),
+              )
               .toList() ??
           [],
-      waysForward: (json['waysForward'] as List<dynamic>?)
+      waysForward:
+          (json['waysForward'] as List<dynamic>?)
               ?.map((w) => GradeWaysForward.fromJson(w as Map<String, dynamic>))
               .toList() ??
           [],
@@ -213,26 +208,25 @@ class LessonPlan {
     String? language,
     String? preparedByRole,
     String? checkedByRole,
-  }) =>
-      LessonPlan(
-        header: header ?? this.header,
-        grades: grades ?? this.grades,
-        sharedSubTheme: sharedSubTheme ?? this.sharedSubTheme,
-        bothGradesObjective: bothGradesObjective ?? this.bothGradesObjective,
-        learnerContext: learnerContext ?? this.learnerContext,
-        materials: materials ?? this.materials,
-        flow: flow ?? this.flow,
-        assessments: assessments ?? this.assessments,
-        reflectionQuestions: reflectionQuestions ?? this.reflectionQuestions,
-        waysForward: waysForward ?? this.waysForward,
-        notesNextSession: notesNextSession ?? this.notesNextSession,
-        preparedBy: preparedBy ?? this.preparedBy,
-        checkedBy: checkedBy ?? this.checkedBy,
-        aiUseDeclaration: aiUseDeclaration ?? this.aiUseDeclaration,
-        language: language ?? this.language,
-        preparedByRole: preparedByRole ?? this.preparedByRole,
-        checkedByRole: checkedByRole ?? this.checkedByRole,
-      );
+  }) => LessonPlan(
+    header: header ?? this.header,
+    grades: grades ?? this.grades,
+    sharedSubTheme: sharedSubTheme ?? this.sharedSubTheme,
+    bothGradesObjective: bothGradesObjective ?? this.bothGradesObjective,
+    learnerContext: learnerContext ?? this.learnerContext,
+    materials: materials ?? this.materials,
+    flow: flow ?? this.flow,
+    assessments: assessments ?? this.assessments,
+    reflectionQuestions: reflectionQuestions ?? this.reflectionQuestions,
+    waysForward: waysForward ?? this.waysForward,
+    notesNextSession: notesNextSession ?? this.notesNextSession,
+    preparedBy: preparedBy ?? this.preparedBy,
+    checkedBy: checkedBy ?? this.checkedBy,
+    aiUseDeclaration: aiUseDeclaration ?? this.aiUseDeclaration,
+    language: language ?? this.language,
+    preparedByRole: preparedByRole ?? this.preparedByRole,
+    checkedByRole: checkedByRole ?? this.checkedByRole,
+  );
 }
 
 /// The default AI use declaration text

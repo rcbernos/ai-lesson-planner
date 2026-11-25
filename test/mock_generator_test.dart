@@ -27,11 +27,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Test')
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Test',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -48,7 +49,9 @@ void main() {
       expect((events[1] as SectionCompleted).name, equals('Intentions'));
       expect(events[2], isA<SectionStarted>());
       expect(
-          (events[2] as SectionStarted).name, equals('Learning Experiences'));
+        (events[2] as SectionStarted).name,
+        equals('Learning Experiences'),
+      );
       expect(events[3], isA<SectionCompleted>());
       expect(events[4], isA<SectionStarted>());
       expect((events[4] as SectionStarted).name, equals('Assessment'));
@@ -73,23 +76,26 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Comp 1'),
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
           GradeInput(
-              gradeLabel: 'Grade 4',
-              male: 2,
-              female: 2,
-              subTheme: 'Test',
-              competency: 'Comp 2'),
+            gradeLabel: 'Grade 4',
+            male: 2,
+            female: 2,
+            subTheme: 'Test',
+            competency: 'Comp 2',
+          ),
           GradeInput(
-              gradeLabel: 'Grade 5',
-              male: 1,
-              female: 1,
-              subTheme: 'Test',
-              competency: 'Comp 3'),
+            gradeLabel: 'Grade 5',
+            male: 1,
+            female: 1,
+            subTheme: 'Test',
+            competency: 'Comp 3',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.english,
@@ -116,11 +122,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Test')
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Test',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -144,11 +151,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Test')
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Test',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -166,59 +174,70 @@ void main() {
       expect(hasCompleted, isFalse);
     });
 
-    test('competencyIndexByGrade is populated for non-whole-class stages',
-        () async {
-      final request = GenerationRequest(
-        header: PlanHeader(
-          school: 'Test',
-          teacher: 'Test',
-          learningArea: 'Filipino',
-          date: '2026-01-15',
-          term: 'Term 1',
-          sessions: 1,
-          sessionMinutes: 90,
-          multigradeModel: 'STDT',
-        ),
-        grades: [
-          GradeInput(
+    test(
+      'competencyIndexByGrade is populated for non-whole-class stages',
+      () async {
+        final request = GenerationRequest(
+          header: PlanHeader(
+            school: 'Test',
+            teacher: 'Test',
+            learningArea: 'Filipino',
+            date: '2026-01-15',
+            term: 'Term 1',
+            sessions: 1,
+            sessionMinutes: 90,
+            multigradeModel: 'STDT',
+          ),
+          grades: [
+            GradeInput(
               gradeLabel: 'Grade 3',
               male: 3,
               female: 3,
               subTheme: 'Test',
-              competency: 'Comp 1'),
-          GradeInput(
+              competency: 'Comp 1',
+            ),
+            GradeInput(
               gradeLabel: 'Grade 4',
               male: 2,
               female: 2,
               subTheme: 'Test',
-              competency: 'Comp 2'),
-        ],
-        sharedSubTheme: 'Theme',
-        language: OutputLanguage.english,
-      );
+              competency: 'Comp 2',
+            ),
+          ],
+          sharedSubTheme: 'Theme',
+          language: OutputLanguage.english,
+        );
 
-      final plan = await _getCompletedPlan(generator.generate(request));
+        final plan = await _getCompletedPlan(generator.generate(request));
 
-      // Check whole-class stages have empty competencyIndexByGrade
-      for (final stage in plan.flow) {
-        if (stage.wholeClass) {
-          expect(stage.competencyIndexByGrade, isEmpty,
+        // Check whole-class stages have empty competencyIndexByGrade
+        for (final stage in plan.flow) {
+          if (stage.wholeClass) {
+            expect(
+              stage.competencyIndexByGrade,
+              isEmpty,
               reason:
-                  'Whole-class stage "${stage.stage}" should have empty map');
+                  'Whole-class stage "${stage.stage}" should have empty map',
+            );
+          }
         }
-      }
 
-      // Check non-whole-class stages have index for each grade
-      final nonWholeClassStages =
-          plan.flow.where((s) => !s.wholeClass).toList();
-      for (final stage in nonWholeClassStages) {
-        for (final grade in plan.grades) {
-          expect(stage.competencyIndexByGrade[grade.gradeLabel], equals(0),
+        // Check non-whole-class stages have index for each grade
+        final nonWholeClassStages = plan.flow
+            .where((s) => !s.wholeClass)
+            .toList();
+        for (final stage in nonWholeClassStages) {
+          for (final grade in plan.grades) {
+            expect(
+              stage.competencyIndexByGrade[grade.gradeLabel],
+              equals(0),
               reason:
-                  'Stage "${stage.stage}" should have index 0 for ${grade.gradeLabel}');
+                  'Stage "${stage.stage}" should have index 0 for ${grade.gradeLabel}',
+            );
+          }
         }
-      }
-    });
+      },
+    );
 
     test('competencyIndex is set for assessments', () async {
       final request = GenerationRequest(
@@ -234,17 +253,19 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Comp 1'),
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
           GradeInput(
-              gradeLabel: 'Grade 4',
-              male: 2,
-              female: 2,
-              subTheme: 'Test',
-              competency: 'Comp 2'),
+            gradeLabel: 'Grade 4',
+            male: 2,
+            female: 2,
+            subTheme: 'Test',
+            competency: 'Comp 2',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.english,
@@ -253,9 +274,12 @@ void main() {
       final plan = await _getCompletedPlan(generator.generate(request));
 
       for (final assessment in plan.assessments) {
-        expect(assessment.competencyIndex, equals(0),
-            reason:
-                'Assessment for ${assessment.gradeLabel} should have competencyIndex 0');
+        expect(
+          assessment.competencyIndex,
+          equals(0),
+          reason:
+              'Assessment for ${assessment.gradeLabel} should have competencyIndex 0',
+        );
       }
     });
 
@@ -273,11 +297,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Comp 3'),
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 3',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -290,23 +315,32 @@ void main() {
         for (final entry in stage.competencyIndexByGrade.entries) {
           final gradeLabel = entry.key;
           final index = entry.value;
-          final grade =
-              plan.grades.firstWhere((g) => g.gradeLabel == gradeLabel);
-          expect(index, inInclusiveRange(0, grade.competencies.length - 1),
-              reason: 'Index $index for $gradeLabel out of range '
-                  '(competencies: ${grade.competencies.length})');
+          final grade = plan.grades.firstWhere(
+            (g) => g.gradeLabel == gradeLabel,
+          );
+          expect(
+            index,
+            inInclusiveRange(0, grade.competencies.length - 1),
+            reason:
+                'Index $index for $gradeLabel out of range '
+                '(competencies: ${grade.competencies.length})',
+          );
         }
       }
 
       // Check assessments
       for (final assessment in plan.assessments) {
         if (assessment.competencyIndex != null) {
-          final grade = plan.grades
-              .firstWhere((g) => g.gradeLabel == assessment.gradeLabel);
-          expect(assessment.competencyIndex,
-              inInclusiveRange(0, grade.competencies.length - 1),
-              reason: 'Assessment index ${assessment.competencyIndex} for '
-                  '${assessment.gradeLabel} out of range');
+          final grade = plan.grades.firstWhere(
+            (g) => g.gradeLabel == assessment.gradeLabel,
+          );
+          expect(
+            assessment.competencyIndex,
+            inInclusiveRange(0, grade.competencies.length - 1),
+            reason:
+                'Assessment index ${assessment.competencyIndex} for '
+                '${assessment.gradeLabel} out of range',
+          );
         }
       }
     });
@@ -326,11 +360,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Comp 1'),
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -361,15 +396,20 @@ void main() {
 
       // Flow stages should have empty maps
       for (final stage in result.flow) {
-        expect(stage.competencyIndexByGrade, isEmpty,
-            reason:
-                'Flow stage should have empty competencyIndexByGrade in v1');
+        expect(
+          stage.competencyIndexByGrade,
+          isEmpty,
+          reason: 'Flow stage should have empty competencyIndexByGrade in v1',
+        );
       }
 
       // Assessments should have null competencyIndex
       for (final assessment in result.assessments) {
-        expect(assessment.competencyIndex, isNull,
-            reason: 'Assessment should have null competencyIndex in v1');
+        expect(
+          assessment.competencyIndex,
+          isNull,
+          reason: 'Assessment should have null competencyIndex in v1',
+        );
       }
     });
 
@@ -387,11 +427,12 @@ void main() {
         ),
         grades: [
           GradeInput(
-              gradeLabel: 'Grade 3',
-              male: 3,
-              female: 3,
-              subTheme: 'Test',
-              competency: 'Comp 1'),
+            gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -406,16 +447,20 @@ void main() {
 
       // Verify flow stages
       for (int i = 0; i < plan.flow.length; i++) {
-        expect(result.flow[i].competencyIndexByGrade,
-            equals(plan.flow[i].competencyIndexByGrade),
-            reason: 'Flow stage $i competencyIndexByGrade mismatch');
+        expect(
+          result.flow[i].competencyIndexByGrade,
+          equals(plan.flow[i].competencyIndexByGrade),
+          reason: 'Flow stage $i competencyIndexByGrade mismatch',
+        );
       }
 
       // Verify assessments
       for (int i = 0; i < plan.assessments.length; i++) {
-        expect(result.assessments[i].competencyIndex,
-            equals(plan.assessments[i].competencyIndex),
-            reason: 'Assessment $i competencyIndex mismatch');
+        expect(
+          result.assessments[i].competencyIndex,
+          equals(plan.assessments[i].competencyIndex),
+          reason: 'Assessment $i competencyIndex mismatch',
+        );
       }
     });
 
@@ -456,10 +501,7 @@ void main() {
         sharedSubTheme: 'Theme',
         bothGradesObjective: 'Both',
         learnerContext: 'Context',
-        materials: Materials(
-          items: ['M'],
-          references: ['R'],
-        ),
+        materials: Materials(items: ['M'], references: ['R']),
         flow: [],
         assessments: [],
         reflectionQuestions: [],

@@ -25,8 +25,11 @@ class _IsolateResult<T> {
 /// Runs a function in a separate isolate and returns the result
 Future<T> computeDart<Q, T>(FutureOr<T> Function(Q) function, Q message) async {
   final receivePort = ReceivePort();
-  await Isolate.spawn(
-      _isolateEntryPoint, [receivePort.sendPort, message, function]);
+  await Isolate.spawn(_isolateEntryPoint, [
+    receivePort.sendPort,
+    message,
+    function,
+  ]);
   final result = await receivePort.first as _IsolateResult<T>;
   receivePort.close();
 
@@ -128,7 +131,9 @@ class AIService {
       // Check if model file exists
       final modelFile = File(modelPath);
       if (!modelFile.existsSync()) {
-        log('LLM: Model file not found at $modelPath, returning simulated response');
+        log(
+          'LLM: Model file not found at $modelPath, returning simulated response',
+        );
         return generateSimulatedLessonPlan(
           topic: topic,
           gradeLevel: gradeLevel,
@@ -196,7 +201,8 @@ class AIService {
   /// - gradeLevel: Grade level for the lesson plan
   /// - learningArea: Subject/area for the lesson plan
   @Deprecated(
-      'This is legacy code; LLM integration will be re-added in Phase 3')
+    'This is legacy code; LLM integration will be re-added in Phase 3',
+  )
   static String _runLLMInference(
     String modelPath,
     String topic,
@@ -205,7 +211,9 @@ class AIService {
   ) {
     // Legacy function stub - actual LLM inference requires llama_cpp_dart
     // which is not available in Phase 0. Return simulated response for now.
-    log('LLM: Inference stub - model at $modelPath, returning simulated response');
+    log(
+      'LLM: Inference stub - model at $modelPath, returning simulated response',
+    );
     return generateSimulatedLessonPlan(
       topic: topic,
       gradeLevel: gradeLevel,
@@ -221,7 +229,8 @@ class AIService {
   }) {
     final buffer = StringBuffer();
     buffer.writeln(
-        'Generate a comprehensive lesson plan based on the ILAW format.');
+      'Generate a comprehensive lesson plan based on the ILAW format.',
+    );
     buffer.writeln('');
     buffer.writeln('TOPIC: $topic');
     buffer.writeln('GRADE LEVEL: $gradeLevel');
@@ -229,16 +238,21 @@ class AIService {
     buffer.writeln('');
     buffer.writeln('ILAW FORMAT INSTRUCTIONS:');
     buffer.writeln(
-        'I INTENTIONS: Include Shared Sub-theme, Content Standard, Performance Standard, Learning Competencies, and Learning Objectives.');
+      'I INTENTIONS: Include Shared Sub-theme, Content Standard, Performance Standard, Learning Competencies, and Learning Objectives.',
+    );
     buffer.writeln(
-        'L LEARNING EXPERIENCES: Include Learner Context, Instructional Materials, and Flow of Lesson with time-activity table.');
+      'L LEARNING EXPERIENCES: Include Learner Context, Instructional Materials, and Flow of Lesson with time-activity table.',
+    );
     buffer.writeln(
-        'A ASSESSMENT: Include Formative Assessment, Exit Task, and Success Criteria.');
+      'A ASSESSMENT: Include Formative Assessment, Exit Task, and Success Criteria.',
+    );
     buffer.writeln(
-        'W WAYS FORWARD: Include Reflection Questions, Remediation, and Enrichment.');
+      'W WAYS FORWARD: Include Reflection Questions, Remediation, and Enrichment.',
+    );
     buffer.writeln('');
     buffer.writeln(
-        'Please generate a detailed lesson plan following this format.');
+      'Please generate a detailed lesson plan following this format.',
+    );
 
     return buffer.toString();
   }
@@ -265,10 +279,7 @@ class AIService {
     }
 
     // Prepare parameters for isolate with model path
-    final isolateParams = {
-      ...params,
-      'modelPath': modelPath,
-    };
+    final isolateParams = {...params, 'modelPath': modelPath};
 
     // Run generation in background isolate
     return await generateLessonPlanInIsolate(isolateParams);

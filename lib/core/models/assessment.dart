@@ -17,12 +17,12 @@ class GradeAssessment {
   final int? competencyIndex;
 
   Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'formative': formative,
-        'exitTask': exitTask,
-        'successCriteria': successCriteria,
-        'competencyIndex': competencyIndex,
-      };
+    'gradeLabel': gradeLabel,
+    'formative': formative,
+    'exitTask': exitTask,
+    'successCriteria': successCriteria,
+    'competencyIndex': competencyIndex,
+  };
 
   factory GradeAssessment.fromJson(Map<String, dynamic> json) =>
       GradeAssessment(
@@ -39,12 +39,11 @@ class GradeAssessment {
     String? exitTask,
     String? successCriteria,
     int? competencyIndex,
-  }) =>
-      GradeAssessment(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        formative: formative ?? this.formative,
-        exitTask: exitTask ?? this.exitTask,
-        successCriteria: successCriteria ?? this.successCriteria,
-        competencyIndex: competencyIndex ?? this.competencyIndex,
-      );
+  }) => GradeAssessment(
+    gradeLabel: gradeLabel ?? this.gradeLabel,
+    formative: formative ?? this.formative,
+    exitTask: exitTask ?? this.exitTask,
+    successCriteria: successCriteria ?? this.successCriteria,
+    competencyIndex: competencyIndex ?? this.competencyIndex,
+  );
 }

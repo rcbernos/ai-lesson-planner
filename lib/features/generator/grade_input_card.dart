@@ -38,11 +38,13 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
   void initState() {
     super.initState();
     _maleController = TextEditingController(text: widget.grade.male.toString());
-    _femaleController =
-        TextEditingController(text: widget.grade.female.toString());
+    _femaleController = TextEditingController(
+      text: widget.grade.female.toString(),
+    );
     _subThemeController = TextEditingController(text: widget.grade.subTheme);
-    _competencyController =
-        TextEditingController(text: widget.grade.competency);
+    _competencyController = TextEditingController(
+      text: widget.grade.competency,
+    );
     _gradeLabel = widget.grade.gradeLabel;
   }
 
@@ -61,13 +63,15 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
     final subTheme = _subThemeController.text;
     final competency = _competencyController.text;
 
-    widget.onChanged(GradeInput(
-      gradeLabel: _gradeLabel,
-      male: male,
-      female: female,
-      subTheme: subTheme,
-      competency: competency,
-    ));
+    widget.onChanged(
+      GradeInput(
+        gradeLabel: _gradeLabel,
+        male: male,
+        female: female,
+        subTheme: subTheme,
+        competency: competency,
+      ),
+    );
   }
 
   @override
@@ -99,7 +103,8 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant),
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
                 borderRadius: BorderRadius.circular(8),
                 color: Theme.of(context).colorScheme.surfaceVariant,
               ),
@@ -108,19 +113,22 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                 decoration: const InputDecoration(
                   labelText: '* Grade',
                   border: InputBorder.none,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
-                items: [
-                  'Grade 1',
-                  'Grade 2',
-                  'Grade 3',
-                  'Grade 4',
-                  'Grade 5',
-                  'Grade 6'
-                ]
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                    .toList(),
+                items:
+                    [
+                          'Grade 1',
+                          'Grade 2',
+                          'Grade 3',
+                          'Grade 4',
+                          'Grade 5',
+                          'Grade 6',
+                        ]
+                        .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                        .toList(),
                 onChanged: (value) {
                   if (value != null) {
                     setState(() {
@@ -139,7 +147,8 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant),
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                       color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
@@ -148,8 +157,10 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                       decoration: const InputDecoration(
                         labelText: 'Male',
                         border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (_) => _updateGrade(),
@@ -161,7 +172,8 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                          color: Theme.of(context).colorScheme.outlineVariant),
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
                       borderRadius: BorderRadius.circular(8),
                       color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
@@ -170,8 +182,10 @@ class _GradeInputCardState extends ConsumerState<GradeInputCard> {
                       decoration: const InputDecoration(
                         labelText: 'Female',
                         border: InputBorder.none,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                       onChanged: (_) => _updateGrade(),

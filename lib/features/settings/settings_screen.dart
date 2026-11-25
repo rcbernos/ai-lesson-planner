@@ -47,8 +47,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Delete Database'),
         content: const Text(
-            'This will permanently delete all saved lesson plans and references. '
-            'This action cannot be undone. Are you sure?'),
+          'This will permanently delete all saved lesson plans and references. '
+          'This action cannot be undone. Are you sure?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -56,9 +57,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop(true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -76,17 +75,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(deleted
-                ? 'Database deleted successfully'
-                : 'Database file not found or could not be deleted'),
+            content: Text(
+              deleted
+                  ? 'Database deleted successfully'
+                  : 'Database file not found or could not be deleted',
+            ),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error deleting database: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error deleting database: $e')));
       }
     } finally {
       if (mounted) {
@@ -100,9 +101,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -152,10 +151,12 @@ class _LanguageSection extends ConsumerWidget {
                 border: OutlineInputBorder(),
               ),
               items: OutputLanguage.values
-                  .map((lang) => DropdownMenuItem(
-                        value: lang,
-                        child: Text(lang.name.toUpperCase()),
-                      ))
+                  .map(
+                    (lang) => DropdownMenuItem(
+                      value: lang,
+                      child: Text(lang.name.toUpperCase()),
+                    ),
+                  )
                   .toList(),
               onChanged: (value) {
                 if (value != null) {
@@ -213,10 +214,7 @@ class _DataFolderSectionState extends State<_DataFolderSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Data Folder',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Data Folder', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             _isLoading
                 ? const LinearProgressIndicator()
@@ -275,18 +273,12 @@ class _DatabaseSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Database',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Database', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
             if (databasePath != null)
               SelectableText(
                 databasePath!,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                ),
+                style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
               ),
             const SizedBox(height: 16),
             SizedBox(

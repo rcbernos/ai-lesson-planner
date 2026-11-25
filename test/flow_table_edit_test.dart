@@ -8,8 +8,9 @@ import 'fixtures/sample_plan.dart';
 
 void main() {
   group('FlowTable cell edit', () {
-    testWidgets('tapping grade cell and confirming calls onChange',
-        (WidgetTester tester) async {
+    testWidgets('tapping grade cell and confirming calls onChange', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       String? capturedChange;
 
@@ -47,8 +48,9 @@ void main() {
       expect(capturedChange, equals('Baguhin ang text.'));
     });
 
-    testWidgets('cancelling dialog changes nothing',
-        (WidgetTester tester) async {
+    testWidgets('cancelling dialog changes nothing', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       var callCount = 0;
 
@@ -76,8 +78,9 @@ void main() {
       expect(callCount, equals(0));
     });
 
-    testWidgets('table renders with all expected text',
-        (WidgetTester tester) async {
+    testWidgets('table renders with all expected text', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
@@ -105,8 +108,9 @@ void main() {
       expect(find.text('Bilugan ang mga pangatnig.'), findsOneWidget);
     });
 
-    testWidgets('editing minutes validates integer input and updates',
-        (WidgetTester tester) async {
+    testWidgets('editing minutes validates integer input and updates', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       String? savedMinutes;
 
@@ -135,8 +139,9 @@ void main() {
       expect(savedMinutes, equals('25'));
     });
 
-    testWidgets('editing stage name updates correctly',
-        (WidgetTester tester) async {
+    testWidgets('editing stage name updates correctly', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       String? savedStageName;
 

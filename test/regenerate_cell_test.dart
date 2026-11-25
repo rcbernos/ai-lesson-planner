@@ -7,8 +7,9 @@ import 'fixtures/sample_plan.dart' as fixtures;
 
 void main() {
   group('FlowTable regenerate cell', () {
-    testWidgets('refresh button shown when onRegenerate provided',
-        (WidgetTester tester) async {
+    testWidgets('refresh button shown when onRegenerate provided', (
+      WidgetTester tester,
+    ) async {
       final plan = fixtures.createSamplePlan();
       await tester.pumpWidget(
         MaterialApp(
@@ -32,8 +33,9 @@ void main() {
       expect(refreshButtons, findsNWidgets(14));
     });
 
-    testWidgets('tapping refresh button calls callback with gradeLabel',
-        (WidgetTester tester) async {
+    testWidgets('tapping refresh button calls callback with gradeLabel', (
+      WidgetTester tester,
+    ) async {
       final plan = fixtures.createSamplePlan();
       String? capturedGrade;
       await tester.pumpWidget(
@@ -72,8 +74,9 @@ void main() {
   });
 
   group('AssessmentSection regenerate cell', () {
-    testWidgets('refresh buttons render for each grade',
-        (WidgetTester tester) async {
+    testWidgets('refresh buttons render for each grade', (
+      WidgetTester tester,
+    ) async {
       final plan = fixtures.createSamplePlan();
       await tester.pumpWidget(
         MaterialApp(
@@ -93,8 +96,9 @@ void main() {
   });
 
   group('WaysForwardSection regenerate cell', () {
-    testWidgets('refresh buttons render for each grade',
-        (WidgetTester tester) async {
+    testWidgets('refresh buttons render for each grade', (
+      WidgetTester tester,
+    ) async {
       final plan = fixtures.createSamplePlan();
       await tester.pumpWidget(
         MaterialApp(

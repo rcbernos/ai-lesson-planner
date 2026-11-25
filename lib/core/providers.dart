@@ -24,8 +24,8 @@ final generatedPlanProvider = StateProvider<LessonPlan?>((ref) => null);
 /// Provides the generation controller for managing the generation state.
 final generationControllerProvider =
     StateNotifierProvider<GenerationController, GenerationState>((ref) {
-  return GenerationController(ref);
-});
+      return GenerationController(ref);
+    });
 
 /// Provides the PlanRepository for persisting lesson plans.
 final planRepositoryProvider = Provider<PlanRepository>((ref) {
@@ -41,9 +41,7 @@ final draftStoreProvider = Provider<DraftStore>((ref) {
 /// Provides the plan editor state with undo history.
 /// Survives tab switches (no auto-dispose).
 final planEditorProvider =
-    StateNotifierProvider<PlanEditorNotifier, PlanEditorState?>(
-  (ref) {
-    ref.keepAlive();
-    return PlanEditorNotifier(drafts: ref.read(draftStoreProvider));
-  },
-);
+    StateNotifierProvider<PlanEditorNotifier, PlanEditorState?>((ref) {
+      ref.keepAlive();
+      return PlanEditorNotifier(drafts: ref.read(draftStoreProvider));
+    });

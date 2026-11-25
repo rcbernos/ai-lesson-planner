@@ -11,28 +11,23 @@ void main() {
     testWidgets('renders when no plan is loaded', (WidgetTester tester) async {
       await tester.pumpWidget(
         const ProviderScope(
-          child: MaterialApp(
-            home: Scaffold(body: PlanWorkspace()),
-          ),
+          child: MaterialApp(home: Scaffold(body: PlanWorkspace())),
         ),
       );
 
       expect(find.text('No plan loaded'), findsOneWidget);
     });
 
-    testWidgets('displays plan and dirty chip after edit',
-        (WidgetTester tester) async {
+    testWidgets('displays plan and dirty chip after edit', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
 
       await tester.pumpWidget(
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 800,
-                height: 800,
-                child: PlanWorkspace(),
-              ),
+              body: SizedBox(width: 800, height: 800, child: PlanWorkspace()),
             ),
           ),
         ),
@@ -40,8 +35,9 @@ void main() {
 
       // Load the plan
       await tester.pumpAndSettle();
-      final container =
-          ProviderScope.containerOf(tester.element(find.byType(PlanWorkspace)));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanWorkspace)),
+      );
       container.read(planEditorProvider.notifier).load(plan);
       await tester.pumpAndSettle();
 
@@ -52,9 +48,9 @@ void main() {
       expect(find.text('Unsaved changes'), findsNothing);
 
       // Simulate an edit through the editor state
-      container.read(planEditorProvider.notifier).update(
-            (p) => p.copyWith(sharedSubTheme: 'Updated Theme'),
-          );
+      container
+          .read(planEditorProvider.notifier)
+          .update((p) => p.copyWith(sharedSubTheme: 'Updated Theme'));
       await tester.pumpAndSettle();
 
       // Dirty chip should appear
@@ -68,19 +64,16 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 800,
-                height: 800,
-                child: PlanWorkspace(),
-              ),
+              body: SizedBox(width: 800, height: 800, child: PlanWorkspace()),
             ),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
-      final container =
-          ProviderScope.containerOf(tester.element(find.byType(PlanWorkspace)));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanWorkspace)),
+      );
       container.read(planEditorProvider.notifier).load(plan);
       await tester.pumpAndSettle();
 
@@ -88,9 +81,9 @@ void main() {
       expect(find.byIcon(Icons.undo), findsNothing);
 
       // Make an edit
-      container.read(planEditorProvider.notifier).update(
-            (p) => p.copyWith(sharedSubTheme: 'First Change'),
-          );
+      container
+          .read(planEditorProvider.notifier)
+          .update((p) => p.copyWith(sharedSubTheme: 'First Change'));
       await tester.pumpAndSettle();
 
       // Undo button should appear after one edit (canUndo = true)
@@ -104,19 +97,16 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 800,
-                height: 800,
-                child: PlanWorkspace(),
-              ),
+              body: SizedBox(width: 800, height: 800, child: PlanWorkspace()),
             ),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
-      final container =
-          ProviderScope.containerOf(tester.element(find.byType(PlanWorkspace)));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanWorkspace)),
+      );
       container.read(planEditorProvider.notifier).load(plan);
       await tester.pumpAndSettle();
 
@@ -124,33 +114,39 @@ void main() {
       final originalTheme = state!.plan.sharedSubTheme;
 
       // Make edits
-      container.read(planEditorProvider.notifier).update(
-            (p) => p.copyWith(sharedSubTheme: 'First Change'),
-          );
-      container.read(planEditorProvider.notifier).update(
-            (p) => p.copyWith(sharedSubTheme: 'Second Change'),
-          );
+      container
+          .read(planEditorProvider.notifier)
+          .update((p) => p.copyWith(sharedSubTheme: 'First Change'));
+      container
+          .read(planEditorProvider.notifier)
+          .update((p) => p.copyWith(sharedSubTheme: 'Second Change'));
       await tester.pumpAndSettle();
 
       // Verify second edit
-      expect(container.read(planEditorProvider)!.plan.sharedSubTheme,
-          equals('Second Change'));
+      expect(
+        container.read(planEditorProvider)!.plan.sharedSubTheme,
+        equals('Second Change'),
+      );
 
       // Undo
       container.read(planEditorProvider.notifier).undo();
       await tester.pumpAndSettle();
 
       // Should be back to first change
-      expect(container.read(planEditorProvider)!.plan.sharedSubTheme,
-          equals('First Change'));
+      expect(
+        container.read(planEditorProvider)!.plan.sharedSubTheme,
+        equals('First Change'),
+      );
 
       // Undo again
       container.read(planEditorProvider.notifier).undo();
       await tester.pumpAndSettle();
 
       // Should be back to original
-      expect(container.read(planEditorProvider)!.plan.sharedSubTheme,
-          equals(originalTheme));
+      expect(
+        container.read(planEditorProvider)!.plan.sharedSubTheme,
+        equals(originalTheme),
+      );
     });
 
     testWidgets('Save clears dirty flag', (WidgetTester tester) async {
@@ -160,26 +156,23 @@ void main() {
         ProviderScope(
           child: MaterialApp(
             home: Scaffold(
-              body: SizedBox(
-                width: 800,
-                height: 800,
-                child: PlanWorkspace(),
-              ),
+              body: SizedBox(width: 800, height: 800, child: PlanWorkspace()),
             ),
           ),
         ),
       );
 
       await tester.pumpAndSettle();
-      final container =
-          ProviderScope.containerOf(tester.element(find.byType(PlanWorkspace)));
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(PlanWorkspace)),
+      );
       container.read(planEditorProvider.notifier).load(plan);
       await tester.pumpAndSettle();
 
       // Make an edit
-      container.read(planEditorProvider.notifier).update(
-            (p) => p.copyWith(sharedSubTheme: 'Updated'),
-          );
+      container
+          .read(planEditorProvider.notifier)
+          .update((p) => p.copyWith(sharedSubTheme: 'Updated'));
       await tester.pumpAndSettle();
 
       expect(container.read(planEditorProvider)!.dirty, isTrue);

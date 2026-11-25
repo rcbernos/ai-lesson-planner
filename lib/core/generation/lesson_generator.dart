@@ -58,21 +58,24 @@ class GenerationRequest {
   /// Builds a request from an existing lesson plan.
   /// Competencies are joined with '; ' for each grade.
   factory GenerationRequest.fromPlan(
-          LessonPlan plan, OutputLanguage language) =>
-      GenerationRequest(
-        header: plan.header,
-        grades: plan.grades
-            .map((g) => GradeInput(
-                  gradeLabel: g.gradeLabel,
-                  male: g.learnersMale,
-                  female: g.learnersFemale,
-                  subTheme: g.subTheme,
-                  competency: g.competencies.join('; '),
-                ))
-            .toList(),
-        sharedSubTheme: plan.sharedSubTheme,
-        language: language,
-      );
+    LessonPlan plan,
+    OutputLanguage language,
+  ) => GenerationRequest(
+    header: plan.header,
+    grades: plan.grades
+        .map(
+          (g) => GradeInput(
+            gradeLabel: g.gradeLabel,
+            male: g.learnersMale,
+            female: g.learnersFemale,
+            subTheme: g.subTheme,
+            competency: g.competencies.join('; '),
+          ),
+        )
+        .toList(),
+    sharedSubTheme: plan.sharedSubTheme,
+    language: language,
+  );
 }
 
 /// Base class for generation events in the streaming pipeline.

@@ -10,18 +10,15 @@ import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
 
 void main() {
   group('Generator form layout on phones', () {
-    testWidgets('shows single-column layout at 360x640',
-        (WidgetTester tester) async {
+    testWidgets('shows single-column layout at 360x640', (
+      WidgetTester tester,
+    ) async {
       // Set narrow phone screen size
       tester.binding.window.physicalSizeTestValue = const Size(360, 640);
       tester.binding.window.devicePixelRatioTestValue = 1.0;
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AppShell(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: AppShell())),
       );
 
       // Tap FAB on Library screen to open Generator screen
@@ -35,18 +32,15 @@ void main() {
       expect(find.text('Generate'), findsOneWidget);
     });
 
-    testWidgets('generate button is always reachable in 360x640',
-        (WidgetTester tester) async {
+    testWidgets('generate button is always reachable in 360x640', (
+      WidgetTester tester,
+    ) async {
       // Set narrow phone screen size
       tester.binding.window.physicalSizeTestValue = const Size(360, 640);
       tester.binding.window.devicePixelRatioTestValue = 1.0;
 
       await tester.pumpWidget(
-        const ProviderScope(
-          child: MaterialApp(
-            home: AppShell(),
-          ),
-        ),
+        const ProviderScope(child: MaterialApp(home: AppShell())),
       );
 
       // Tap FAB to open Generator screen
@@ -58,11 +52,12 @@ void main() {
 
       // Scroll to verify button is reachable
       await tester.drag(
-          find.descendant(
-            of: find.byType(Scaffold),
-            matching: find.byType(SingleChildScrollView),
-          ),
-          const Offset(0, 200));
+        find.descendant(
+          of: find.byType(Scaffold),
+          matching: find.byType(SingleChildScrollView),
+        ),
+        const Offset(0, 200),
+      );
       await tester.pump();
 
       expect(find.text('Generate'), findsOneWidget);

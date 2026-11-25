@@ -18,15 +18,18 @@ extension PlanSectionPatch on LessonPlan {
     // Validate gradeLabel if provided
     if (gradeLabel != null) {
       final thisHasGrade = grades.any((g) => g.gradeLabel == gradeLabel);
-      final sourceHasGrade =
-          source.grades.any((g) => g.gradeLabel == gradeLabel);
+      final sourceHasGrade = source.grades.any(
+        (g) => g.gradeLabel == gradeLabel,
+      );
       if (!thisHasGrade) {
         throw ArgumentError(
-            'Grade label "$gradeLabel" not found in current plan');
+          'Grade label "$gradeLabel" not found in current plan',
+        );
       }
       if (!sourceHasGrade) {
         throw ArgumentError(
-            'Grade label "$gradeLabel" not found in source plan');
+          'Grade label "$gradeLabel" not found in source plan',
+        );
       }
     }
 
@@ -49,16 +52,15 @@ extension PlanSectionPatch on LessonPlan {
   }
 
   /// Replaces objectives from source, preserving grounded fields.
-  LessonPlan _replaceIntentions(
-    LessonPlan source, {
-    String? gradeLabel,
-  }) {
+  LessonPlan _replaceIntentions(LessonPlan source, {String? gradeLabel}) {
     final newGrades = gradeLabel == null
         ? _replaceIntentionsFull(source)
         : _replaceIntentionsSlice(source, gradeLabel: gradeLabel);
 
     return copyWith(
-        grades: newGrades, bothGradesObjective: source.bothGradesObjective);
+      grades: newGrades,
+      bothGradesObjective: source.bothGradesObjective,
+    );
   }
 
   List<GradeBlock> _replaceIntentionsFull(LessonPlan source) {
@@ -81,10 +83,13 @@ extension PlanSectionPatch on LessonPlan {
     }).toList();
   }
 
-  List<GradeBlock> _replaceIntentionsSlice(LessonPlan source,
-      {required String gradeLabel}) {
-    final sourceGrade =
-        source.grades.firstWhere((g) => g.gradeLabel == gradeLabel);
+  List<GradeBlock> _replaceIntentionsSlice(
+    LessonPlan source, {
+    required String gradeLabel,
+  }) {
+    final sourceGrade = source.grades.firstWhere(
+      (g) => g.gradeLabel == gradeLabel,
+    );
     return grades.map((g) {
       final newObjectives = g.gradeLabel == gradeLabel
           ? List<String>.from(sourceGrade.objectives)
@@ -117,19 +122,22 @@ extension PlanSectionPatch on LessonPlan {
     // Grade slice: update only activityByGrade and competencyIndexByGrade
     if (source.flow.length != flow.length) {
       throw ArgumentError(
-          'Source has ${source.flow.length} stages, expected ${flow.length}');
+        'Source has ${source.flow.length} stages, expected ${flow.length}',
+      );
     }
     final newFlow = List<FlowStage>.from(
       flow.asMap().entries.map((e) {
         final i = e.key;
         final oldStage = e.value;
         final newStage = source.flow[i];
-        final newActivityByGrade =
-            Map<String, String>.from(oldStage.activityByGrade);
+        final newActivityByGrade = Map<String, String>.from(
+          oldStage.activityByGrade,
+        );
         newActivityByGrade[gradeLabel] =
             newStage.activityByGrade[gradeLabel] ?? '';
-        final newCompetencyIndexByGrade =
-            Map<String, int>.from(oldStage.competencyIndexByGrade);
+        final newCompetencyIndexByGrade = Map<String, int>.from(
+          oldStage.competencyIndexByGrade,
+        );
         newCompetencyIndexByGrade[gradeLabel] =
             newStage.competencyIndexByGrade[gradeLabel] ?? 0;
         return FlowStage(
@@ -148,22 +156,21 @@ extension PlanSectionPatch on LessonPlan {
   /// Clones flow stages to avoid shared references.
   List<FlowStage> _cloneFlowStages(List<FlowStage> stages) {
     return stages
-        .map((s) => FlowStage(
-              minutes: s.minutes,
-              stage: s.stage,
-              wholeClass: s.wholeClass,
-              activityByGrade: Map.from(s.activityByGrade),
-              wholeClassActivity: s.wholeClassActivity,
-              competencyIndexByGrade: Map.from(s.competencyIndexByGrade),
-            ))
+        .map(
+          (s) => FlowStage(
+            minutes: s.minutes,
+            stage: s.stage,
+            wholeClass: s.wholeClass,
+            activityByGrade: Map.from(s.activityByGrade),
+            wholeClassActivity: s.wholeClassActivity,
+            competencyIndexByGrade: Map.from(s.competencyIndexByGrade),
+          ),
+        )
         .toList();
   }
 
   /// Replaces assessment from source.
-  LessonPlan _replaceAssessment(
-    LessonPlan source, {
-    String? gradeLabel,
-  }) {
+  LessonPlan _replaceAssessment(LessonPlan source, {String? gradeLabel}) {
     if (gradeLabel == null) {
       return copyWith(assessments: _cloneAssessments(source.assessments));
     }
@@ -178,8 +185,9 @@ extension PlanSectionPatch on LessonPlan {
         successCriteria: '',
       ),
     );
-    final existingIndex =
-        newAssessments.indexWhere((a) => a.gradeLabel == gradeLabel);
+    final existingIndex = newAssessments.indexWhere(
+      (a) => a.gradeLabel == gradeLabel,
+    );
     if (existingIndex >= 0) {
       newAssessments[existingIndex] = _cloneAssessment(sourceAssessment);
     } else {
@@ -194,18 +202,15 @@ extension PlanSectionPatch on LessonPlan {
   }
 
   GradeAssessment _cloneAssessment(GradeAssessment a) => GradeAssessment(
-        gradeLabel: a.gradeLabel,
-        formative: a.formative,
-        exitTask: a.exitTask,
-        successCriteria: a.successCriteria,
-        competencyIndex: a.competencyIndex,
-      );
+    gradeLabel: a.gradeLabel,
+    formative: a.formative,
+    exitTask: a.exitTask,
+    successCriteria: a.successCriteria,
+    competencyIndex: a.competencyIndex,
+  );
 
   /// Replaces ways forward from source.
-  LessonPlan _replaceWaysForward(
-    LessonPlan source, {
-    String? gradeLabel,
-  }) {
+  LessonPlan _replaceWaysForward(LessonPlan source, {String? gradeLabel}) {
     if (gradeLabel == null) {
       return copyWith(
         waysForward: _cloneGradeWaysForward(source.waysForward),
@@ -226,11 +231,15 @@ extension PlanSectionPatch on LessonPlan {
       }
       // Keep existing if source lacks this grade
       return GradeWaysForward(
-          gradeLabel: g.gradeLabel, remediation: '', enrichment: '');
+        gradeLabel: g.gradeLabel,
+        remediation: '',
+        enrichment: '',
+      );
     }).toList();
     // Keep whole-class questions from this, add source's questions for the grade
-    final wholeClassQuestions =
-        reflectionQuestions.where((q) => q.gradeLabel == null).toList();
+    final wholeClassQuestions = reflectionQuestions
+        .where((q) => q.gradeLabel == null)
+        .toList();
     final sourceGradeQuestions = source.reflectionQuestions
         .where((q) => q.gradeLabel == gradeLabel)
         .toList();
@@ -244,11 +253,13 @@ extension PlanSectionPatch on LessonPlan {
   /// Clones GradeWaysForward objects.
   List<GradeWaysForward> _cloneGradeWaysForward(List<GradeWaysForward> list) {
     return list
-        .map((w) => GradeWaysForward(
-              gradeLabel: w.gradeLabel,
-              remediation: w.remediation,
-              enrichment: w.enrichment,
-            ))
+        .map(
+          (w) => GradeWaysForward(
+            gradeLabel: w.gradeLabel,
+            remediation: w.remediation,
+            enrichment: w.enrichment,
+          ),
+        )
         .toList();
   }
 }

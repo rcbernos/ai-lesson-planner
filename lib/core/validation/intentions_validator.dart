@@ -12,23 +12,27 @@ List<ValidationIssue> validateIntentions(LessonPlan plan) {
     final g = grades[i];
 
     if (g.competencies.isEmpty) {
-      issues.add(ValidationIssue(
-        code: 'intentions.no_competency',
-        severity: IssueSeverity.error,
-        section: PlanSection.intentions,
-        path: 'grades[$i]',
-        message: 'Grade ${g.gradeLabel} has no competencies defined.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'intentions.no_competency',
+          severity: IssueSeverity.error,
+          section: PlanSection.intentions,
+          path: 'grades[$i]',
+          message: 'Grade ${g.gradeLabel} has no competencies defined.',
+        ),
+      );
     }
 
     if (g.objectives.isEmpty) {
-      issues.add(ValidationIssue(
-        code: 'intentions.no_objective',
-        severity: IssueSeverity.warning,
-        section: PlanSection.intentions,
-        path: 'grades[$i]',
-        message: 'Grade ${g.gradeLabel} has no objectives defined.',
-      ));
+      issues.add(
+        ValidationIssue(
+          code: 'intentions.no_objective',
+          severity: IssueSeverity.warning,
+          section: PlanSection.intentions,
+          path: 'grades[$i]',
+          message: 'Grade ${g.gradeLabel} has no objectives defined.',
+        ),
+      );
     }
   }
 

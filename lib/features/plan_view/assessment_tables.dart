@@ -11,10 +11,7 @@ const double kMinGradeColumnWidth = 220.0;
 /// Assessment table widget for displaying formative assessments per grade.
 /// On narrow screens, wraps in a horizontally scrollable container.
 class AssessmentTables extends StatelessWidget {
-  const AssessmentTables({
-    required this.assessments,
-    super.key,
-  });
+  const AssessmentTables({required this.assessments, super.key});
 
   final List<GradeAssessment> assessments;
 
@@ -30,37 +27,50 @@ class AssessmentTables extends StatelessWidget {
         1: const FixedColumnWidth(170), // Formative Assessment
         2: const FixedColumnWidth(170), // Exit Task
         3: FixedColumnWidth(
-            isNarrow ? kMinGradeColumnWidth : 170), // Success Criteria
+          isNarrow ? kMinGradeColumnWidth : 170,
+        ), // Success Criteria
       },
       border: TableBorder.all(color: Theme.of(context).dividerColor),
       children: [
-        const TableRow(children: [
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Grade',
+        const TableRow(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Grade',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Formative',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Formative',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Exit Task',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Exit Task',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Success Criteria',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Success Criteria',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-        ]),
-        ...assessments.map((a) => TableRow(children: [
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+        ...assessments.map(
+          (a) => TableRow(
+            children: [
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: Text(a.gradeLabel, textAlign: TextAlign.center),
@@ -77,7 +87,9 @@ class AssessmentTables extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: Text(a.successCriteria, textAlign: TextAlign.center),
               ),
-            ])),
+            ],
+          ),
+        ),
       ],
     );
 
@@ -109,10 +121,7 @@ class AssessmentTables extends StatelessWidget {
 /// Ways Forward table widget for displaying remediation and enrichment per grade.
 /// On narrow screens, wraps in a horizontally scrollable container.
 class WaysForwardTables extends StatelessWidget {
-  const WaysForwardTables({
-    required this.waysForward,
-    super.key,
-  });
+  const WaysForwardTables({required this.waysForward, super.key});
 
   final List<GradeWaysForward> waysForward;
 
@@ -126,33 +135,45 @@ class WaysForwardTables extends StatelessWidget {
       columnWidths: {
         0: const FixedColumnWidth(80), // Grade label
         1: FixedColumnWidth(
-            isNarrow ? kMinGradeColumnWidth : 210), // Remediation
+          isNarrow ? kMinGradeColumnWidth : 210,
+        ), // Remediation
         2: FixedColumnWidth(
-            isNarrow ? kMinGradeColumnWidth : 210), // Enrichment
+          isNarrow ? kMinGradeColumnWidth : 210,
+        ), // Enrichment
       },
       border: TableBorder.all(color: Theme.of(context).dividerColor),
       children: [
-        const TableRow(children: [
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Grade',
+        const TableRow(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Grade',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Remediation',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Remediation',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Text('Enrichment',
+                textAlign: TextAlign.center,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: Text(
+                'Enrichment',
                 style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center),
-          ),
-        ]),
-        ...waysForward.map((w) => TableRow(children: [
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+        ...waysForward.map(
+          (w) => TableRow(
+            children: [
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: Text(w.gradeLabel, textAlign: TextAlign.center),
@@ -165,7 +186,9 @@ class WaysForwardTables extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: Text(w.enrichment, textAlign: TextAlign.center),
               ),
-            ])),
+            ],
+          ),
+        ),
       ],
     );
 

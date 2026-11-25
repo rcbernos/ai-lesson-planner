@@ -58,24 +58,26 @@ class GenerationController extends StateNotifier<GenerationState> {
     final generator = _ref.read(lessonGeneratorProvider);
 
     // Start listening to the stream
-    _subscription = generator.generate(request).listen(
-      _handleFullGenerationEvent,
-      onError: (error, stackTrace) {
-        state = state.copyWith(
-          isGenerating: false,
-          errorMessage: 'Generation failed: $error',
+    _subscription = generator
+        .generate(request)
+        .listen(
+          _handleFullGenerationEvent,
+          onError: (error, stackTrace) {
+            state = state.copyWith(
+              isGenerating: false,
+              errorMessage: 'Generation failed: $error',
+            );
+          },
+          onDone: () {
+            if (state.isGenerating && state.errorMessage == null) {
+              // Stream completed without yielding a plan - unexpected
+              state = state.copyWith(
+                isGenerating: false,
+                errorMessage: 'Generation did not complete.',
+              );
+            }
+          },
         );
-      },
-      onDone: () {
-        if (state.isGenerating && state.errorMessage == null) {
-          // Stream completed without yielding a plan - unexpected
-          state = state.copyWith(
-            isGenerating: false,
-            errorMessage: 'Generation did not complete.',
-          );
-        }
-      },
-    );
   }
 
   /// Handles events for full generation (sets generatedPlanProvider).
@@ -85,16 +87,10 @@ class GenerationController extends StateNotifier<GenerationState> {
     } else if (event is SectionCompleted) {
       // Keep current section visible until completion
     } else if (event is GenerationCompleted) {
-      state = state.copyWith(
-        isGenerating: false,
-        currentSection: null,
-      );
+      state = state.copyWith(isGenerating: false, currentSection: null);
       _ref.read(generatedPlanProvider.notifier).state = event.plan;
     } else if (event is GenerationFailed) {
-      state = state.copyWith(
-        isGenerating: false,
-        errorMessage: event.message,
-      );
+      state = state.copyWith(isGenerating: false, errorMessage: event.message);
     }
   }
 
@@ -127,22 +123,22 @@ class GenerationController extends StateNotifier<GenerationState> {
     _subscription = generator
         .generateSection(request, section, plan, gradeLabel: gradeLabel)
         .listen(
-      _handleRegenerationEvent,
-      onError: (error, stackTrace) {
-        state = state.copyWith(
-          isGenerating: false,
-          errorMessage: 'Generation failed: $error',
+          _handleRegenerationEvent,
+          onError: (error, stackTrace) {
+            state = state.copyWith(
+              isGenerating: false,
+              errorMessage: 'Generation failed: $error',
+            );
+          },
+          onDone: () {
+            if (state.isGenerating && state.errorMessage == null) {
+              state = state.copyWith(
+                isGenerating: false,
+                errorMessage: 'Generation did not complete.',
+              );
+            }
+          },
         );
-      },
-      onDone: () {
-        if (state.isGenerating && state.errorMessage == null) {
-          state = state.copyWith(
-            isGenerating: false,
-            errorMessage: 'Generation did not complete.',
-          );
-        }
-      },
-    );
   }
 
   /// Handles events for section regeneration (applies to editor).
@@ -152,17 +148,11 @@ class GenerationController extends StateNotifier<GenerationState> {
     } else if (event is SectionCompleted) {
       // Keep current section visible until completion
     } else if (event is GenerationCompleted) {
-      state = state.copyWith(
-        isGenerating: false,
-        currentSection: null,
-      );
+      state = state.copyWith(isGenerating: false, currentSection: null);
       // Apply the regenerated plan to the editor with undo capability
       _ref.read(planEditorProvider.notifier).applyRegenerated(event.plan);
     } else if (event is GenerationFailed) {
-      state = state.copyWith(
-        isGenerating: false,
-        errorMessage: event.message,
-      );
+      state = state.copyWith(isGenerating: false, errorMessage: event.message);
     }
   }
 

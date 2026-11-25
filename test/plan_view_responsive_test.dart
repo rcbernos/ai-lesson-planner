@@ -16,27 +16,33 @@ LessonPlan createNGradePlan(int n) {
   final waysForward = <GradeWaysForward>[];
   for (int i = 0; i < n; i++) {
     final label = 'Grade ${3 + i}';
-    grades.add(GradeBlock(
-      gradeLabel: label,
-      learnersMale: i + 1,
-      learnersFemale: i + 1,
-      subTheme: 'Fictional subtheme for $label',
-      contentStandard: 'Content standard for $label.',
-      performanceStandard: 'Performance standard for $label.',
-      competencies: ['Competency A for $label'],
-      objectives: ['Objective A for $label.'],
-    ));
-    assessments.add(GradeAssessment(
-      gradeLabel: label,
-      formative: 'Observe $label.',
-      exitTask: 'Exit task for $label.',
-      successCriteria: 'Success criteria for $label.',
-    ));
-    waysForward.add(GradeWaysForward(
-      gradeLabel: label,
-      remediation: 'Remediation for $label.',
-      enrichment: 'Enrichment for $label.',
-    ));
+    grades.add(
+      GradeBlock(
+        gradeLabel: label,
+        learnersMale: i + 1,
+        learnersFemale: i + 1,
+        subTheme: 'Fictional subtheme for $label',
+        contentStandard: 'Content standard for $label.',
+        performanceStandard: 'Performance standard for $label.',
+        competencies: ['Competency A for $label'],
+        objectives: ['Objective A for $label.'],
+      ),
+    );
+    assessments.add(
+      GradeAssessment(
+        gradeLabel: label,
+        formative: 'Observe $label.',
+        exitTask: 'Exit task for $label.',
+        successCriteria: 'Success criteria for $label.',
+      ),
+    );
+    waysForward.add(
+      GradeWaysForward(
+        gradeLabel: label,
+        remediation: 'Remediation for $label.',
+        enrichment: 'Enrichment for $label.',
+      ),
+    );
   }
   return LessonPlan(
     header: PlanHeader(
@@ -103,8 +109,9 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('no overflow at 360x640 with 2 grades',
-        (WidgetTester tester) async {
+    testWidgets('no overflow at 360x640 with 2 grades', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -116,8 +123,9 @@ void main() {
       expect(find.text('W  WAYS FORWARD'), findsOneWidget);
     });
 
-    testWidgets('no overflow at 360x640 with 4 grades',
-        (WidgetTester tester) async {
+    testWidgets('no overflow at 360x640 with 4 grades', (
+      WidgetTester tester,
+    ) async {
       final plan = createNGradePlan(4);
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -128,8 +136,9 @@ void main() {
       expect(find.text('W  WAYS FORWARD'), findsOneWidget);
     });
 
-    testWidgets('no overflow at 360x640 with 6 grades',
-        (WidgetTester tester) async {
+    testWidgets('no overflow at 360x640 with 6 grades', (
+      WidgetTester tester,
+    ) async {
       final plan = createNGradePlan(6);
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -147,8 +156,9 @@ void main() {
       expect(find.text('Direct Teaching'), findsOneWidget);
     });
 
-    testWidgets('assessment tables render correctly',
-        (WidgetTester tester) async {
+    testWidgets('assessment tables render correctly', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -157,8 +167,9 @@ void main() {
       expect(find.text('A  ASSESSMENT'), findsOneWidget);
     });
 
-    testWidgets('ways forward tables render correctly',
-        (WidgetTester tester) async {
+    testWidgets('ways forward tables render correctly', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -178,8 +189,9 @@ void main() {
       expect(find.text('W  WAYS FORWARD'), findsOneWidget);
     });
 
-    testWidgets('header table stacks to two columns on narrow screens',
-        (WidgetTester tester) async {
+    testWidgets('header table stacks to two columns on narrow screens', (
+      WidgetTester tester,
+    ) async {
       final plan = createSamplePlan();
       await pumpAtSize(tester, 360, 640, plan);
 
@@ -187,7 +199,9 @@ void main() {
       // Use the school name and other specific values to avoid matching labels
       expect(find.text('Sampaguita Elementary School'), findsOneWidget);
       expect(
-          find.text('Maria Santos'), findsWidgets); // Teacher label and value
+        find.text('Maria Santos'),
+        findsWidgets,
+      ); // Teacher label and value
       expect(find.textContaining('Quarter/Term'), findsOneWidget);
     });
   });

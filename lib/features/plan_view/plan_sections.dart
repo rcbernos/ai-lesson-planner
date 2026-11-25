@@ -46,7 +46,8 @@ class HeaderSection extends StatelessWidget {
         return h.copyWith(sessions: int.tryParse(value) ?? h.sessions);
       case 'sessionMinutes':
         return h.copyWith(
-            sessionMinutes: int.tryParse(value) ?? h.sessionMinutes);
+          sessionMinutes: int.tryParse(value) ?? h.sessionMinutes,
+        );
       case 'multigradeModel':
         return h.copyWith(multigradeModel: value);
       default:
@@ -55,7 +56,11 @@ class HeaderSection extends StatelessWidget {
   }
 
   Widget _editableField(
-      BuildContext context, String label, String value, bool canEdit) {
+    BuildContext context,
+    String label,
+    String value,
+    bool canEdit,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,8 +68,11 @@ class HeaderSection extends StatelessWidget {
         GestureDetector(
           onTap: canEdit
               ? () async {
-                  final r = await showCellEditDialog(context,
-                      title: 'Edit $label', initial: value);
+                  final r = await showCellEditDialog(
+                    context,
+                    title: 'Edit $label',
+                    initial: value,
+                  );
                   if (r != null) _updateHeader(label, r);
                 }
               : null,
@@ -82,7 +90,11 @@ class HeaderSection extends StatelessWidget {
   }
 
   Widget _numericField(
-      BuildContext context, String label, String value, bool canEdit) {
+    BuildContext context,
+    String label,
+    String value,
+    bool canEdit,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -90,8 +102,12 @@ class HeaderSection extends StatelessWidget {
         GestureDetector(
           onTap: canEdit
               ? () async {
-                  final r = await showCellEditDialog(context,
-                      title: 'Edit $label', initial: value, numeric: true);
+                  final r = await showCellEditDialog(
+                    context,
+                    title: 'Edit $label',
+                    initial: value,
+                    numeric: true,
+                  );
                   if (r != null) _updateHeader(label, r);
                 }
               : null,
@@ -114,40 +130,88 @@ class HeaderSection extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          Row(children: [
-            Expanded(
-                child: _editableField(
-                    context, 'school', plan.header.school, canEdit)),
-            Expanded(
-                child: _editableField(
-                    context, 'teacher', plan.header.teacher, canEdit)),
-          ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-                child: _editableField(context, 'learningArea',
-                    plan.header.learningArea, canEdit)),
-            Expanded(
-                child:
-                    _editableField(context, 'date', plan.header.date, canEdit)),
-            Expanded(
-                child:
-                    _editableField(context, 'term', plan.header.term, canEdit)),
-          ]),
-          const SizedBox(height: 12),
-          Row(children: [
-            Expanded(
-                child: _numericField(
-                    context, 'sessions', '${plan.header.sessions}', canEdit)),
-            Expanded(
-                child: _numericField(context, 'sessionMinutes',
-                    '${plan.header.sessionMinutes}', canEdit)),
-            Expanded(
-                child: _editableField(context, 'multigradeModel',
-                    plan.header.multigradeModel, canEdit)),
-          ]),
-        ]),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'school',
+                    plan.header.school,
+                    canEdit,
+                  ),
+                ),
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'teacher',
+                    plan.header.teacher,
+                    canEdit,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'learningArea',
+                    plan.header.learningArea,
+                    canEdit,
+                  ),
+                ),
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'date',
+                    plan.header.date,
+                    canEdit,
+                  ),
+                ),
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'term',
+                    plan.header.term,
+                    canEdit,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _numericField(
+                    context,
+                    'sessions',
+                    '${plan.header.sessions}',
+                    canEdit,
+                  ),
+                ),
+                Expanded(
+                  child: _numericField(
+                    context,
+                    'sessionMinutes',
+                    '${plan.header.sessionMinutes}',
+                    canEdit,
+                  ),
+                ),
+                Expanded(
+                  child: _editableField(
+                    context,
+                    'multigradeModel',
+                    plan.header.multigradeModel,
+                    canEdit,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -167,54 +231,79 @@ class IntentionsSectionWidget extends StatelessWidget {
       color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(plan.sharedSubTheme,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          _editField(context, 'Both Grades Objective', plan.bothGradesObjective,
-              canEdit),
-          const SizedBox(height: 8),
-          _editField(context, 'Learner Context', plan.learnerContext, canEdit),
-          const SizedBox(height: 16),
-          _objectivesTable(context, canEdit),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              plan.sharedSubTheme,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            _editField(
+              context,
+              'Both Grades Objective',
+              plan.bothGradesObjective,
+              canEdit,
+            ),
+            const SizedBox(height: 8),
+            _editField(
+              context,
+              'Learner Context',
+              plan.learnerContext,
+              canEdit,
+            ),
+            const SizedBox(height: 16),
+            _objectivesTable(context, canEdit),
+          ],
+        ),
       ),
     );
   }
 
   Widget _editField(
-      BuildContext context, String label, String value, bool canEdit) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: const TextStyle(fontSize: 14)),
-      GestureDetector(
-        onTap: canEdit
-            ? () async {
-                final r = await showCellEditDialog(context,
-                    title: 'Edit $label', initial: value);
-                if (r != null && onChange != null) {
-                  switch (label) {
-                    case 'Both Grades Objective':
-                      onChange!((p) => p.copyWith(bothGradesObjective: r));
-                      break;
-                    case 'Learner Context':
-                      onChange!((p) => p.copyWith(learnerContext: r));
-                      break;
+    BuildContext context,
+    String label,
+    String value,
+    bool canEdit,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 14)),
+        GestureDetector(
+          onTap: canEdit
+              ? () async {
+                  final r = await showCellEditDialog(
+                    context,
+                    title: 'Edit $label',
+                    initial: value,
+                  );
+                  if (r != null && onChange != null) {
+                    switch (label) {
+                      case 'Both Grades Objective':
+                        onChange!((p) => p.copyWith(bothGradesObjective: r));
+                        break;
+                      case 'Learner Context':
+                        onChange!((p) => p.copyWith(learnerContext: r));
+                        break;
+                    }
                   }
                 }
-              }
-            : null,
-        child: MouseRegion(
-          cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            color: canEdit ? Theme.of(context).hoverColor : null,
-            child: Text(value,
-                style: const TextStyle(fontStyle: FontStyle.italic)),
+              : null,
+          child: MouseRegion(
+            cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              color: canEdit ? Theme.of(context).hoverColor : null,
+              child: Text(
+                value,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+            ),
           ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
   Widget _objectivesTable(BuildContext context, bool canEdit) {
@@ -223,7 +312,8 @@ class IntentionsSectionWidget extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Table(
         border: TableBorder.all(
-            color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade400,
+        ),
         columnWidths: {
           0: const FixedColumnWidth(130),
           for (int i = 0; i < plan.grades.length; i++)
@@ -234,22 +324,34 @@ class IntentionsSectionWidget extends StatelessWidget {
             decoration: const BoxDecoration(color: Color(0xFFEEEEEE)),
             children: [
               const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Standard / Objective',
-                      style: TextStyle(fontWeight: FontWeight.bold))),
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  'Standard / Objective',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
               for (final g in plan.grades)
                 Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(g.gradeLabel,
-                        style: const TextStyle(fontWeight: FontWeight.bold))),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    g.gradeLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
             ],
           ),
-          _tableRow('Content Standard',
-              plan.grades.map((g) => g.contentStandard).toList()),
-          _tableRow('Performance Standard',
-              plan.grades.map((g) => g.performanceStandard).toList()),
-          _tableRow('Competencies',
-              plan.grades.map((g) => g.competencies.join(', ')).toList()),
+          _tableRow(
+            'Content Standard',
+            plan.grades.map((g) => g.contentStandard).toList(),
+          ),
+          _tableRow(
+            'Performance Standard',
+            plan.grades.map((g) => g.performanceStandard).toList(),
+          ),
+          _tableRow(
+            'Competencies',
+            plan.grades.map((g) => g.competencies.join(', ')).toList(),
+          ),
           _editableObjectivesRow(context, canEdit),
         ],
       ),
@@ -257,47 +359,57 @@ class IntentionsSectionWidget extends StatelessWidget {
   }
 
   TableRow _tableRow(String label, List<String> values) {
-    return TableRow(children: [
-      Padding(padding: const EdgeInsets.all(8), child: Text(label)),
-      for (final v in values)
-        Padding(padding: const EdgeInsets.all(8), child: Text(v)),
-    ]);
+    return TableRow(
+      children: [
+        Padding(padding: const EdgeInsets.all(8), child: Text(label)),
+        for (final v in values)
+          Padding(padding: const EdgeInsets.all(8), child: Text(v)),
+      ],
+    );
   }
 
   TableRow _editableObjectivesRow(BuildContext context, bool canEdit) {
-    return TableRow(children: [
-      const Padding(padding: EdgeInsets.all(8), child: Text('Objectives')),
-      for (int i = 0; i < plan.grades.length; i++)
-        GestureDetector(
-          onTap: canEdit
-              ? () async {
-                  final text = await showCellEditDialog(
-                    context,
-                    title: 'Edit Objectives',
-                    initial: joinLines(plan.grades[i].objectives),
-                    maxLines: 10,
-                  );
-                  if (text == null) return;
-                  final newObj = splitLines(text);
-                  final newGrade = plan.grades[i].copyWith(objectives: newObj);
-                  if (onChange != null) {
-                    onChange!((p) => p.copyWith(grades: [
-                          for (int j = 0; j < p.grades.length; j++)
-                            if (j == i) newGrade else p.grades[j],
-                        ]));
+    return TableRow(
+      children: [
+        const Padding(padding: EdgeInsets.all(8), child: Text('Objectives')),
+        for (int i = 0; i < plan.grades.length; i++)
+          GestureDetector(
+            onTap: canEdit
+                ? () async {
+                    final text = await showCellEditDialog(
+                      context,
+                      title: 'Edit Objectives',
+                      initial: joinLines(plan.grades[i].objectives),
+                      maxLines: 10,
+                    );
+                    if (text == null) return;
+                    final newObj = splitLines(text);
+                    final newGrade = plan.grades[i].copyWith(
+                      objectives: newObj,
+                    );
+                    if (onChange != null) {
+                      onChange!(
+                        (p) => p.copyWith(
+                          grades: [
+                            for (int j = 0; j < p.grades.length; j++)
+                              if (j == i) newGrade else p.grades[j],
+                          ],
+                        ),
+                      );
+                    }
                   }
-                }
-              : null,
-          child: MouseRegion(
-            cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              color: canEdit ? Theme.of(context).hoverColor : null,
-              child: Text(plan.grades[i].objectives.join(', ')),
+                : null,
+            child: MouseRegion(
+              cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: canEdit ? Theme.of(context).hoverColor : null,
+                child: Text(plan.grades[i].objectives.join(', ')),
+              ),
             ),
           ),
-        ),
-    ]);
+      ],
+    );
   }
 }
 
@@ -329,27 +441,42 @@ class AssessmentSection extends StatelessWidget {
         },
         border: TableBorder.all(color: Colors.grey.shade400),
         children: [
-          const TableRow(children: [
-            Padding(
+          const TableRow(
+            children: [
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Grade',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Grade',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Formative',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Formative',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Exit Task',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Exit Task',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Success Criteria',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Success Criteria',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: SizedBox.shrink()), // Header for refresh column
-          ]),
+                child: SizedBox.shrink(),
+              ), // Header for refresh column
+            ],
+          ),
           for (final a in plan.assessments) _assessmentRow(context, a, canEdit),
         ],
       ),
@@ -357,34 +484,59 @@ class AssessmentSection extends StatelessWidget {
   }
 
   TableRow _assessmentRow(
-      BuildContext context, GradeAssessment a, bool canEdit) {
-    return TableRow(children: [
-      Padding(padding: const EdgeInsets.all(8), child: Text(a.gradeLabel)),
-      _editableCell(context, a.formative, canEdit,
-          (v) => _updateAssessment('formative', a.gradeLabel, v)),
-      _editableCell(context, a.exitTask, canEdit,
-          (v) => _updateAssessment('exitTask', a.gradeLabel, v)),
-      _editableCell(context, a.successCriteria, canEdit,
-          (v) => _updateAssessment('successCriteria', a.gradeLabel, v)),
-      Center(
-        child: onRegenerate != null
-            ? IconButton(
-                icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
-                tooltip: 'Regenerate assessment for ${a.gradeLabel}',
-                onPressed: () => _showRegenerateConfirm(context, a.gradeLabel),
-              )
-            : const SizedBox.shrink(),
-      ),
-    ]);
+    BuildContext context,
+    GradeAssessment a,
+    bool canEdit,
+  ) {
+    return TableRow(
+      children: [
+        Padding(padding: const EdgeInsets.all(8), child: Text(a.gradeLabel)),
+        _editableCell(
+          context,
+          a.formative,
+          canEdit,
+          (v) => _updateAssessment('formative', a.gradeLabel, v),
+        ),
+        _editableCell(
+          context,
+          a.exitTask,
+          canEdit,
+          (v) => _updateAssessment('exitTask', a.gradeLabel, v),
+        ),
+        _editableCell(
+          context,
+          a.successCriteria,
+          canEdit,
+          (v) => _updateAssessment('successCriteria', a.gradeLabel, v),
+        ),
+        Center(
+          child: onRegenerate != null
+              ? IconButton(
+                  icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                  tooltip: 'Regenerate assessment for ${a.gradeLabel}',
+                  onPressed: () =>
+                      _showRegenerateConfirm(context, a.gradeLabel),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
   }
 
-  Widget _editableCell(BuildContext context, String value, bool canEdit,
-      void Function(String) onChanged) {
+  Widget _editableCell(
+    BuildContext context,
+    String value,
+    bool canEdit,
+    void Function(String) onChanged,
+  ) {
     return GestureDetector(
       onTap: canEdit
           ? () async {
-              final r = await showCellEditDialog(context,
-                  title: 'Edit', initial: value);
+              final r = await showCellEditDialog(
+                context,
+                title: 'Edit',
+                initial: value,
+              );
               if (r != null) onChanged(r);
             }
           : null,
@@ -410,10 +562,14 @@ class AssessmentSection extends StatelessWidget {
       'successCriteria' => current.copyWith(successCriteria: value),
       _ => current,
     };
-    onChange!((p) => p.copyWith(assessments: [
+    onChange!(
+      (p) => p.copyWith(
+        assessments: [
           for (int i = 0; i < p.assessments.length; i++)
             if (i == idx) updated else p.assessments[i],
-        ]));
+        ],
+      ),
+    );
   }
 
   /// Shows a confirmation dialog before regenerating a grade's assessment.
@@ -423,7 +579,8 @@ class AssessmentSection extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Regenerate Assessment'),
         content: Text(
-            'This replaces your edits in the assessment for $gradeLabel. Continue?'),
+          'This replaces your edits in the assessment for $gradeLabel. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -470,23 +627,35 @@ class WaysForwardSection extends StatelessWidget {
         },
         border: TableBorder.all(color: Colors.grey.shade400),
         children: [
-          const TableRow(children: [
-            Padding(
+          const TableRow(
+            children: [
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Grade',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Grade',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Remediation',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Remediation',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: Text('Enrichment',
-                    style: TextStyle(fontWeight: FontWeight.bold))),
-            Padding(
+                child: Text(
+                  'Enrichment',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(8),
-                child: SizedBox.shrink()), // Header for refresh column
-          ]),
+                child: SizedBox.shrink(),
+              ), // Header for refresh column
+            ],
+          ),
           for (final w in plan.waysForward) _waysRow(context, w, canEdit),
         ],
       ),
@@ -494,31 +663,49 @@ class WaysForwardSection extends StatelessWidget {
   }
 
   TableRow _waysRow(BuildContext context, GradeWaysForward w, bool canEdit) {
-    return TableRow(children: [
-      Padding(padding: const EdgeInsets.all(8), child: Text(w.gradeLabel)),
-      _editableCell(context, w.remediation, canEdit,
-          (v) => _updateWays('remediation', w.gradeLabel, v)),
-      _editableCell(context, w.enrichment, canEdit,
-          (v) => _updateWays('enrichment', w.gradeLabel, v)),
-      Center(
-        child: onRegenerate != null
-            ? IconButton(
-                icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
-                tooltip: 'Regenerate ways forward for ${w.gradeLabel}',
-                onPressed: () => _showRegenerateConfirm(context, w.gradeLabel),
-              )
-            : const SizedBox.shrink(),
-      ),
-    ]);
+    return TableRow(
+      children: [
+        Padding(padding: const EdgeInsets.all(8), child: Text(w.gradeLabel)),
+        _editableCell(
+          context,
+          w.remediation,
+          canEdit,
+          (v) => _updateWays('remediation', w.gradeLabel, v),
+        ),
+        _editableCell(
+          context,
+          w.enrichment,
+          canEdit,
+          (v) => _updateWays('enrichment', w.gradeLabel, v),
+        ),
+        Center(
+          child: onRegenerate != null
+              ? IconButton(
+                  icon: const Icon(Icons.refresh, size: 16, color: Colors.blue),
+                  tooltip: 'Regenerate ways forward for ${w.gradeLabel}',
+                  onPressed: () =>
+                      _showRegenerateConfirm(context, w.gradeLabel),
+                )
+              : const SizedBox.shrink(),
+        ),
+      ],
+    );
   }
 
-  Widget _editableCell(BuildContext context, String value, bool canEdit,
-      void Function(String) onChanged) {
+  Widget _editableCell(
+    BuildContext context,
+    String value,
+    bool canEdit,
+    void Function(String) onChanged,
+  ) {
     return GestureDetector(
       onTap: canEdit
           ? () async {
-              final r = await showCellEditDialog(context,
-                  title: 'Edit', initial: value);
+              final r = await showCellEditDialog(
+                context,
+                title: 'Edit',
+                initial: value,
+              );
               if (r != null) onChanged(r);
             }
           : null,
@@ -543,10 +730,14 @@ class WaysForwardSection extends StatelessWidget {
       'enrichment' => current.copyWith(enrichment: value),
       _ => current,
     };
-    onChange!((p) => p.copyWith(waysForward: [
+    onChange!(
+      (p) => p.copyWith(
+        waysForward: [
           for (int i = 0; i < p.waysForward.length; i++)
             if (i == idx) updated else p.waysForward[i],
-        ]));
+        ],
+      ),
+    );
   }
 
   /// Shows a confirmation dialog before regenerating a grade's ways forward.
@@ -556,7 +747,8 @@ class WaysForwardSection extends StatelessWidget {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Regenerate Ways Forward'),
         content: Text(
-            'This replaces your edits in the remediation/enrichment for $gradeLabel. Continue?'),
+          'This replaces your edits in the remediation/enrichment for $gradeLabel. Continue?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext, false),
@@ -585,51 +777,71 @@ class ReflectionSection extends StatelessWidget {
   void _editQuestion(BuildContext context, int index) async {
     if (onChange == null) return;
     final q = plan.reflectionQuestions[index];
-    final text = await showCellEditDialog(context,
-        title: 'Edit Question', initial: q.text);
+    final text = await showCellEditDialog(
+      context,
+      title: 'Edit Question',
+      initial: q.text,
+    );
     if (text == null) return;
     final newQ = q.copyWith(text: text);
-    onChange!((p) => p.copyWith(reflectionQuestions: [
+    onChange!(
+      (p) => p.copyWith(
+        reflectionQuestions: [
           for (int i = 0; i < p.reflectionQuestions.length; i++)
             if (i == index) newQ else p.reflectionQuestions[i],
-        ]));
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (plan.reflectionQuestions.isEmpty) return const SizedBox.shrink();
     final canEdit = onChange != null;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const SizedBox(height: 16),
-      const Text('Reflection Questions',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 8),
-      for (int i = 0; i < plan.reflectionQuestions.length; i++)
-        GestureDetector(
-          onTap: canEdit ? () => _editQuestion(context, i) : null,
-          child: MouseRegion(
-            cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(children: [
-                if (plan.reflectionQuestions[i].gradeLabel != null)
-                  SizedBox(
-                      width: 80,
-                      child: Text('${plan.reflectionQuestions[i].gradeLabel}:',
-                          style: const TextStyle(fontWeight: FontWeight.bold))),
-                Expanded(child: Text(plan.reflectionQuestions[i].text)),
-              ]),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        const Text(
+          'Reflection Questions',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        for (int i = 0; i < plan.reflectionQuestions.length; i++)
+          GestureDetector(
+            onTap: canEdit ? () => _editQuestion(context, i) : null,
+            child: MouseRegion(
+              cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    if (plan.reflectionQuestions[i].gradeLabel != null)
+                      SizedBox(
+                        width: 80,
+                        child: Text(
+                          '${plan.reflectionQuestions[i].gradeLabel}:',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    Expanded(child: Text(plan.reflectionQuestions[i].text)),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-    ]);
+      ],
+    );
   }
 }
 
 /// Learning Experience section with learner context, materials, and references.
 class LearningExperienceSectionWidget extends StatelessWidget {
-  const LearningExperienceSectionWidget(
-      {super.key, required this.plan, this.onChange});
+  const LearningExperienceSectionWidget({
+    super.key,
+    required this.plan,
+    this.onChange,
+  });
   final LessonPlan plan;
   final PlanChange? onChange;
 
@@ -637,57 +849,68 @@ class LearningExperienceSectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final canEdit = onChange != null;
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const SizedBox(height: 8),
-      const Text('Learner Context (Sang-panitikang Pangkatapat)',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-      const SizedBox(height: 4),
-      GestureDetector(
-        onTap: canEdit
-            ? () async {
-                final r = await showCellEditDialog(context,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        const Text(
+          'Learner Context (Sang-panitikang Pangkatapat)',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: canEdit
+              ? () async {
+                  final r = await showCellEditDialog(
+                    context,
                     title: 'Edit Learner Context',
                     initial: plan.learnerContext,
-                    maxLines: 8);
-                if (r != null && onChange != null)
-                  onChange!((p) => p.copyWith(learnerContext: r));
-              }
-            : null,
-        child: MouseRegion(
-          cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            color: canEdit ? Theme.of(context).hoverColor : null,
-            child: Text(plan.learnerContext, textAlign: TextAlign.center),
+                    maxLines: 8,
+                  );
+                  if (r != null && onChange != null)
+                    onChange!((p) => p.copyWith(learnerContext: r));
+                }
+              : null,
+          child: MouseRegion(
+            cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              color: canEdit ? Theme.of(context).hoverColor : null,
+              child: Text(plan.learnerContext, textAlign: TextAlign.center),
+            ),
           ),
         ),
-      ),
-      const SizedBox(height: 12),
-      if (plan.materials.items.isEmpty && plan.materials.references.isEmpty)
-        const SizedBox.shrink(),
-      if (plan.materials.items.isNotEmpty ||
-          plan.materials.references.isNotEmpty) ...[
-        const Text('Materials (Mga Kagamitan)',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        for (final item in plan.materials.items) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Text('• $item', textAlign: TextAlign.center),
+        const SizedBox(height: 12),
+        if (plan.materials.items.isEmpty && plan.materials.references.isEmpty)
+          const SizedBox.shrink(),
+        if (plan.materials.items.isNotEmpty ||
+            plan.materials.references.isNotEmpty) ...[
+          const Text(
+            'Materials (Mga Kagamitan)',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
-        ],
-        const SizedBox(height: 4),
-        const Text('References (Mga Sanggunian)',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        for (final ref in plan.materials.references) ...[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: Text('• $ref', textAlign: TextAlign.center),
+          const SizedBox(height: 4),
+          for (final item in plan.materials.items) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text('• $item', textAlign: TextAlign.center),
+            ),
+          ],
+          const SizedBox(height: 4),
+          const Text(
+            'References (Mga Sanggunian)',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
+          const SizedBox(height: 4),
+          for (final ref in plan.materials.references) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Text('• $ref', textAlign: TextAlign.center),
+            ),
+          ],
         ],
       ],
-    ]);
+    );
   }
 }
 
@@ -702,29 +925,55 @@ class FooterSection extends StatelessWidget {
     final canEdit = onChange != null;
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _editableText(context, 'Prepared by: ${plan.preparedBy}',
-              'Prepared by', plan.preparedBy, canEdit),
-          _editableText(context, 'Checked by: ${plan.checkedBy}', 'Checked by',
-              plan.checkedBy, canEdit),
-        ]),
-        Expanded(
-          child: Text(plan.aiUseDeclaration,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _editableText(
+                context,
+                'Prepared by: ${plan.preparedBy}',
+                'Prepared by',
+                plan.preparedBy,
+                canEdit,
+              ),
+              _editableText(
+                context,
+                'Checked by: ${plan.checkedBy}',
+                'Checked by',
+                plan.checkedBy,
+                canEdit,
+              ),
+            ],
+          ),
+          Expanded(
+            child: Text(
+              plan.aiUseDeclaration,
               textAlign: TextAlign.right,
-              style: const TextStyle(fontStyle: FontStyle.italic)),
-        ),
-      ]),
+              style: const TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _editableText(BuildContext context, String display, String fieldName,
-      String value, bool canEdit) {
+  Widget _editableText(
+    BuildContext context,
+    String display,
+    String fieldName,
+    String value,
+    bool canEdit,
+  ) {
     return GestureDetector(
       onTap: canEdit
           ? () async {
-              final r = await showCellEditDialog(context,
-                  title: 'Edit $fieldName', initial: value);
+              final r = await showCellEditDialog(
+                context,
+                title: 'Edit $fieldName',
+                initial: value,
+              );
               if (r != null && onChange != null) {
                 switch (fieldName) {
                   case 'Prepared by':
@@ -741,10 +990,13 @@ class FooterSection extends StatelessWidget {
           : null,
       child: MouseRegion(
         cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-        child: Text(display,
-            style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: canEdit ? null : Colors.black87)),
+        child: Text(
+          display,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: canEdit ? null : Colors.black87,
+          ),
+        ),
       ),
     );
   }
@@ -761,31 +1013,38 @@ class NotesSection extends StatelessWidget {
     final canEdit = onChange != null;
     return Padding(
       padding: const EdgeInsets.all(16),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('Notes for Next Session',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        GestureDetector(
-          onTap: canEdit
-              ? () async {
-                  final r = await showCellEditDialog(context,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Notes for Next Session',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: canEdit
+                ? () async {
+                    final r = await showCellEditDialog(
+                      context,
                       title: 'Edit Notes',
                       initial: plan.notesNextSession,
-                      maxLines: 10);
-                  if (r != null && onChange != null)
-                    onChange!((p) => p.copyWith(notesNextSession: r));
-                }
-              : null,
-          child: MouseRegion(
-            cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              color: canEdit ? Theme.of(context).hoverColor : null,
-              child: Text(plan.notesNextSession),
+                      maxLines: 10,
+                    );
+                    if (r != null && onChange != null)
+                      onChange!((p) => p.copyWith(notesNextSession: r));
+                  }
+                : null,
+            child: MouseRegion(
+              cursor: canEdit ? SystemMouseCursors.click : MouseCursor.defer,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: canEdit ? Theme.of(context).hoverColor : null,
+                child: Text(plan.notesNextSession),
+              ),
             ),
           ),
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

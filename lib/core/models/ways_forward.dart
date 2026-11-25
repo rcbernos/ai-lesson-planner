@@ -13,10 +13,10 @@ class GradeWaysForward {
   final String enrichment;
 
   Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'remediation': remediation,
-        'enrichment': enrichment,
-      };
+    'gradeLabel': gradeLabel,
+    'remediation': remediation,
+    'enrichment': enrichment,
+  };
 
   factory GradeWaysForward.fromJson(Map<String, dynamic> json) =>
       GradeWaysForward(
@@ -29,28 +29,21 @@ class GradeWaysForward {
     String? gradeLabel,
     String? remediation,
     String? enrichment,
-  }) =>
-      GradeWaysForward(
-        gradeLabel: gradeLabel ?? this.gradeLabel,
-        remediation: remediation ?? this.remediation,
-        enrichment: enrichment ?? this.enrichment,
-      );
+  }) => GradeWaysForward(
+    gradeLabel: gradeLabel ?? this.gradeLabel,
+    remediation: remediation ?? this.remediation,
+    enrichment: enrichment ?? this.enrichment,
+  );
 }
 
 /// A reflection question, optionally targeted to one grade
 class ReflectionQuestion {
-  ReflectionQuestion({
-    required this.gradeLabel,
-    required this.text,
-  });
+  ReflectionQuestion({required this.gradeLabel, required this.text});
 
   final String? gradeLabel; // null means whole-class
   final String text;
 
-  Map<String, dynamic> toJson() => {
-        'gradeLabel': gradeLabel,
-        'text': text,
-      };
+  Map<String, dynamic> toJson() => {'gradeLabel': gradeLabel, 'text': text};
 
   factory ReflectionQuestion.fromJson(Map<String, dynamic> json) =>
       ReflectionQuestion(
@@ -62,9 +55,8 @@ class ReflectionQuestion {
     String? gradeLabel,
     String? text,
     bool clearGradeLabel = false,
-  }) =>
-      ReflectionQuestion(
-        gradeLabel: clearGradeLabel ? null : (gradeLabel ?? this.gradeLabel),
-        text: text ?? this.text,
-      );
+  }) => ReflectionQuestion(
+    gradeLabel: clearGradeLabel ? null : (gradeLabel ?? this.gradeLabel),
+    text: text ?? this.text,
+  );
 }

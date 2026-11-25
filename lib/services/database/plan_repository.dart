@@ -38,13 +38,15 @@ class PlanRepository {
     final gradeLevel = _extractGradeLevel(plan);
     final subject = plan.header.learningArea;
 
-    return await _db.insertLessonPlan(LessonPlansCompanion.insert(
-      title: title,
-      gradeLevel: Value(gradeLevel),
-      subject: Value(subject),
-      ilawContent: Value(jsonEncode(plan.toJson())),
-      status: const Value('saved'),
-    ));
+    return await _db.insertLessonPlan(
+      LessonPlansCompanion.insert(
+        title: title,
+        gradeLevel: Value(gradeLevel),
+        subject: Value(subject),
+        ilawContent: Value(jsonEncode(plan.toJson())),
+        status: const Value('saved'),
+      ),
+    );
   }
 
   /// Loads all saved plans with their metadata.
@@ -64,7 +66,8 @@ class PlanRepository {
             title: _generateTitle(decoded),
             date: plan.createdAt.toIso8601String().split('T').first,
             gradeLevels: _gradeLevelsToString(
-                decoded.grades.map((g) => g.gradeLabel).toList()),
+              decoded.grades.map((g) => g.gradeLabel).toList(),
+            ),
             subject: decoded.header.learningArea,
           );
         })
@@ -80,9 +83,7 @@ class PlanRepository {
     final jsonStr = plan.ilawContent;
     if (jsonStr == null) return null;
 
-    return lp.LessonPlan.fromJson(
-      jsonDecode(jsonStr) as Map<String, dynamic>,
-    );
+    return lp.LessonPlan.fromJson(jsonDecode(jsonStr) as Map<String, dynamic>);
   }
 
   /// Deletes a lesson plan by ID.
@@ -100,19 +101,20 @@ class PlanRepository {
 
     // Use update with companion to only update specified fields,
     // preserving createdAt from the original record
-    final affectedRows = await (_db.update(_db.lessonPlans)
-          ..where((t) => t.id.equals(id)))
-        .write(
-      LessonPlansCompanion(
-        title: Value(title),
-        gradeLevel: Value(gradeLevel),
-        subject: Value(subject),
-        ilawContent: Value(jsonEncode(plan.toJson())),
-        status: const Value('saved'),
-        updatedAt: Value(DateTime.now()),
-        // createdAt is not set, so it's preserved
-      ),
-    );
+    final affectedRows =
+        await (_db.update(
+          _db.lessonPlans,
+        )..where((t) => t.id.equals(id))).write(
+          LessonPlansCompanion(
+            title: Value(title),
+            gradeLevel: Value(gradeLevel),
+            subject: Value(subject),
+            ilawContent: Value(jsonEncode(plan.toJson())),
+            status: const Value('saved'),
+            updatedAt: Value(DateTime.now()),
+            // createdAt is not set, so it's preserved
+          ),
+        );
 
     return affectedRows > 0;
   }
@@ -141,10 +143,9 @@ class PlanRepository {
     if (grades.isEmpty) return 'Unknown';
     if (grades.length == 1) return grades.first.split(' ').last;
 
-    final numbers = grades
-        .map((g) => int.tryParse(g.split(' ').last) ?? 0)
-        .toList()
-      ..sort();
+    final numbers =
+        grades.map((g) => int.tryParse(g.split(' ').last) ?? 0).toList()
+          ..sort();
 
     if (numbers.length == 2 && numbers[1] - numbers[0] == 1) {
       return '${numbers.first} & ${numbers.last}';

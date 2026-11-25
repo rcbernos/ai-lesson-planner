@@ -31,12 +31,14 @@ void main() {
 
   group('Lesson Plans CRUD', () {
     test('insert -> fetch -> update -> delete a lesson plan', () async {
-      final id = await db.insertLessonPlan(LessonPlansCompanion.insert(
-        title: 'Photosynthesis',
-        gradeLevel: const Value(7),
-        subject: const Value('Science'),
-        status: const Value('draft'),
-      ));
+      final id = await db.insertLessonPlan(
+        LessonPlansCompanion.insert(
+          title: 'Photosynthesis',
+          gradeLevel: const Value(7),
+          subject: const Value('Science'),
+          status: const Value('draft'),
+        ),
+      );
       expect(id, greaterThan(0));
 
       var plan = await db.getLessonPlanById(id);
@@ -65,15 +67,17 @@ void main() {
 
   group('Reference Notes CRUD', () {
     test('insert -> fetch -> update -> delete a reference note', () async {
-      final lessonId =
-          await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
+      final lessonId = await db.insertLessonPlan(
+        LessonPlansCompanion.insert(title: 'L'),
+      );
 
-      final noteId =
-          await db.insertReferenceNote(ReferenceNotesCompanion.insert(
-        lessonPlanId: Value(lessonId),
-        title: 'DepEd K-12 Curriculum Guide',
-        content: const Value('Curriculum standards reference.'),
-      ));
+      final noteId = await db.insertReferenceNote(
+        ReferenceNotesCompanion.insert(
+          lessonPlanId: Value(lessonId),
+          title: 'DepEd K-12 Curriculum Guide',
+          content: const Value('Curriculum standards reference.'),
+        ),
+      );
       expect(noteId, greaterThan(0));
 
       var notes = await db.getReferenceNotesForLessonPlan(lessonId);
@@ -92,17 +96,19 @@ void main() {
 
   group('Bibliography CRUD', () {
     test('insert -> fetch -> update -> delete a bibliography entry', () async {
-      final lessonId =
-          await db.insertLessonPlan(LessonPlansCompanion.insert(title: 'L'));
+      final lessonId = await db.insertLessonPlan(
+        LessonPlansCompanion.insert(title: 'L'),
+      );
 
-      final entryId =
-          await db.insertBibliographyEntry(BibliographyCompanion.insert(
-        lessonPlanId: Value(lessonId),
-        author: 'Department of Education',
-        title: 'K to 12 Basic Education Curriculum Guide',
-        year: 2023,
-        url: const Value('https://www.deped.gov.ph'),
-      ));
+      final entryId = await db.insertBibliographyEntry(
+        BibliographyCompanion.insert(
+          lessonPlanId: Value(lessonId),
+          author: 'Department of Education',
+          title: 'K to 12 Basic Education Curriculum Guide',
+          year: 2023,
+          url: const Value('https://www.deped.gov.ph'),
+        ),
+      );
       expect(entryId, greaterThan(0));
 
       var entries = await db.getBibliographyForLessonPlan(lessonId);

@@ -36,9 +36,9 @@ class DraftStore {
 
   /// The real store: `<app support dir>/drafts`. App-private on Android.
   factory DraftStore.inSupportDir() => DraftStore(() async {
-        final base = await getApplicationSupportDirectory();
-        return Directory(p.join(base.path, 'drafts'));
-      });
+    final base = await getApplicationSupportDirectory();
+    return Directory(p.join(base.path, 'drafts'));
+  });
 
   static const String _fileName = 'current_draft.json';
 
@@ -57,44 +57,43 @@ class DraftStore {
   }
 
   Future<void> write(LessonPlan plan, {int? savedId}) => _enqueue(() async {
-        final file = await _file();
-        await file.parent.create(recursive: true);
-        final tmp = File('${file.path}.tmp');
-        await tmp.writeAsString(
-          jsonEncode({
-            'savedId': savedId,
-            'savedAt': DateTime.now().toUtc().toIso8601String(),
-            'plan': plan.toJson(),
-          }),
-          flush: true,
-        );
-        await tmp.rename(file.path);
-      });
+    final file = await _file();
+    await file.parent.create(recursive: true);
+    final tmp = File('${file.path}.tmp');
+    await tmp.writeAsString(
+      jsonEncode({
+        'savedId': savedId,
+        'savedAt': DateTime.now().toUtc().toIso8601String(),
+        'plan': plan.toJson(),
+      }),
+      flush: true,
+    );
+    await tmp.rename(file.path);
+  });
 
   /// Returns the draft, or null if there is none or it cannot be read.
   /// An unreadable draft is deleted so it does not block the next launch.
   Future<PlanDraft?> read() => _enqueue(() async {
-        final file = await _file();
-        if (!await file.exists()) return null;
-        try {
-          final map =
-              jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-          return PlanDraft(
-            plan: LessonPlan.fromJson(map['plan'] as Map<String, dynamic>),
-            savedId: map['savedId'] as int?,
-            savedAt: DateTime.parse(map['savedAt'] as String),
-          );
-        } catch (_) {
-          await _deleteQuietly(file);
-          return null;
-        }
-      });
+    final file = await _file();
+    if (!await file.exists()) return null;
+    try {
+      final map = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      return PlanDraft(
+        plan: LessonPlan.fromJson(map['plan'] as Map<String, dynamic>),
+        savedId: map['savedId'] as int?,
+        savedAt: DateTime.parse(map['savedAt'] as String),
+      );
+    } catch (_) {
+      await _deleteQuietly(file);
+      return null;
+    }
+  });
 
   Future<void> clear() => _enqueue(() async {
-        final file = await _file();
-        await _deleteQuietly(file);
-        await _deleteQuietly(File('${file.path}.tmp'));
-      });
+    final file = await _file();
+    await _deleteQuietly(file);
+    await _deleteQuietly(File('${file.path}.tmp'));
+  });
 
   Future<void> _deleteQuietly(File f) async {
     try {
