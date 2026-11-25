@@ -13,7 +13,7 @@
 - Added Android platform with applicationId: `ph.lms.lessonplanner`.
 - minSdk 24, targetSdk 36, compileSdk 36, arm64-v8a only.
 - INTERNET permission only, largeHeap disabled, no storage permissions.
-- Debug APK builds successfully (~88 MB).
+- Debug APK builds successfully (~167 MB).
 
 ### T3.2 (Complete)
 - Adaptive shell: NavigationBar (bottom) for screens < 600dp, NavigationRail (side) for ≥ 600dp.
@@ -26,8 +26,7 @@
 - Added copyWith to GradeInput for partial updates.
 - Widget tests verify no overflow at 360×640; Generate button reachable.
 ### Notes
-- file_picker temporarily removed due to Flutter 3.47.6 / AGP 9.x compatibility issue (plugin AAR built against SDK 34).
-- Will be reintroduced before T7.1 export implementation.
+- file_picker resolution: Updated to ^12.0.0. Debug APK builds successfully (~167 MB). Android compatibility issue resolved.
 
 ### T3.4 (Complete)
 - Flow table grade columns use minimum 220dp width on narrow screens.
