@@ -1,12 +1,14 @@
 /// Settings screen for configuring application preferences.
 library;
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:ai_lesson_planner/core/utils.dart';
 
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
+import 'package:ai_lesson_planner/features/debug/llm_debug_screen.dart';
 import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
 import 'package:ai_lesson_planner/services/database/database_helper.dart';
 
@@ -240,12 +242,27 @@ class _AIStatusSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: ListTile(
-          leading: Icon(Icons.data_object, color: Colors.orange),
-          title: Text('AI Status'),
-          subtitle: Text('Demo mode: no model installed'),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const ListTile(
+              leading: Icon(Icons.data_object, color: Colors.orange),
+              title: Text('AI Status'),
+              subtitle: Text('Demo mode: no model installed'),
+            ),
+            if (kDebugMode)
+              ListTile(
+                leading: const Icon(Icons.bolt, color: Colors.blue),
+                title: const Text('LLM Debug Screen'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const LlmDebugScreen()),
+                  );
+                },
+              ),
+          ],
         ),
       ),
     );

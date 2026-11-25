@@ -1,0 +1,58 @@
+/// Utilities for checking model file paths and availability.
+library;
+
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+
+/// Utility class for model file path operations.
+class ModelPaths {
+  /// Checks if a model file exists and meets minimum size requirements.
+  /// Returns the model file path if valid, null otherwise.
+  static Future<String?> checkModelInstalled() async {
+    // Use application support directory as a fallback
+    // On Android, this resolves to: getApplicationSupportDirectory()
+    // which is: /data/user/0/<package>/files/
+    // For prototype, we check for model.gguf in this location
+    final appDir = await getApplicationSupportDirectory();
+    final modelPath = p.join(appDir.path, 'model.gguf');
+    final file = File(modelPath);
+
+    if (!await file.exists()) return null;
+
+    // Check minimum size (100 MB)
+    final fileSize = await file.length();
+    const int minSize = 100 * 1024 * 1024; // 100 MB
+
+    if (fileSize < minSize) return null;
+
+    return modelPath;
+  }
+
+  /// Gets the expected model file path for loading.
+  static Future<String> getExpectedModelPath() async {
+    final appDir = await getApplicationSupportDirectory();
+    return p.join(appDir.path, 'model.gguf');
+  }
+
+  /// Gets the file size of the installed model in bytes.
+  /// Returns null if model doesn't exist.
+  static Future<int?> getModelFileSize() async {
+    final path = await checkModelInstalled();
+    if (path == null) return null;
+    return File(path).length();
+  }
+
+  /// Formats file size in human-readable format.
+  static String formatFileSize(int bytes) {
+    if (bytes >= 1024 * 1024 * 1024) {
+      return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+    } else if (bytes >= 1024 * 1024) {
+      return '${(bytes / (1024 * 1024)).toStringAsFixed(2)} MB';
+    } else if (bytes >= 1024) {
+      return '${(bytes / 1024).toStringAsFixed(2)} KB';
+    }
+    return '$bytes bytes';
+  }
+}

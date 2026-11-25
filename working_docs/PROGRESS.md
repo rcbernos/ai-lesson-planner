@@ -97,4 +97,10 @@
 - All tests pass: 4 local_llama_engine tests pass (2 skipped for integration tests gated by LMS_TEST_GGUF).
 - Commit: `feat(core): implement LocalLlamaEngine with llamadart 0.21.0 API`
 
----
+### T4.5b Throwaway LLM Debug Screen (Complete)
+- Created `lib/features/debug/llm_debug_screen.dart` - debug screen with model load/generate/cancel UI
+- Created `lib/core/llm/model_paths.dart` - utility class for checking model file existence and size
+- Created `test/llm_debug_screen_test.dart` - widget tests for responsive layout (360x640, 1024x600)
+- Added debug link in Settings screen (only visible in kDebugMode) via bolt icon
+- All tests pass, flutter analyze clean
+- Commit: `feat(prototype): throwaway LLM debug screen`
