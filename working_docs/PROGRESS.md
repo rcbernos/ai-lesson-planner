@@ -166,6 +166,20 @@
 
 ## Phase 6 - Chat Session Management (T6.1 Complete)
 
+### T6.2 Conversational Slot Filling (Complete)
+- Created `lib/core/chat/slot_filler.dart`: extracts fields from chat using LlmEngine
+  - `SlotFiller.processMessage()`: sends user message to LLM for slot extraction
+  - `applyPatchToSession()`: merges extracted fields into chat session
+  - `getNextMissingField()`: identifies next required field for conversation flow
+  - `_validatePatch()`: validates extracted values against SlotSchema
+- Created `lib/core/chat/slot_schema.dart`: defines extractable fields and validation rules
+  - `SlotSchema.isValidGradeLabel()`: validates formats like "Grade 3"
+  - `SlotSchema.isValidSessionMinutes()`: validates 60/90/120 minute sessions
+  - `SlotSchema.isValidGradeCount()`: validates 2-6 grades
+- Created `test/slot_filler_test.dart` with 18 tests covering extraction, validation, and edge cases
+- All tests pass, flutter analyze clean
+- Commit: `feat(core): conversational slot filling for chat assistant`
+
 ### T6.1 Chat session model and storage layer (Complete)
 - Created `lib/core/chat/chat_session.dart` with ChatMessage and ChatSession classes.
 - ChatSession includes: id, created, messages, header, grades, sharedSubTheme, multigradeModel, outputLanguage.
