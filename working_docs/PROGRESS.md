@@ -179,7 +179,7 @@
 
 ### T6.3 Chat UI (Complete)
 - Created `lib/features/assistant/assistant_screen.dart` with real slot-filling implementation.
-- Messages list, input bar with loading state, summary card with quick-reply chips.
+- Messages list, input bar, a "form so far" summary card with edit buttons, quick-reply chips for the next missing field.
 - Integrated with SlotFiller and ChatRepository for end-to-end chat flow.
 - Tests: 9 tests pass (assistant_screen_test.dart).
 
@@ -188,3 +188,10 @@
 - Tests: 4 tests pass (chat_bridge_test.dart).
 
 **Total Phase 6 tests: 37 passing**
+
+### Bug fix: Engine not loaded error in chat assistant
+- Fixed `llmEngineProvider` to use `FutureProvider` that automatically loads the engine before returning it.
+- Added `_UnloadedLlmEngine` placeholder class for graceful error handling when model is unavailable.
+- Updated `slotFillerProvider` to handle the async engine initialization properly.
+- The engine is now properly loaded before use, preventing the "Engine not loaded" error.
+- Commit: `fix(chat): engine not loaded error in assistant screen`
