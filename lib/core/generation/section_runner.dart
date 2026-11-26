@@ -97,3 +97,73 @@ Map<String, dynamic>? extractJson(String text) {
   } catch (_) {}
   return null;
 }
+
+/// Builds the Assessment section prompt.
+/// 
+/// JSON schema:
+/// {
+///   "assessments": [
+///     {
+///       "gradeLabel": "Grade 3",
+///       "formative": "Obserbahan ang pakikilahok...",
+///       "exitTask": "Isulat ang sumusunod...",
+///       "successCriteria": "Nakapagpapahayag...",
+///       "competencyIndex": 0
+///     }
+///   ]
+/// }
+String buildAssessmentPrompt(GenerationRequest request) {
+  final labels = request.grades.map((g) => g.gradeLabel).toList();
+  final block = buildSystemBlock(
+    language: request.language,
+    gradeLabels: labels,
+    multigradeModel: request.header.multigradeModel,
+  );
+
+  // Build competency count map for validation
+  final competencyCounts = <String, int>{};
+  for (final g in request.grades) {
+    final count = g.competency.split('; ').where((s) => s.trim().isNotEmpty).length;
+    competencyCounts[g.gradeLabel] = count;
+  }
+
+  final competencyInfo = competencyCounts.entries
+      .map((e) => '${e.key}: ${e.value} competencies')
+      .join(', ');
+
+  return '$block\n'
+      'Generate Assessment section for ${request.header.sessionMinutes} minute session. '
+      'Each grade needs: formative assessment (observation/participation), exit task (written), success criteria. '
+      'Include competencyIndex (0-based index into competencies list, or null if no competencies). '
+      'Competency counts: $competencyInfo\n'
+      'Return JSON: {"assessments": [{"gradeLabel": "...", "formative": "...", "exitTask": "...", "successCriteria": "...", "competencyIndex": n}]}';
+}
+
+/// Builds the Ways Forward section prompt.
+/// 
+/// JSON schema:
+/// {
+///   "waysForward": [
+///     {"gradeLabel": "Grade 3", "remediation": "...", "enrichment": "..."}
+///   ],
+///   "reflectionQuestions": [
+///     {"gradeLabel": "Grade 3", "text": "..."},
+///     {"gradeLabel": null, "text": "..."}
+///   ],
+///   "notesNextSession": "..."
+/// }
+String buildWaysForwardPrompt(GenerationRequest request) {
+  final labels = request.grades.map((g) => g.gradeLabel).toList();
+  final block = buildSystemBlock(
+    language: request.language,
+    gradeLabels: labels,
+    multigradeModel: request.header.multigradeModel,
+  );
+
+  return '$block\n'
+      'Generate Ways Forward section with remediation and enrichment for each grade, '
+      'reflection questions (one per grade plus one whole-class), and notes for next session. '
+      'Remediation: what to do if students struggle. Enrichment: what to do for early finishers. '
+      'Return JSON: {"waysForward": [{"gradeLabel": "...", "remediation": "...", "enrichment": "..."}], '
+      '"reflectionQuestions": [{"gradeLabel": "...", "text": "..."}], "notesNextSession": "..."}';
+}

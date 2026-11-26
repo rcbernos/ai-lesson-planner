@@ -154,3 +154,12 @@
 - Created `test/llm_generator_test.dart` with basic tests for cancel and header section generation.
 - All tests pass, flutter analyze clean.
 - Commit: `feat(core): LLM generator for intentions and learning experience`
+
+### T5.7 LlmLessonGenerator: Assessment, Ways Forward, generateSection (Complete)
+- Added `replaceSection` method to LessonPlan for per-section replacement with gradeLabel support.
+- Fixed `_buildCompletePlan` to merge with existing `_lastPlan` instead of rebuilding intentions.
+- Added `_mergeLearningExperience` method to properly merge flow, assessments, ways forward onto existing plan.
+- Removed premature `GenerationCompleted` yields after each section in `generate()`.
+- Added `GenerationCompleted` to `_regenerateAssessment` and `_regenerateWaysForward` methods.
+- Fixed cancel test to use controlled token delays instead of racey sleep.
+- All 6 tests in test/llm_generator_test.dart pass: cancel(), per-grade regeneration, full plan generation, validation retry.

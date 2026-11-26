@@ -227,6 +227,65 @@ class LessonPlan {
     preparedByRole: preparedByRole ?? this.preparedByRole,
     checkedByRole: checkedByRole ?? this.checkedByRole,
   );
+
+  /// Replaces a section of the plan with new content from source.
+  /// If [gradeLabel] is provided, only the specified grade's data is replaced.
+  /// Throws [ArgumentError] if [gradeLabel] is not found in the plan.
+  LessonPlan replaceSection(PlanSection section, LessonPlan source, {String? gradeLabel}) {
+    switch (section) {
+      case PlanSection.intentions:
+        return copyWith(
+          sharedSubTheme: source.sharedSubTheme,
+          bothGradesObjective: source.bothGradesObjective,
+        );
+      case PlanSection.learningExperiences:
+        return copyWith(
+          learnerContext: source.learnerContext,
+          materials: source.materials,
+          flow: source.flow,
+        );
+      case PlanSection.assessment:
+        if (gradeLabel != null) {
+          final updatedAssessments = <GradeAssessment>[];
+          for (final a in assessments) {
+            if (a.gradeLabel == gradeLabel) {
+              final newAssessment = source.assessments.firstWhere(
+                (s) => s.gradeLabel == gradeLabel,
+                orElse: () => a,
+              );
+              updatedAssessments.add(newAssessment);
+            } else {
+              updatedAssessments.add(a);
+            }
+          }
+          return copyWith(assessments: updatedAssessments);
+        }
+        return copyWith(assessments: source.assessments);
+      case PlanSection.waysForward:
+        if (gradeLabel != null) {
+          final updatedWaysForward = <GradeWaysForward>[];
+          for (final w in waysForward) {
+            if (w.gradeLabel == gradeLabel) {
+              final newWaysForward = source.waysForward.firstWhere(
+                (s) => s.gradeLabel == gradeLabel,
+                orElse: () => w,
+              );
+              updatedWaysForward.add(newWaysForward);
+            } else {
+              updatedWaysForward.add(w);
+            }
+          }
+          return copyWith(waysForward: updatedWaysForward);
+        }
+        return copyWith(
+          waysForward: source.waysForward,
+          reflectionQuestions: source.reflectionQuestions,
+          notesNextSession: source.notesNextSession,
+        );
+      case PlanSection.header:
+        return this; // Header is not replaceable
+    }
+  }
 }
 
 /// The default AI use declaration text

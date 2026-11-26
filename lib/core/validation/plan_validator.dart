@@ -27,4 +27,21 @@ class PlanValidator {
   /// Returns only the issues that belong to the given section.
   List<ValidationIssue> validateSection(LessonPlan plan, PlanSection section) =>
       validate(plan).where((issue) => issue.section == section).toList();
+
+  /// Validates reflection questions across the plan.
+  List<ValidationIssue> validateReflection(LessonPlan plan) {
+    final issues = <ValidationIssue>[];
+    if (plan.reflectionQuestions.isEmpty) {
+      issues.add(
+        const ValidationIssue(
+          code: 'reflection.empty',
+          severity: IssueSeverity.warning,
+          section: PlanSection.waysForward,
+          path: 'reflectionQuestions',
+          message: 'No reflection questions defined.',
+        ),
+      );
+    }
+    return issues;
+  }
 }

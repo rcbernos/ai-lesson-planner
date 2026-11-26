@@ -41,6 +41,18 @@ class LlmLessonGenerator implements LessonGenerator {
       return;
     }
 
+    yield* _generateAssessment(request);
+    if (_isCancelled) {
+      yield* _emitFailure('Generation cancelled');
+      return;
+    }
+
+    yield* _generateWaysForward(request);
+    if (_isCancelled) {
+      yield* _emitFailure('Generation cancelled');
+      return;
+    }
+
     final plan = _lastPlan!;
     yield GenerationCompleted(plan);
   }
@@ -72,10 +84,13 @@ class LlmLessonGenerator implements LessonGenerator {
     }
 
     yield SectionCompleted('Intentions');
-    yield GenerationCompleted(_lastPlan!);
   }
 
   Stream<GenerationEvent> _generateLearningExperience(GenerationRequest request) async* {
+    // Store learner context from intentions section
+    final learnerContext = _lastPlan?.learnerContext ?? '';
+    final materials = _lastPlan?.materials ?? Materials();
+    
     yield SectionStarted('Learner Context');
     await _streamTokens(buildLearnerContextPrompt(request));
     yield SectionCompleted('Learner Context');
@@ -88,7 +103,13 @@ class LlmLessonGenerator implements LessonGenerator {
     final flowResponse = await _streamTokens(buildFlowPrompt(request));
     final flowJson = extractJson(flowResponse);
     
-    _lastPlan = _buildCompletePlan(request, flowJson);
+    // Merge flow, assessments, ways forward onto existing plan
+    _lastPlan = _mergeLearningExperience(
+      request: request,
+      flowJson: flowJson,
+      learnerContext: learnerContext,
+      materials: materials,
+    );
     
     var issues = validator.validateSection(_lastPlan!, PlanSection.learningExperiences);
     if (issues.isNotEmpty) {
@@ -97,7 +118,12 @@ class LlmLessonGenerator implements LessonGenerator {
         buildFlowPrompt(request),
       );
       final retryResponse = await _streamTokens(retryPrompt);
-      _lastPlan = _buildCompletePlan(request, extractJson(retryResponse));
+      _lastPlan = _mergeLearningExperience(
+        request: request,
+        flowJson: extractJson(retryResponse),
+        learnerContext: learnerContext,
+        materials: materials,
+      );
       issues = validator.validateSection(_lastPlan!, PlanSection.learningExperiences);
 
       if (issues.isNotEmpty) {
@@ -108,7 +134,6 @@ class LlmLessonGenerator implements LessonGenerator {
     }
     
     yield SectionCompleted('Flow');
-    yield GenerationCompleted(_lastPlan!);
   }
 
   Future<String> _streamTokens(String prompt) async {
@@ -123,9 +148,18 @@ class LlmLessonGenerator implements LessonGenerator {
     final completer = Completer<String>();
 
     _tokenSub = _engine.complete(messages, params).listen(
-      (token) => buffer.write(token),
+      (token) {
+        if (_isCancelled) {
+          return;
+        }
+        buffer.write(token);
+      },
       onDone: () {
-        if (!_isCancelled && !completer.isCompleted) {
+        if (_isCancelled) {
+          if (!completer.isCompleted) {
+            completer.complete('');
+          }
+        } else if (!completer.isCompleted) {
           completer.complete(buffer.toString());
         }
       },
@@ -187,6 +221,34 @@ class LlmLessonGenerator implements LessonGenerator {
       checkedBy: request.header.teacher,
       aiUseDeclaration: '',
       language: request.language == OutputLanguage.filipino ? 'fil' : 'en',
+    );
+  }
+
+  /// Merges flow, assessments, ways forward onto existing plan (preserves intentions).
+  LessonPlan _mergeLearningExperience({
+    required GenerationRequest request,
+    required Map<String, dynamic>? flowJson,
+    required String learnerContext,
+    required Materials materials,
+  }) {
+    final basePlan = _lastPlan ?? _buildPlaceholderPlan(request);
+    
+    final flowStages = _buildFlowStages(flowJson, request.header.sessionMinutes, request.grades);
+    final assessments = _buildAssessments(request.grades);
+    final waysForward = _buildWaysForward(request.grades);
+    final reflectionQuestions = _buildReflectionQuestions(request.grades, flowJson);
+    
+    return basePlan.copyWith(
+      flow: flowStages,
+      assessments: assessments,
+      waysForward: waysForward,
+      reflectionQuestions: reflectionQuestions,
+      notesNextSession: 'Usapan ang aralin sa susunod na session.',
+      learnerContext: learnerContext.isEmpty ? 'Ang mga mag-aaral ay nakatire sa pagitan na kawaranan.' : learnerContext,
+      materials: materials.items.isEmpty
+          ? Materials(items: ['Mga larawan', 'Handouts', 'Manipulatives'], references: ['DepEd Curriculum Guide'])
+          : materials,
+      aiUseDeclaration: defaultAiUseDeclaration,
     );
   }
 
@@ -495,12 +557,128 @@ class LlmLessonGenerator implements LessonGenerator {
     yield GenerationCompleted(mergedPlan);
   }
 
+  Stream<GenerationEvent> _generateAssessment(GenerationRequest request) async* {
+    yield SectionStarted('Assessment');
+    
+    final prompt = buildAssessmentPrompt(request);
+    final response = await _streamTokens(prompt);
+    final json = extractJson(response);
+
+    final sourcePlan = _buildPlanFromAssessment(json, request);
+
+    LessonPlan mergedPlan;
+    try {
+      mergedPlan = _lastPlan!.replaceSection(
+        PlanSection.assessment, sourcePlan, gradeLabel: null,
+      );
+    } catch (e) {
+      yield* _emitFailure('Failed to merge regenerated section: $e');
+      return;
+    }
+
+    _lastPlan = mergedPlan;
+    var issues = validator.validateSection(_lastPlan!, PlanSection.assessment);
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+      final retrySource = _buildPlanFromAssessment(retryJson, request);
+
+      mergedPlan = _lastPlan!.replaceSection(
+        PlanSection.assessment, retrySource, gradeLabel: null,
+      );
+      _lastPlan = mergedPlan;
+      issues = validator.validateSection(_lastPlan!, PlanSection.assessment);
+
+      if (issues.isNotEmpty) {
+        yield* _emitFailure(issues.map((i) => i.message).join('; '));
+        return;
+      }
+    }
+
+    yield SectionCompleted('Assessment');
+  }
+
+  Stream<GenerationEvent> _generateWaysForward(GenerationRequest request) async* {
+    yield SectionStarted('Ways Forward');
+    
+    final prompt = buildWaysForwardPrompt(request);
+    final response = await _streamTokens(prompt);
+    final json = extractJson(response);
+
+    final sourcePlan = _buildPlanFromWaysForward(json, request);
+
+    LessonPlan mergedPlan;
+    try {
+      mergedPlan = _lastPlan!.replaceSection(
+        PlanSection.waysForward, sourcePlan, gradeLabel: null,
+      );
+    } catch (e) {
+      yield* _emitFailure('Failed to merge regenerated section: $e');
+      return;
+    }
+
+    _lastPlan = mergedPlan;
+    var issues = validator.validateSection(_lastPlan!, PlanSection.waysForward);
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+      final retrySource = _buildPlanFromWaysForward(retryJson, request);
+
+      mergedPlan = _lastPlan!.replaceSection(
+        PlanSection.waysForward, retrySource, gradeLabel: null,
+      );
+      _lastPlan = mergedPlan;
+      issues = validator.validateSection(_lastPlan!, PlanSection.waysForward);
+
+      if (issues.isNotEmpty) {
+        yield* _emitFailure(issues.map((i) => i.message).join('; '));
+        return;
+      }
+    }
+
+    // Also validate reflection questions
+    issues = validator.validateSection(_lastPlan!, PlanSection.waysForward);
+    final reflectionIssues = validator.validateReflection(_lastPlan!);
+    issues.addAll(reflectionIssues);
+
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+
+      mergedPlan = _lastPlan!.replaceSection(
+        PlanSection.waysForward, _buildPlanFromWaysForward(retryJson, request),
+        gradeLabel: null,
+      );
+      _lastPlan = mergedPlan;
+    }
+
+    yield SectionCompleted('Ways Forward');
+  }
+
   Stream<GenerationEvent> _regenerateAssessment(
     GenerationRequest request,
     LessonPlan current,
     String? gradeLabel,
   ) async* {
-    final sourcePlan = _buildPlaceholderPlan(request);
+    yield SectionStarted('Assessment');
+
+    final prompt = buildAssessmentPrompt(request);
+    final response = await _streamTokens(prompt);
+    final json = extractJson(response);
+
+    final sourcePlan = _buildPlanFromAssessment(json, request);
 
     LessonPlan mergedPlan;
     try {
@@ -513,6 +691,34 @@ class LlmLessonGenerator implements LessonGenerator {
       return;
     }
 
+    var issues = validator.validateSection(mergedPlan, PlanSection.assessment);
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+      final retrySource = _buildPlanFromAssessment(retryJson, request);
+
+      try {
+        mergedPlan = current.replaceSection(
+          PlanSection.assessment, retrySource, gradeLabel: gradeLabel,
+        );
+      } catch (e) {
+        yield GenerationFailed('Failed to merge regenerated section: $e');
+        _isCancelled = false;
+        return;
+      }
+      issues = validator.validateSection(mergedPlan, PlanSection.assessment);
+
+      if (issues.isNotEmpty) {
+        yield GenerationFailed(issues.map((i) => i.message).join('; '));
+        _isCancelled = false;
+        return;
+      }
+    }
+
     _lastPlan = mergedPlan;
     yield SectionCompleted('Assessment');
     yield GenerationCompleted(mergedPlan);
@@ -523,7 +729,13 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan current,
     String? gradeLabel,
   ) async* {
-    final sourcePlan = _buildPlaceholderPlan(request);
+    yield SectionStarted('Ways Forward');
+
+    final prompt = buildWaysForwardPrompt(request);
+    final response = await _streamTokens(prompt);
+    final json = extractJson(response);
+
+    final sourcePlan = _buildPlanFromWaysForward(json, request);
 
     LessonPlan mergedPlan;
     try {
@@ -536,9 +748,176 @@ class LlmLessonGenerator implements LessonGenerator {
       return;
     }
 
+    var issues = validator.validateSection(mergedPlan, PlanSection.waysForward);
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+      final retrySource = _buildPlanFromWaysForward(retryJson, request);
+
+      try {
+        mergedPlan = current.replaceSection(
+          PlanSection.waysForward, retrySource, gradeLabel: gradeLabel,
+        );
+      } catch (e) {
+        yield GenerationFailed('Failed to merge regenerated section: $e');
+        _isCancelled = false;
+        return;
+      }
+      issues = validator.validateSection(mergedPlan, PlanSection.waysForward);
+
+      if (issues.isNotEmpty) {
+        yield GenerationFailed(issues.map((i) => i.message).join('; '));
+        _isCancelled = false;
+        return;
+      }
+    }
+
+    // Also validate reflection questions
+    issues = validator.validateSection(mergedPlan, PlanSection.waysForward);
+    final reflectionIssues = validator.validateReflection(mergedPlan);
+    issues.addAll(reflectionIssues);
+
+    if (issues.isNotEmpty) {
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
+      final retryResponse = await _streamTokens(retryPrompt);
+      final retryJson = extractJson(retryResponse);
+
+      try {
+        mergedPlan = current.replaceSection(
+          PlanSection.waysForward, _buildPlanFromWaysForward(retryJson, request),
+          gradeLabel: gradeLabel,
+        );
+      } catch (e) {
+        yield GenerationFailed('Failed to merge regenerated section: $e');
+        _isCancelled = false;
+        return;
+      }
+    }
+
     _lastPlan = mergedPlan;
     yield SectionCompleted('Ways Forward');
-    yield GenerationCompleted(mergedPlan);
+  }
+
+  /// Builds a LessonPlan from Assessment JSON response.
+  LessonPlan _buildPlanFromAssessment(
+    Map<String, dynamic>? json,
+    GenerationRequest request,
+  ) {
+    if (json == null) return _buildPlaceholderPlan(request);
+
+    final assessments = <GradeAssessment>[];
+    final assessmentsJson = json['assessments'] as List<dynamic>? ?? [];
+
+    for (final a in assessmentsJson) {
+      if (a is Map<String, dynamic>) {
+        assessments.add(GradeAssessment(
+          gradeLabel: a['gradeLabel'] as String? ?? '',
+          formative: a['formative'] as String? ?? '',
+          exitTask: a['exitTask'] as String? ?? '',
+          successCriteria: a['successCriteria'] as String? ?? '',
+          competencyIndex: a['competencyIndex'] as int?,
+        ));
+      }
+    }
+
+    return LessonPlan(
+      header: request.header,
+      grades: request.grades.map((g) => GradeBlock(
+        gradeLabel: g.gradeLabel,
+        learnersMale: g.male,
+        learnersFemale: g.female,
+        subTheme: g.subTheme,
+        contentStandard: g.subTheme,
+        performanceStandard: '',
+        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
+        objectives: [],
+      )).toList(),
+      sharedSubTheme: request.sharedSubTheme,
+      bothGradesObjective: '',
+      learnerContext: '',
+      materials: Materials(),
+      flow: [],
+      assessments: assessments,
+      reflectionQuestions: [],
+      waysForward: [],
+      notesNextSession: '',
+      preparedBy: request.header.teacher,
+      checkedBy: request.header.teacher,
+      aiUseDeclaration: '',
+      language: request.language == OutputLanguage.filipino ? 'fil' : 'en',
+    );
+  }
+
+  /// Builds a LessonPlan from Ways Forward JSON response.
+  LessonPlan _buildPlanFromWaysForward(
+    Map<String, dynamic>? json,
+    GenerationRequest request,
+  ) {
+    if (json == null) return _buildPlaceholderPlan(request);
+
+    final waysForward = <GradeWaysForward>[];
+    final waysForwardJson = json['waysForward'] as List<dynamic>? ?? [];
+
+    for (final w in waysForwardJson) {
+      if (w is Map<String, dynamic>) {
+        waysForward.add(GradeWaysForward(
+          gradeLabel: w['gradeLabel'] as String? ?? '',
+          remediation: w['remediation'] as String? ?? '',
+          enrichment: w['enrichment'] as String? ?? '',
+        ));
+      }
+    }
+
+    final reflectionQuestions = <ReflectionQuestion>[];
+    final questionsJson = json['reflectionQuestions'] as List<dynamic>? ?? [];
+
+    for (final q in questionsJson) {
+      if (q is Map<String, dynamic>) {
+        final gradeLabel = q['gradeLabel'];
+        if (gradeLabel is String || gradeLabel == null) {
+          reflectionQuestions.add(ReflectionQuestion(
+            gradeLabel: gradeLabel,
+            text: q['text'] as String? ?? '',
+          ));
+        }
+      }
+    }
+
+    final notesNextSession = json['notesNextSession'] as String? ?? '';
+
+    return LessonPlan(
+      header: request.header,
+      grades: request.grades.map((g) => GradeBlock(
+        gradeLabel: g.gradeLabel,
+        learnersMale: g.male,
+        learnersFemale: g.female,
+        subTheme: g.subTheme,
+        contentStandard: g.subTheme,
+        performanceStandard: '',
+        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
+        objectives: [],
+      )).toList(),
+      sharedSubTheme: request.sharedSubTheme,
+      bothGradesObjective: '',
+      learnerContext: '',
+      materials: Materials(),
+      flow: [],
+      assessments: [],
+      reflectionQuestions: reflectionQuestions,
+      waysForward: waysForward,
+      notesNextSession: notesNextSession,
+      preparedBy: request.header.teacher,
+      checkedBy: request.header.teacher,
+      aiUseDeclaration: '',
+      language: request.language == OutputLanguage.filipino ? 'fil' : 'en',
+    );
   }
 
   @override

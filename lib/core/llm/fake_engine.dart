@@ -17,13 +17,16 @@ class FakeTokenSequence {
 /// Fake engine that replays scripted token sequences.
 /// Supports cancellable streaming and failure injection for testing.
 class FakeEngine implements LlmEngine {
-  FakeEngine({this.tokenSequences = const {}, this.failOnLoad = false});
+  FakeEngine({this.tokenSequences = const {}, this.failOnLoad = false, this.useFullKey = false});
 
   /// Token sequences keyed by a hash of the messages.
   final Map<String, FakeTokenSequence> tokenSequences;
 
   /// If true, load() throws an exception.
   final bool failOnLoad;
+
+  /// If true, use full message content as key (for testing).
+  final bool useFullKey;
 
   final StreamController<EngineState> _stateController =
       StreamController<EngineState>.broadcast();
@@ -118,6 +121,13 @@ class FakeEngine implements LlmEngine {
 
   /// Computes a simple key from the messages for sequence lookup.
   String _computeKey(List<ChatMsg> messages) {
+    if (useFullKey) {
+      final buffer = StringBuffer();
+      for (final msg in messages) {
+        buffer.write('${msg.role}:${msg.content};');
+      }
+      return buffer.toString();
+    }
     final buffer = StringBuffer();
     for (final msg in messages) {
       buffer.write(
