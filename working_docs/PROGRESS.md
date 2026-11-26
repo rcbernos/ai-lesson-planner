@@ -203,3 +203,10 @@
 - Added `test/assistant_screen_test.dart` with 6 widget tests.
 - All tests pass, debug APK builds successfully.
 - Commit: `feat(ui): chat assistant screen`
+
+### T6.4 Chat to Generation Bridge (Complete)
+- Added `setState()` method to `GeneratorFormNotifier` for pre-filling form state from chat.
+- Fixed protected member access warning in `assistant_screen.dart` by using `setState()` instead of direct state assignment.
+- Created `test/chat_bridge_test.dart` with 4 tests verifying session-to-request conversion and canGenerate logic.
+- "Generate from Chat" button pre-fills generator form and navigates to GeneratorScreen.
+- Commit: `feat(ui): generate a plan from the chat draft`

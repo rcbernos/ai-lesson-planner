@@ -9,7 +9,9 @@ import 'package:ai_lesson_planner/features/shell/app_shell.dart';
 
 void main() {
   group('AssistantScreen', () {
-    testWidgets('shows message list and input bar', (WidgetTester tester) async {
+    testWidgets('shows message list and input bar', (
+      WidgetTester tester,
+    ) async {
       tester.binding.window.physicalSizeTestValue = const Size(360, 640);
       tester.binding.window.devicePixelRatioTestValue = 1.0;
 
@@ -21,21 +23,25 @@ void main() {
       expect(find.byType(FloatingActionButton), findsOneWidget);
     });
 
-    testWidgets('can send a message and see it appear', (WidgetTester tester) async {
+    testWidgets('can send a message and see it appear', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(child: MaterialApp(home: AssistantScreen())),
       );
 
       final textField = find.byType(TextField);
       await tester.enterText(textField, 'Test message');
-      
+
       await tester.tap(find.byType(FloatingActionButton));
       await tester.pump();
 
       expect(find.text('Test message'), findsOneWidget);
     });
 
-    testWidgets('shows Generate button when form is complete', (WidgetTester tester) async {
+    testWidgets('shows Generate button when form is complete', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(child: MaterialApp(home: AssistantScreen())),
       );
@@ -43,7 +49,9 @@ void main() {
       expect(find.text('Complete Form First'), findsOneWidget);
     });
 
-    testWidgets('summary card displays form fields', (WidgetTester tester) async {
+    testWidgets('summary card displays form fields', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         const ProviderScope(child: MaterialApp(home: AssistantScreen())),
       );

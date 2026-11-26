@@ -103,6 +103,33 @@ class GeneratorFormState {
       language: outputLanguage,
     );
   }
+
+  /// Creates a GeneratorFormState from a GenerationRequest (for pre-filling from chat).
+  factory GeneratorFormState.fromGenerationRequest(GenerationRequest request) {
+    return GeneratorFormState(
+      school: request.header.school,
+      teacher: request.header.teacher,
+      learningArea: request.header.learningArea,
+      date: request.header.date,
+      term: request.header.term,
+      sessions: request.header.sessions,
+      sessionMinutes: request.header.sessionMinutes,
+      sharedSubTheme: request.sharedSubTheme,
+      multigradeModel: request.header.multigradeModel,
+      outputLanguage: request.language,
+      grades: request.grades
+          .map(
+            (g) => GradeInput(
+              gradeLabel: g.gradeLabel,
+              male: g.male,
+              female: g.female,
+              subTheme: g.subTheme,
+              competency: g.competency,
+            ),
+          )
+          .toList(),
+    );
+  }
 }
 
 /// StateNotifier for managing generator form state.
@@ -170,6 +197,11 @@ class GeneratorFormNotifier extends StateNotifier<GeneratorFormState> {
 
   void reset() {
     state = const GeneratorFormState();
+  }
+
+  /// Replaces the entire form state (useful for pre-filling from chat).
+  void setState(GeneratorFormState newState) {
+    state = newState;
   }
 }
 

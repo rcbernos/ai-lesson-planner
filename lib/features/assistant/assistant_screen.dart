@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/chat/chat_session.dart';
 import 'package:ai_lesson_planner/features/assistant/chat_bubble.dart';
+import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
+import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
 
 /// Provider for the chat session state.
-final chatSessionProvider =
-    StateProvider<ChatSession>((ref) => ChatSession());
+final chatSessionProvider = StateProvider<ChatSession>((ref) => ChatSession());
 
 class AssistantScreen extends ConsumerStatefulWidget {
   const AssistantScreen({super.key});
@@ -105,18 +106,29 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
           children: [
             Text('Form so far', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 12),
-            _buildSummaryRow('School', session.header.school, 
-                session.header.school.isEmpty ? 'tap to edit' : null),
-            _buildSummaryRow('Teacher', session.header.teacher,
-                session.header.teacher.isEmpty ? 'tap to edit' : null),
-            _buildSummaryRow('Learning Area', session.header.learningArea,
-                session.header.learningArea.isEmpty ? 'tap to edit' : null),
+            _buildSummaryRow(
+              'School',
+              session.header.school,
+              session.header.school.isEmpty ? 'tap to edit' : null,
+            ),
+            _buildSummaryRow(
+              'Teacher',
+              session.header.teacher,
+              session.header.teacher.isEmpty ? 'tap to edit' : null,
+            ),
+            _buildSummaryRow(
+              'Learning Area',
+              session.header.learningArea,
+              session.header.learningArea.isEmpty ? 'tap to edit' : null,
+            ),
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 onPressed: canGenerate ? _openInForm : null,
-                child: Text(canGenerate ? 'Generate from Chat' : 'Complete Form First'),
+                child: Text(
+                  canGenerate ? 'Generate from Chat' : 'Complete Form First',
+                ),
               ),
             ),
           ],
@@ -129,9 +141,19 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
-      title: Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      title: Text(
+        label,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+      ),
       subtitle: value.isEmpty || hint != null
-          ? Text(hint ?? '', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6)))
+          ? Text(
+              hint ?? '',
+              style: TextStyle(
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurfaceVariant.withOpacity(0.6),
+              ),
+            )
           : SelectableText(
               value,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -148,9 +170,27 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   }
 
   void _openInForm() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Feature: Open in form would pre-fill the generator from chat')),
-    );
+    final session = ref.read(chatSessionProvider);
+    if (!session.canGenerate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete all required fields first'),
+        ),
+      );
+      return;
+    }
+
+    // Pre-fill the generator form state from the chat session
+    final request = session.toGenerationRequest();
+    final formState = GeneratorFormState.fromGenerationRequest(request);
+
+    // Use a provider to pass the pre-filled state
+    ref.read(generatorFormProvider.notifier).setState(formState);
+
+    // Navigate to the generator screen
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const GeneratorScreen()));
   }
 
   Widget _buildInputBar() {
