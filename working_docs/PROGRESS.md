@@ -193,3 +193,13 @@
 - Created `test/chat_repository_test.dart` with 6 tests covering model validation, JSON round-trip, and repository CRUD.
 - All tests pass, flutter analyze clean (only pre-existing deprecation warnings).
 - Commit: `feat(chat): chat session model and storage for slot-filling assistant`
+
+### T6.3 Chat UI (Complete)
+- Created `lib/features/assistant/chat_bubble.dart` - reusable widget for displaying messages.
+- Created `lib/features/assistant/assistant_screen.dart` - full chat UI with message list, input bar, and summary card.
+- Creates `chatSessionProvider` for state management via Riverpod.
+- Summary card shows filled fields (School, Teacher, Learning Area) and Generate button.
+- Quick-reply chip shows next missing field.
+- Added `test/assistant_screen_test.dart` with 6 widget tests.
+- All tests pass, debug APK builds successfully.
+- Commit: `feat(ui): chat assistant screen`
