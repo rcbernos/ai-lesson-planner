@@ -1,0 +1,121 @@
+[
+  {
+    "id": "req-1",
+    "name": "2 grades Filipino 60min",
+    "request": {
+      "header": {
+        "school": "Sampaguita Elementary School",
+        "teacher": "Maria Santos",
+        "learningArea": "Filipino",
+        "date": "2026-08-04",
+        "term": "Term 1",
+        "sessions": 1,
+        "sessionMinutes": 60,
+        "multigradeModel": "Gemma-SEA-LION-v4-4B-VL",
+        "gradeLevels": "III & IV"
+      },
+      "grades": [
+        {
+          "gradeLabel": "Grade 3",
+          "male": 2,
+          "female": 3,
+          "subTheme": "Pag-iisa-isa at paglalarawan",
+          "competency": "Natutukoy ang mga salitang naglalarawan; Nakapagbibigay ng payak na paglalarawan"
+        },
+        {
+          "gradeLabel": "Grade 4",
+          "male": 2,
+          "female": 2,
+          "subTheme": "Pangatnig sa teksto",
+          "competency": "Nakikilala ang pangunahing ideya; Nagagamit ang pangatnig"
+        }
+      ],
+      "sharedSubTheme": "Mga salita na naglalarawan",
+      "language": "filipino"
+    }
+  },
+  {
+    "id": "req-2",
+    "name": "2 grades English 60min",
+    "request": {
+      "header": {
+        "school": "Liberty Elementary School",
+        "teacher": "John Smith",
+        "learningArea": "English",
+        "date": "2026-08-04",
+        "term": "Term 1",
+        "sessions": 1,
+        "sessionMinutes": 60,
+        "multigradeModel": "Gemma-SEA-LION-v4-4B-VL",
+        "gradeLevels": "III & IV"
+      },
+      "grades": [
+        {
+          "gradeLabel": "Grade 3",
+          "male": 3,
+          "female": 2,
+          "subTheme": "Adjectives and descriptions",
+          "competency": "Identifies adjectives; Provides simple description"
+        },
+        {
+          "gradeLabel": "Grade 4",
+          "male": 1,
+          "female": 1,
+          "subTheme": "Reading comprehension",
+          "competency": "Identifies main idea; Uses comparison words"
+        }
+      ],
+      "sharedSubTheme": "Descriptive adjectives",
+      "language": "english"
+    }
+  },
+  {
+    "id": "req-3",
+    "name": "4 grades Filipino 90min",
+    "request": {
+      "header": {
+        "school": "Rural Elementary School",
+        "teacher": "Luisa Mendoza",
+        "learningArea": "Filipino",
+        "date": "2026-08-04",
+        "term": "Term 1",
+        "sessions": 1,
+        "sessionMinutes": 90,
+        "multigradeModel": "Gemma-SEA-LION-v4-4B-VL",
+        "gradeLevels": "I, II, III & IV"
+      },
+      "grades": [
+        {
+          "gradeLabel": "Grade 1",
+          "male": 4,
+          "female": 5,
+          "subTheme": "Pangunahing salita",
+          "competency": "Natutukoy ang mga pangunahing salita; Nakapagpapahayag ng simpleng ideya"
+        },
+        {
+          "gradeLabel": "Grade 2",
+          "male": 3,
+          "female": 4,
+          "subTheme": "Pangunahing salita",
+          "competency": "Natutukoy ang mga pangunahing salita; Nakapagpapahayag ng simpleng ideya"
+        },
+        {
+          "gradeLabel": "Grade 3",
+          "male": 2,
+          "female": 3,
+          "subTheme": "Pag-iisa-isa at paglalarawan",
+          "competency": "Natutukoy ang mga salitang naglalarawan; Nakapagbibigay ng payak na paglalarawan"
+        },
+        {
+          "gradeLabel": "Grade 4",
+          "male": 2,
+          "female": 2,
+          "subTheme": "Pangatnig sa teksto",
+          "competency": "Nakikilala ang pangunahing ideya; Nagagamit ang pangatnig"
+        }
+      ],
+      "sharedSubTheme": "Mga salita at pangungusap",
+      "language": "filipino"
+    }
+  }
+]
