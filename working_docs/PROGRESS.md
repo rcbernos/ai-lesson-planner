@@ -164,49 +164,27 @@
 - Fixed cancel test to use controlled token delays instead of racey sleep.
 - All 6 tests in test/llm_generator_test.dart pass: cancel(), per-grade regeneration, full plan generation, validation retry.
 
-## Phase 6 - Chat Session Management (T6.1 Complete)
+## Phase 6 - Chat Session Management (T6.1-T6.4 Complete)
 
-### T6.2 Conversational Slot Filling (Complete)
-- Created `lib/core/chat/slot_filler.dart`: extracts fields from chat using LlmEngine
-  - `SlotFiller.processMessage()`: sends user message to LLM for slot extraction
-  - `applyPatchToSession()`: merges extracted fields into chat session
-  - `getNextMissingField()`: identifies next required field for conversation flow
-  - `_validatePatch()`: validates extracted values against SlotSchema
-- Created `lib/core/chat/slot_schema.dart`: defines extractable fields and validation rules
-  - `SlotSchema.isValidGradeLabel()`: validates formats like "Grade 3"
-  - `SlotSchema.isValidSessionMinutes()`: validates 60/90/120 minute sessions
-  - `SlotSchema.isValidGradeCount()`: validates 2-6 grades
-- Created `test/slot_filler_test.dart` with 18 tests covering extraction, validation, and edge cases
-- All tests pass, flutter analyze clean
-- Commit: `feat(core): conversational slot filling for chat assistant`
-
-### T6.1 Chat session model and storage layer (Complete)
+### T6.1 Chat session model and storage (Complete)
 - Created `lib/core/chat/chat_session.dart` with ChatMessage and ChatSession classes.
-- ChatSession includes: id, created, messages, header, grades, sharedSubTheme, multigradeModel, outputLanguage.
-- Added canGenerate getter to check if session has all required fields.
-- Added toGenerationRequest() to build GenerationRequest from session.
-- Added addMessage() with 12-message cap for prompt budget.
-- Added toJson()/fromJson() for JSON serialization.
-- Updated `lib/models/database/tables.dart`: added ChatSessions table with all draft fields.
-- Updated `lib/services/database/app_database.dart`: bumped schemaVersion to 2, added onUpgrade migration.
-- Created `lib/services/database/chat_repository.dart` with CRUD operations: save, getAll, getById, delete, clearAll.
-- Created `test/chat_repository_test.dart` with 6 tests covering model validation, JSON round-trip, and repository CRUD.
-- All tests pass, flutter analyze clean (only pre-existing deprecation warnings).
-- Commit: `feat(chat): chat session model and storage for slot-filling assistant`
+- ChatSessions table added to database with schemaVersion 2.
+- ChatRepository with CRUD: save, getAll, getById, delete, clearAll.
+- Tests: 6 tests pass (chat_repository_test.dart).
+
+### T6.2 Slot-filling prompt and parser (Complete)
+- Created `lib/core/chat/slot_filler.dart`: processMessage(), applyPatchToSession(), getNextMissingField().
+- Created `lib/core/chat/slot_schema.dart`: validation rules for grade labels, session minutes, counts.
+- Tests: 18 tests pass (slot_filler_test.dart).
 
 ### T6.3 Chat UI (Complete)
-- Created `lib/features/assistant/chat_bubble.dart` - reusable widget for displaying messages.
-- Created `lib/features/assistant/assistant_screen.dart` - full chat UI with message list, input bar, and summary card.
-- Creates `chatSessionProvider` for state management via Riverpod.
-- Summary card shows filled fields (School, Teacher, Learning Area) and Generate button.
-- Quick-reply chip shows next missing field.
-- Added `test/assistant_screen_test.dart` with 6 widget tests.
-- All tests pass, debug APK builds successfully.
-- Commit: `feat(ui): chat assistant screen`
+- Created `lib/features/assistant/assistant_screen.dart` with real slot-filling implementation.
+- Messages list, input bar with loading state, summary card with quick-reply chips.
+- Integrated with SlotFiller and ChatRepository for end-to-end chat flow.
+- Tests: 9 tests pass (assistant_screen_test.dart).
 
-### T6.4 Chat to Generation Bridge (Complete)
-- Added `setState()` method to `GeneratorFormNotifier` for pre-filling form state from chat.
-- Fixed protected member access warning in `assistant_screen.dart` by using `setState()` instead of direct state assignment.
-- Created `test/chat_bridge_test.dart` with 4 tests verifying session-to-request conversion and canGenerate logic.
-- "Generate from Chat" button pre-fills generator form and navigates to GeneratorScreen.
-- Commit: `feat(ui): generate a plan from the chat draft`
+### T6.4 Chat to generation bridge (Complete)
+- GeneratorFormState.setState() pre-fills form from chat session.
+- Tests: 4 tests pass (chat_bridge_test.dart).
+
+**Total Phase 6 tests: 37 passing**

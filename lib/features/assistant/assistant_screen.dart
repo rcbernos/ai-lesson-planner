@@ -4,9 +4,11 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai_lesson_planner/core/chat/chat_session.dart';
+import 'package:ai_lesson_planner/core/chat/slot_filler.dart' as slot_filler;
 import 'package:ai_lesson_planner/features/assistant/chat_bubble.dart';
 import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
 import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
+import 'package:ai_lesson_planner/core/providers.dart';
 
 /// Provider for the chat session state.
 final chatSessionProvider = StateProvider<ChatSession>((ref) => ChatSession());
@@ -21,6 +23,7 @@ class AssistantScreen extends ConsumerStatefulWidget {
 class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   late final TextEditingController _controller;
   final ScrollController _scrollController = ScrollController();
+  bool _isProcessing = false;
 
   @override
   void initState() {
@@ -35,6 +38,15 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     super.dispose();
   }
 
+  void _focusTextField() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(FocusNode());
+      _controller.selection = TextSelection.fromPosition(
+        TextPosition(offset: _controller.text.length),
+      );
+    });
+  }
+
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -47,24 +59,58 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
     });
   }
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    final session = ref.read(chatSessionProvider);
-    _controller.clear();
+    setState(() => _isProcessing = true);
 
-    final updatedSession = session.addMessage(
-      ChatMessage(role: 'user', content: text),
-    );
-    ref.read(chatSessionProvider.notifier).state = updatedSession;
+    try {
+      final session = ref.read(chatSessionProvider);
+      _controller.clear();
 
-    final assistantSession = ref.read(chatSessionProvider);
-    final finalSession = assistantSession.addMessage(
-      ChatMessage(role: 'assistant', content: 'Got it!'),
-    );
-    ref.read(chatSessionProvider.notifier).state = finalSession;
-    _scrollToBottom();
+      // Add user message
+      final updatedSession = session.addMessage(
+        ChatMessage(role: 'user', content: text),
+      );
+      ref.read(chatSessionProvider.notifier).state = updatedSession;
+
+      // Process message with SlotFiller
+      final slotFillerInstance = ref.read(slotFillerProvider);
+      final result = await slotFillerInstance.processMessage(
+        text,
+        updatedSession,
+      );
+
+      // Apply patch to session
+      var newSession = updatedSession;
+      if (result.patch.isNotEmpty) {
+        newSession = slot_filler.applyPatchToSession(
+          updatedSession,
+          result.patch,
+        );
+      }
+
+      // Add assistant response
+      final assistantSession = newSession.addMessage(
+        ChatMessage(role: 'assistant', content: result.assistantResponse),
+      );
+      ref.read(chatSessionProvider.notifier).state = assistantSession;
+
+      // Save to database
+      await ref.read(chatRepositoryProvider).save(assistantSession);
+
+      _scrollToBottom();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
   }
 
   @override
@@ -97,6 +143,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
 
   Widget _buildSummaryCard(ChatSession session) {
     final canGenerate = session.canGenerate;
+    final nextMissing = slot_filler.getNextMissingField(session);
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -121,18 +168,75 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
               session.header.learningArea,
               session.header.learningArea.isEmpty ? 'tap to edit' : null,
             ),
+            if (nextMissing != 'all filled') ...[
+              const SizedBox(height: 8),
+              _buildQuickReplyChip(nextMissing),
+            ],
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: FilledButton(
                 onPressed: canGenerate ? _openInForm : null,
-                child: Text(
-                  canGenerate ? 'Generate from Chat' : 'Complete Form First',
-                ),
+                child: _isProcessing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        canGenerate
+                            ? 'Generate from Chat'
+                            : 'Complete Form First',
+                      ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildQuickReplyChip(String missingField) {
+    String label;
+    IconData icon;
+    switch (missingField) {
+      case 'school':
+        label = 'Enter school name';
+        icon = Icons.school;
+      case 'teacher':
+        label = 'Enter teacher name';
+        icon = Icons.person;
+      case 'learningArea':
+        label = 'What subject?';
+        icon = Icons.book;
+      case 'date':
+        label = 'Enter date';
+        icon = Icons.calendar_today;
+      case 'term':
+        label = 'Enter term';
+        icon = Icons.schedule;
+      case 'sharedSubTheme':
+        label = 'Enter sub-theme';
+        icon = Icons.flag;
+      case 'grades':
+        label = 'What grades?';
+        icon = Icons.numbers;
+      case 'gradeLabel':
+        label = 'Enter grade';
+        icon = Icons.grade;
+      default:
+        label = 'Missing: $missingField';
+        icon = Icons.help;
+    }
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: FilterChip(
+        label: Text(label),
+        avatar: Icon(icon, size: 18),
+        onSelected: (_) {
+          _focusTextField();
+        },
       ),
     );
   }
@@ -210,12 +314,22 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
                 onSubmitted: (_) => _sendMessage(),
                 minLines: 1,
                 maxLines: 4,
+                enabled: !_isProcessing,
               ),
             ),
             const SizedBox(width: 8),
             FloatingActionButton(
-              onPressed: _sendMessage,
-              child: const Icon(Icons.send),
+              onPressed: _isProcessing ? null : _sendMessage,
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.send),
             ),
           ],
         ),

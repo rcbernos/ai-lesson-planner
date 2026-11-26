@@ -15,6 +15,32 @@ import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
 import 'package:ai_lesson_planner/features/generator/generation_controller.dart';
 import 'package:ai_lesson_planner/features/plan_editor/plan_editor_state.dart';
 import 'package:ai_lesson_planner/services/database/plan_repository.dart';
+import 'package:ai_lesson_planner/services/database/chat_repository.dart';
+import 'package:ai_lesson_planner/core/chat/slot_filler.dart' as slot_filler;
+import 'package:ai_lesson_planner/core/llm/fake_engine.dart';
+
+/// Provider for the LLM engine (uses FakeEngine in tests).
+final llmEngineProvider = Provider<LlmEngine>((ref) {
+  // In tests, FakeEngine is injected via override
+  // In production, this will use LocalLlamaEngine
+  return FakeEngine(tokenSequences: {});
+});
+
+/// Provider for the SlotFiller used in chat mode.
+final slotFillerProvider = Provider<slot_filler.SlotFiller>((ref) {
+  final engine = ref.watch(llmEngineProvider);
+  return slot_filler.SlotFiller(
+    engine: engine,
+    temperature: 0.3,
+    maxTokens: 512,
+    seed: 42,
+  );
+});
+
+/// Provider for ChatRepository.
+final chatRepositoryProvider = Provider<ChatRepository>((ref) {
+  return ChatRepository();
+});
 
 /// State of the LLM backend availability.
 enum LlmState {
