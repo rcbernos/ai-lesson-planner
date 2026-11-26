@@ -231,7 +231,11 @@ class LessonPlan {
   /// Replaces a section of the plan with new content from source.
   /// If [gradeLabel] is provided, only the specified grade's data is replaced.
   /// Throws [ArgumentError] if [gradeLabel] is not found in the plan.
-  LessonPlan replaceSection(PlanSection section, LessonPlan source, {String? gradeLabel}) {
+  LessonPlan replaceSection(
+    PlanSection section,
+    LessonPlan source, {
+    String? gradeLabel,
+  }) {
     switch (section) {
       case PlanSection.intentions:
         return copyWith(

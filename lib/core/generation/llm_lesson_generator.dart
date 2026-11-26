@@ -14,8 +14,8 @@ const String defaultAiUseDeclaration =
 
 class LlmLessonGenerator implements LessonGenerator {
   LlmLessonGenerator({required LlmEngine engine, int? seed})
-      : _engine = engine,
-        _seed = seed;
+    : _engine = engine,
+      _seed = seed;
 
   final LlmEngine _engine;
   final int? _seed;
@@ -57,13 +57,15 @@ class LlmLessonGenerator implements LessonGenerator {
     yield GenerationCompleted(plan);
   }
 
-  Stream<GenerationEvent> _generateIntentions(GenerationRequest request) async* {
+  Stream<GenerationEvent> _generateIntentions(
+    GenerationRequest request,
+  ) async* {
     yield SectionStarted('Intentions');
 
     final prompt = buildIntentionsPrompt(request);
     final response = await _streamTokens(prompt);
     final json = extractJson(response);
-    
+
     _lastPlan = _buildPlanFromIntentions(json, request);
     var issues = validator.validateSection(_lastPlan!, PlanSection.intentions);
 
@@ -86,11 +88,13 @@ class LlmLessonGenerator implements LessonGenerator {
     yield SectionCompleted('Intentions');
   }
 
-  Stream<GenerationEvent> _generateLearningExperience(GenerationRequest request) async* {
+  Stream<GenerationEvent> _generateLearningExperience(
+    GenerationRequest request,
+  ) async* {
     // Store learner context from intentions section
     final learnerContext = _lastPlan?.learnerContext ?? '';
     final materials = _lastPlan?.materials ?? Materials();
-    
+
     yield SectionStarted('Learner Context');
     await _streamTokens(buildLearnerContextPrompt(request));
     yield SectionCompleted('Learner Context');
@@ -102,7 +106,7 @@ class LlmLessonGenerator implements LessonGenerator {
     yield SectionStarted('Flow');
     final flowResponse = await _streamTokens(buildFlowPrompt(request));
     final flowJson = extractJson(flowResponse);
-    
+
     // Merge flow, assessments, ways forward onto existing plan
     _lastPlan = _mergeLearningExperience(
       request: request,
@@ -110,8 +114,11 @@ class LlmLessonGenerator implements LessonGenerator {
       learnerContext: learnerContext,
       materials: materials,
     );
-    
-    var issues = validator.validateSection(_lastPlan!, PlanSection.learningExperiences);
+
+    var issues = validator.validateSection(
+      _lastPlan!,
+      PlanSection.learningExperiences,
+    );
     if (issues.isNotEmpty) {
       final retryPrompt = buildRetryPrompt(
         issues.map((i) => i.message).toList(),
@@ -124,7 +131,10 @@ class LlmLessonGenerator implements LessonGenerator {
         learnerContext: learnerContext,
         materials: materials,
       );
-      issues = validator.validateSection(_lastPlan!, PlanSection.learningExperiences);
+      issues = validator.validateSection(
+        _lastPlan!,
+        PlanSection.learningExperiences,
+      );
 
       if (issues.isNotEmpty) {
         yield GenerationFailed(issues.map((i) => i.message).join('; '));
@@ -132,43 +142,41 @@ class LlmLessonGenerator implements LessonGenerator {
         return;
       }
     }
-    
+
     yield SectionCompleted('Flow');
   }
 
   Future<String> _streamTokens(String prompt) async {
     final messages = [ChatMsg(role: 'system', content: prompt)];
-    final params = GenParams(
-      temperature: 0.3,
-      maxTokens: 1024,
-      seed: _seed,
-    );
+    final params = GenParams(temperature: 0.3, maxTokens: 1024, seed: _seed);
 
     final buffer = StringBuffer();
     final completer = Completer<String>();
 
-    _tokenSub = _engine.complete(messages, params).listen(
-      (token) {
-        if (_isCancelled) {
-          return;
-        }
-        buffer.write(token);
-      },
-      onDone: () {
-        if (_isCancelled) {
-          if (!completer.isCompleted) {
-            completer.complete('');
-          }
-        } else if (!completer.isCompleted) {
-          completer.complete(buffer.toString());
-        }
-      },
-      onError: (e) {
-        if (!completer.isCompleted) {
-          completer.completeError(e);
-        }
-      },
-    );
+    _tokenSub = _engine
+        .complete(messages, params)
+        .listen(
+          (token) {
+            if (_isCancelled) {
+              return;
+            }
+            buffer.write(token);
+          },
+          onDone: () {
+            if (_isCancelled) {
+              if (!completer.isCompleted) {
+                completer.complete('');
+              }
+            } else if (!completer.isCompleted) {
+              completer.complete(buffer.toString());
+            }
+          },
+          onError: (e) {
+            if (!completer.isCompleted) {
+              completer.completeError(e);
+            }
+          },
+        );
 
     return completer.future;
   }
@@ -181,28 +189,32 @@ class LlmLessonGenerator implements LessonGenerator {
 
     final grades = <GradeBlock>[];
     final gradesJson = json['grades'] as List? ?? [];
-    
+
     for (var i = 0; i < request.grades.length; i++) {
       final g = request.grades[i];
-      final gJson = gradesJson.length > i && gradesJson[i] is Map<String, dynamic>
+      final gJson =
+          gradesJson.length > i && gradesJson[i] is Map<String, dynamic>
           ? gradesJson[i] as Map<String, dynamic>
           : null;
 
-      final objectives = (gJson?['objectives'] as List?)
-              ?.cast<String>() ??
-          [];
+      final objectives = (gJson?['objectives'] as List?)?.cast<String>() ?? [];
       final subTheme = gJson?['subTheme'] as String? ?? g.subTheme;
 
-      grades.add(GradeBlock(
-        gradeLabel: g.gradeLabel,
-        learnersMale: g.male,
-        learnersFemale: g.female,
-        subTheme: subTheme,
-        contentStandard: g.subTheme,
-        performanceStandard: '',
-        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
-        objectives: objectives,
-      ));
+      grades.add(
+        GradeBlock(
+          gradeLabel: g.gradeLabel,
+          learnersMale: g.male,
+          learnersFemale: g.female,
+          subTheme: subTheme,
+          contentStandard: g.subTheme,
+          performanceStandard: '',
+          competencies: g.competency
+              .split('; ')
+              .where((s) => s.trim().isNotEmpty)
+              .toList(),
+          objectives: objectives,
+        ),
+      );
     }
 
     return LessonPlan(
@@ -232,21 +244,33 @@ class LlmLessonGenerator implements LessonGenerator {
     required Materials materials,
   }) {
     final basePlan = _lastPlan ?? _buildPlaceholderPlan(request);
-    
-    final flowStages = _buildFlowStages(flowJson, request.header.sessionMinutes, request.grades);
+
+    final flowStages = _buildFlowStages(
+      flowJson,
+      request.header.sessionMinutes,
+      request.grades,
+    );
     final assessments = _buildAssessments(request.grades);
     final waysForward = _buildWaysForward(request.grades);
-    final reflectionQuestions = _buildReflectionQuestions(request.grades, flowJson);
-    
+    final reflectionQuestions = _buildReflectionQuestions(
+      request.grades,
+      flowJson,
+    );
+
     return basePlan.copyWith(
       flow: flowStages,
       assessments: assessments,
       waysForward: waysForward,
       reflectionQuestions: reflectionQuestions,
       notesNextSession: 'Usapan ang aralin sa susunod na session.',
-      learnerContext: learnerContext.isEmpty ? 'Ang mga mag-aaral ay nakatire sa pagitan na kawaranan.' : learnerContext,
+      learnerContext: learnerContext.isEmpty
+          ? 'Ang mga mag-aaral ay nakatire sa pagitan na kawaranan.'
+          : learnerContext,
       materials: materials.items.isEmpty
-          ? Materials(items: ['Mga larawan', 'Handouts', 'Manipulatives'], references: ['DepEd Curriculum Guide'])
+          ? Materials(
+              items: ['Mga larawan', 'Handouts', 'Manipulatives'],
+              references: ['DepEd Curriculum Guide'],
+            )
           : materials,
       aiUseDeclaration: defaultAiUseDeclaration,
     );
@@ -261,11 +285,18 @@ class LlmLessonGenerator implements LessonGenerator {
       return basePlan;
     }
 
-    final flowStages = _buildFlowStages(flowJson, request.header.sessionMinutes, request.grades);
+    final flowStages = _buildFlowStages(
+      flowJson,
+      request.header.sessionMinutes,
+      request.grades,
+    );
     final assessments = _buildAssessments(request.grades);
     final waysForward = _buildWaysForward(request.grades);
-    final reflectionQuestions = _buildReflectionQuestions(request.grades, flowJson);
-    
+    final reflectionQuestions = _buildReflectionQuestions(
+      request.grades,
+      flowJson,
+    );
+
     return basePlan.copyWith(
       flow: flowStages,
       assessments: assessments,
@@ -293,9 +324,12 @@ class LlmLessonGenerator implements LessonGenerator {
     final flowList = (flowJson['flow'] as List?) ?? [];
     final stages = <FlowStage>[];
     final gradeLabels = grades.map((g) => g.gradeLabel).toList();
-    final competencyCounts = grades.map(
-      (g) => g.competency.split('; ').where((s) => s.trim().isNotEmpty).length
-    ).toList();
+    final competencyCounts = grades
+        .map(
+          (g) =>
+              g.competency.split('; ').where((s) => s.trim().isNotEmpty).length,
+        )
+        .toList();
 
     for (var i = 0; i < flowList.length; i++) {
       final stageJson = flowList[i] as Map<String, dynamic>? ?? {};
@@ -304,10 +338,12 @@ class LlmLessonGenerator implements LessonGenerator {
       final minutes = stageJson['minutes'] as int? ?? 0;
       final stageName = stageJson['stage'] as String? ?? 'Activity';
       final wholeClass = stageJson['wholeClass'] as bool? ?? false;
-      final wholeClassActivity = stageJson['wholeClassActivity'] as String? ?? '';
-      
+      final wholeClassActivity =
+          stageJson['wholeClassActivity'] as String? ?? '';
+
       final activityByGrade = <String, String>{};
-      final activityJson = stageJson['activityByGrade'] as Map<String, dynamic>?;
+      final activityJson =
+          stageJson['activityByGrade'] as Map<String, dynamic>?;
       if (activityJson != null) {
         for (final entry in activityJson.entries) {
           activityByGrade[entry.key] = entry.value as String? ?? '';
@@ -319,33 +355,42 @@ class LlmLessonGenerator implements LessonGenerator {
       }
 
       final competencyIndexByGrade = <String, int>{};
-      final compIdxJson = stageJson['competencyIndexByGrade'] as Map<String, dynamic>?;
+      final compIdxJson =
+          stageJson['competencyIndexByGrade'] as Map<String, dynamic>?;
       if (compIdxJson != null) {
         for (final entry in compIdxJson.entries) {
           final idx = entry.value as int? ?? 0;
           final gradeIdx = gradeLabels.indexOf(entry.key);
-          if (gradeIdx >= 0 && 
-              gradeIdx < competencyCounts.length && 
+          if (gradeIdx >= 0 &&
+              gradeIdx < competencyCounts.length &&
               competencyCounts[gradeIdx] > 0) {
-            competencyIndexByGrade[entry.key] = idx.clamp(0, competencyCounts[gradeIdx] - 1);
+            competencyIndexByGrade[entry.key] = idx.clamp(
+              0,
+              competencyCounts[gradeIdx] - 1,
+            );
           }
         }
       }
 
-      stages.add(FlowStage(
-        minutes: minutes,
-        stage: stageName,
-        wholeClass: wholeClass,
-        activityByGrade: activityByGrade,
-        wholeClassActivity: wholeClassActivity,
-        competencyIndexByGrade: competencyIndexByGrade,
-      ));
+      stages.add(
+        FlowStage(
+          minutes: minutes,
+          stage: stageName,
+          wholeClass: wholeClass,
+          activityByGrade: activityByGrade,
+          wholeClassActivity: wholeClassActivity,
+          competencyIndexByGrade: competencyIndexByGrade,
+        ),
+      );
     }
 
     return stages;
   }
 
-  List<FlowStage> _buildDefaultFlow(int sessionMinutes, List<GradeInput> grades) {
+  List<FlowStage> _buildDefaultFlow(
+    int sessionMinutes,
+    List<GradeInput> grades,
+  ) {
     final total = sessionMinutes;
     if (total < 10) return [];
     final m = (total ~/ 6).clamp(1, total - 5);
@@ -356,34 +401,61 @@ class LlmLessonGenerator implements LessonGenerator {
 
     return [
       FlowStage(
-        minutes: m, stage: 'Motivation', wholeClass: true,
-        activityByGrade: {}, wholeClassActivity: 'Ipakita ang larawan.',
+        minutes: m,
+        stage: 'Motivation',
+        wholeClass: true,
+        activityByGrade: {},
+        wholeClassActivity: 'Ipakita ang larawan.',
         competencyIndexByGrade: const {},
       ),
       FlowStage(
-        minutes: d, stage: 'Direct Teaching', wholeClass: false,
+        minutes: d,
+        stage: 'Direct Teaching',
+        wholeClass: false,
         activityByGrade: Map.fromEntries(
-          grades.map((g) => MapEntry(g.gradeLabel, 'Binary na tawag at ilarawan ang kulay ng tema.')),
+          grades.map(
+            (g) => MapEntry(
+              g.gradeLabel,
+              'Binary na tawag at ilarawan ang kulay ng tema.',
+            ),
+          ),
         ),
-        wholeClassActivity: '', competencyIndexByGrade: {},
+        wholeClassActivity: '',
+        competencyIndexByGrade: {},
       ),
       FlowStage(
-        minutes: p, stage: 'Practice', wholeClass: false,
+        minutes: p,
+        stage: 'Practice',
+        wholeClass: false,
         activityByGrade: Map.fromEntries(
-          grades.map((g) => MapEntry(g.gradeLabel, 'Gawin ang worksheet na may mga larawan.')),
+          grades.map(
+            (g) => MapEntry(
+              g.gradeLabel,
+              'Gawin ang worksheet na may mga larawan.',
+            ),
+          ),
         ),
-        wholeClassActivity: '', competencyIndexByGrade: {},
+        wholeClassActivity: '',
+        competencyIndexByGrade: {},
       ),
       FlowStage(
-        minutes: a, stage: 'Activity', wholeClass: false,
+        minutes: a,
+        stage: 'Activity',
+        wholeClass: false,
         activityByGrade: Map.fromEntries(
-          grades.map((g) => MapEntry(g.gradeLabel, 'Gumawa ng mapa o diagrama.')),
+          grades.map(
+            (g) => MapEntry(g.gradeLabel, 'Gumawa ng mapa o diagrama.'),
+          ),
         ),
-        wholeClassActivity: '', competencyIndexByGrade: {},
+        wholeClassActivity: '',
+        competencyIndexByGrade: {},
       ),
       FlowStage(
-        minutes: w, stage: 'Wrap-up', wholeClass: true,
-        activityByGrade: {}, wholeClassActivity: 'Ipagpakita ang huling gawa.',
+        minutes: w,
+        stage: 'Wrap-up',
+        wholeClass: true,
+        activityByGrade: {},
+        wholeClassActivity: 'Ipagpakita ang huling gawa.',
         competencyIndexByGrade: const {},
       ),
     ];
@@ -391,7 +463,10 @@ class LlmLessonGenerator implements LessonGenerator {
 
   List<GradeAssessment> _buildAssessments(List<GradeInput> grades) {
     return grades.map((g) {
-      final compCount = g.competency.split('; ').where((s) => s.trim().isNotEmpty).length;
+      final compCount = g.competency
+          .split('; ')
+          .where((s) => s.trim().isNotEmpty)
+          .length;
       final compIdx = compCount > 0 ? 0 : null;
       return GradeAssessment(
         gradeLabel: g.gradeLabel,
@@ -404,21 +479,33 @@ class LlmLessonGenerator implements LessonGenerator {
   }
 
   List<GradeWaysForward> _buildWaysForward(List<GradeInput> grades) {
-    return grades.map((g) => GradeWaysForward(
-      gradeLabel: g.gradeLabel,
-      remediation: 'Muling basahin ang lesson.',
-      enrichment: 'Maghanap ng iba pang halimbawa.',
-    )).toList();
+    return grades
+        .map(
+          (g) => GradeWaysForward(
+            gradeLabel: g.gradeLabel,
+            remediation: 'Muling basahin ang lesson.',
+            enrichment: 'Maghanap ng iba pang halimbawa.',
+          ),
+        )
+        .toList();
   }
 
   List<ReflectionQuestion> _buildReflectionQuestions(
-    List<GradeInput> grades, Map<String, dynamic>? flowJson,
+    List<GradeInput> grades,
+    Map<String, dynamic>? flowJson,
   ) {
     final questions = <ReflectionQuestion>[];
     for (final g in grades) {
-      questions.add(ReflectionQuestion(gradeLabel: g.gradeLabel, text: 'Ano ang natutuhan?'));
+      questions.add(
+        ReflectionQuestion(
+          gradeLabel: g.gradeLabel,
+          text: 'Ano ang natutuhan?',
+        ),
+      );
     }
-    questions.add(ReflectionQuestion(gradeLabel: null, text: 'Kumusta ang aralin?'));
+    questions.add(
+      ReflectionQuestion(gradeLabel: null, text: 'Kumusta ang aralin?'),
+    );
     return questions;
   }
 
@@ -427,18 +514,30 @@ class LlmLessonGenerator implements LessonGenerator {
     final totalMinutes = request.header.sessionMinutes;
     return LessonPlan(
       header: request.header,
-      grades: grades.map((g) => GradeBlock(
-        gradeLabel: g.gradeLabel,
-        learnersMale: g.male, learnersFemale: g.female,
-        subTheme: g.subTheme, contentStandard: g.subTheme,
-        performanceStandard: '',
-        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
-        objectives: ['Natutukoy ang tema.', 'Nakapagpapahayag ng ideya.'],
-      )).toList(),
+      grades: grades
+          .map(
+            (g) => GradeBlock(
+              gradeLabel: g.gradeLabel,
+              learnersMale: g.male,
+              learnersFemale: g.female,
+              subTheme: g.subTheme,
+              contentStandard: g.subTheme,
+              performanceStandard: '',
+              competencies: g.competency
+                  .split('; ')
+                  .where((s) => s.trim().isNotEmpty)
+                  .toList(),
+              objectives: ['Natutukoy ang tema.', 'Nakapagpapahayag ng ideya.'],
+            ),
+          )
+          .toList(),
       sharedSubTheme: request.sharedSubTheme,
       bothGradesObjective: 'Nauunawaan at nakapagpapahayag ng ideya.',
       learnerContext: 'Ang mga mag-aaral ay nakatire sa pagitan na kawaranan.',
-      materials: Materials(items: ['Mga larawan', 'Worksheets'], references: ['DepEd Curriculum Guide']),
+      materials: Materials(
+        items: ['Mga larawan', 'Worksheets'],
+        references: ['DepEd Curriculum Guide'],
+      ),
       flow: _buildDefaultFlow(totalMinutes, grades),
       assessments: _buildAssessments(grades),
       reflectionQuestions: _buildReflectionQuestions(grades, null),
@@ -469,7 +568,7 @@ class LlmLessonGenerator implements LessonGenerator {
     }
 
     yield SectionStarted(section.eventName);
-    
+
     switch (section) {
       case PlanSection.intentions:
         yield* _regenerateIntentions(request, current, gradeLabel);
@@ -499,7 +598,9 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan mergedPlan;
     try {
       mergedPlan = current.replaceSection(
-        PlanSection.intentions, sourcePlan, gradeLabel: gradeLabel,
+        PlanSection.intentions,
+        sourcePlan,
+        gradeLabel: gradeLabel,
       );
     } catch (e) {
       yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -507,16 +608,24 @@ class LlmLessonGenerator implements LessonGenerator {
       return;
     }
 
-    final issues = validator.validateSection(mergedPlan, PlanSection.intentions);
+    final issues = validator.validateSection(
+      mergedPlan,
+      PlanSection.intentions,
+    );
     if (issues.isNotEmpty) {
-      final retryPrompt = buildRetryPrompt(issues.map((i) => i.message).toList(), prompt);
+      final retryPrompt = buildRetryPrompt(
+        issues.map((i) => i.message).toList(),
+        prompt,
+      );
       final retryResponse = await _streamTokens(retryPrompt);
       final retryJson = extractJson(retryResponse);
       final retrySource = _buildPlanFromIntentions(retryJson, request);
 
       try {
         mergedPlan = current.replaceSection(
-          PlanSection.intentions, retrySource, gradeLabel: gradeLabel,
+          PlanSection.intentions,
+          retrySource,
+          gradeLabel: gradeLabel,
         );
       } catch (e) {
         yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -538,13 +647,15 @@ class LlmLessonGenerator implements LessonGenerator {
     final prompt = buildFlowPrompt(request);
     final response = await _streamTokens(prompt);
     final json = extractJson(response);
-    
+
     final sourcePlan = _buildCompletePlan(request, json);
 
     LessonPlan mergedPlan;
     try {
       mergedPlan = current.replaceSection(
-        PlanSection.learningExperiences, sourcePlan, gradeLabel: gradeLabel,
+        PlanSection.learningExperiences,
+        sourcePlan,
+        gradeLabel: gradeLabel,
       );
     } catch (e) {
       yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -557,9 +668,11 @@ class LlmLessonGenerator implements LessonGenerator {
     yield GenerationCompleted(mergedPlan);
   }
 
-  Stream<GenerationEvent> _generateAssessment(GenerationRequest request) async* {
+  Stream<GenerationEvent> _generateAssessment(
+    GenerationRequest request,
+  ) async* {
     yield SectionStarted('Assessment');
-    
+
     final prompt = buildAssessmentPrompt(request);
     final response = await _streamTokens(prompt);
     final json = extractJson(response);
@@ -569,7 +682,9 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan mergedPlan;
     try {
       mergedPlan = _lastPlan!.replaceSection(
-        PlanSection.assessment, sourcePlan, gradeLabel: null,
+        PlanSection.assessment,
+        sourcePlan,
+        gradeLabel: null,
       );
     } catch (e) {
       yield* _emitFailure('Failed to merge regenerated section: $e');
@@ -588,7 +703,9 @@ class LlmLessonGenerator implements LessonGenerator {
       final retrySource = _buildPlanFromAssessment(retryJson, request);
 
       mergedPlan = _lastPlan!.replaceSection(
-        PlanSection.assessment, retrySource, gradeLabel: null,
+        PlanSection.assessment,
+        retrySource,
+        gradeLabel: null,
       );
       _lastPlan = mergedPlan;
       issues = validator.validateSection(_lastPlan!, PlanSection.assessment);
@@ -602,9 +719,11 @@ class LlmLessonGenerator implements LessonGenerator {
     yield SectionCompleted('Assessment');
   }
 
-  Stream<GenerationEvent> _generateWaysForward(GenerationRequest request) async* {
+  Stream<GenerationEvent> _generateWaysForward(
+    GenerationRequest request,
+  ) async* {
     yield SectionStarted('Ways Forward');
-    
+
     final prompt = buildWaysForwardPrompt(request);
     final response = await _streamTokens(prompt);
     final json = extractJson(response);
@@ -614,7 +733,9 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan mergedPlan;
     try {
       mergedPlan = _lastPlan!.replaceSection(
-        PlanSection.waysForward, sourcePlan, gradeLabel: null,
+        PlanSection.waysForward,
+        sourcePlan,
+        gradeLabel: null,
       );
     } catch (e) {
       yield* _emitFailure('Failed to merge regenerated section: $e');
@@ -633,7 +754,9 @@ class LlmLessonGenerator implements LessonGenerator {
       final retrySource = _buildPlanFromWaysForward(retryJson, request);
 
       mergedPlan = _lastPlan!.replaceSection(
-        PlanSection.waysForward, retrySource, gradeLabel: null,
+        PlanSection.waysForward,
+        retrySource,
+        gradeLabel: null,
       );
       _lastPlan = mergedPlan;
       issues = validator.validateSection(_lastPlan!, PlanSection.waysForward);
@@ -658,7 +781,8 @@ class LlmLessonGenerator implements LessonGenerator {
       final retryJson = extractJson(retryResponse);
 
       mergedPlan = _lastPlan!.replaceSection(
-        PlanSection.waysForward, _buildPlanFromWaysForward(retryJson, request),
+        PlanSection.waysForward,
+        _buildPlanFromWaysForward(retryJson, request),
         gradeLabel: null,
       );
       _lastPlan = mergedPlan;
@@ -683,7 +807,9 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan mergedPlan;
     try {
       mergedPlan = current.replaceSection(
-        PlanSection.assessment, sourcePlan, gradeLabel: gradeLabel,
+        PlanSection.assessment,
+        sourcePlan,
+        gradeLabel: gradeLabel,
       );
     } catch (e) {
       yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -703,7 +829,9 @@ class LlmLessonGenerator implements LessonGenerator {
 
       try {
         mergedPlan = current.replaceSection(
-          PlanSection.assessment, retrySource, gradeLabel: gradeLabel,
+          PlanSection.assessment,
+          retrySource,
+          gradeLabel: gradeLabel,
         );
       } catch (e) {
         yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -740,7 +868,9 @@ class LlmLessonGenerator implements LessonGenerator {
     LessonPlan mergedPlan;
     try {
       mergedPlan = current.replaceSection(
-        PlanSection.waysForward, sourcePlan, gradeLabel: gradeLabel,
+        PlanSection.waysForward,
+        sourcePlan,
+        gradeLabel: gradeLabel,
       );
     } catch (e) {
       yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -760,7 +890,9 @@ class LlmLessonGenerator implements LessonGenerator {
 
       try {
         mergedPlan = current.replaceSection(
-          PlanSection.waysForward, retrySource, gradeLabel: gradeLabel,
+          PlanSection.waysForward,
+          retrySource,
+          gradeLabel: gradeLabel,
         );
       } catch (e) {
         yield GenerationFailed('Failed to merge regenerated section: $e');
@@ -791,7 +923,8 @@ class LlmLessonGenerator implements LessonGenerator {
 
       try {
         mergedPlan = current.replaceSection(
-          PlanSection.waysForward, _buildPlanFromWaysForward(retryJson, request),
+          PlanSection.waysForward,
+          _buildPlanFromWaysForward(retryJson, request),
           gradeLabel: gradeLabel,
         );
       } catch (e) {
@@ -817,28 +950,37 @@ class LlmLessonGenerator implements LessonGenerator {
 
     for (final a in assessmentsJson) {
       if (a is Map<String, dynamic>) {
-        assessments.add(GradeAssessment(
-          gradeLabel: a['gradeLabel'] as String? ?? '',
-          formative: a['formative'] as String? ?? '',
-          exitTask: a['exitTask'] as String? ?? '',
-          successCriteria: a['successCriteria'] as String? ?? '',
-          competencyIndex: a['competencyIndex'] as int?,
-        ));
+        assessments.add(
+          GradeAssessment(
+            gradeLabel: a['gradeLabel'] as String? ?? '',
+            formative: a['formative'] as String? ?? '',
+            exitTask: a['exitTask'] as String? ?? '',
+            successCriteria: a['successCriteria'] as String? ?? '',
+            competencyIndex: a['competencyIndex'] as int?,
+          ),
+        );
       }
     }
 
     return LessonPlan(
       header: request.header,
-      grades: request.grades.map((g) => GradeBlock(
-        gradeLabel: g.gradeLabel,
-        learnersMale: g.male,
-        learnersFemale: g.female,
-        subTheme: g.subTheme,
-        contentStandard: g.subTheme,
-        performanceStandard: '',
-        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
-        objectives: [],
-      )).toList(),
+      grades: request.grades
+          .map(
+            (g) => GradeBlock(
+              gradeLabel: g.gradeLabel,
+              learnersMale: g.male,
+              learnersFemale: g.female,
+              subTheme: g.subTheme,
+              contentStandard: g.subTheme,
+              performanceStandard: '',
+              competencies: g.competency
+                  .split('; ')
+                  .where((s) => s.trim().isNotEmpty)
+                  .toList(),
+              objectives: [],
+            ),
+          )
+          .toList(),
       sharedSubTheme: request.sharedSubTheme,
       bothGradesObjective: '',
       learnerContext: '',
@@ -867,11 +1009,13 @@ class LlmLessonGenerator implements LessonGenerator {
 
     for (final w in waysForwardJson) {
       if (w is Map<String, dynamic>) {
-        waysForward.add(GradeWaysForward(
-          gradeLabel: w['gradeLabel'] as String? ?? '',
-          remediation: w['remediation'] as String? ?? '',
-          enrichment: w['enrichment'] as String? ?? '',
-        ));
+        waysForward.add(
+          GradeWaysForward(
+            gradeLabel: w['gradeLabel'] as String? ?? '',
+            remediation: w['remediation'] as String? ?? '',
+            enrichment: w['enrichment'] as String? ?? '',
+          ),
+        );
       }
     }
 
@@ -882,10 +1026,12 @@ class LlmLessonGenerator implements LessonGenerator {
       if (q is Map<String, dynamic>) {
         final gradeLabel = q['gradeLabel'];
         if (gradeLabel is String || gradeLabel == null) {
-          reflectionQuestions.add(ReflectionQuestion(
-            gradeLabel: gradeLabel,
-            text: q['text'] as String? ?? '',
-          ));
+          reflectionQuestions.add(
+            ReflectionQuestion(
+              gradeLabel: gradeLabel,
+              text: q['text'] as String? ?? '',
+            ),
+          );
         }
       }
     }
@@ -894,16 +1040,23 @@ class LlmLessonGenerator implements LessonGenerator {
 
     return LessonPlan(
       header: request.header,
-      grades: request.grades.map((g) => GradeBlock(
-        gradeLabel: g.gradeLabel,
-        learnersMale: g.male,
-        learnersFemale: g.female,
-        subTheme: g.subTheme,
-        contentStandard: g.subTheme,
-        performanceStandard: '',
-        competencies: g.competency.split('; ').where((s) => s.trim().isNotEmpty).toList(),
-        objectives: [],
-      )).toList(),
+      grades: request.grades
+          .map(
+            (g) => GradeBlock(
+              gradeLabel: g.gradeLabel,
+              learnersMale: g.male,
+              learnersFemale: g.female,
+              subTheme: g.subTheme,
+              contentStandard: g.subTheme,
+              performanceStandard: '',
+              competencies: g.competency
+                  .split('; ')
+                  .where((s) => s.trim().isNotEmpty)
+                  .toList(),
+              objectives: [],
+            ),
+          )
+          .toList(),
       sharedSubTheme: request.sharedSubTheme,
       bothGradesObjective: '',
       learnerContext: '',

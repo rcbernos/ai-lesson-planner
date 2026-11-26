@@ -60,7 +60,9 @@ Future<_EvalResult> _runRequest(_EvalRequest req, String? endpoint) async {
     useFullKey: true,
     tokenSequences: _buildTokenSequences(req.request!),
   );
-  await engine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
+  await engine.load(
+    ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+  );
   generator = LlmLessonGenerator(engine: engine, seed: 42);
   try {
     final request = _buildGenerationRequest(req.request!);
@@ -261,7 +263,8 @@ String _goodIntentionsJson() => json.encode({
       ],
     },
   ],
-  'bothGradesObjective': 'Nauunawaan ang mga salita at nakapagpapahayag ng ideya',
+  'bothGradesObjective':
+      'Nauunawaan ang mga salita at nakapagpapahayag ng ideya',
 });
 
 String _goodLearnerContextJson() =>
@@ -290,7 +293,8 @@ String _goodFlowJson(GenerationRequest request) {
   var adjustedW = w;
 
   // If sum is less than total, add to wrap-up
-  final currentTotal = adjustedM + adjustedD + adjustedP + adjustedA + adjustedW;
+  final currentTotal =
+      adjustedM + adjustedD + adjustedP + adjustedA + adjustedW;
   final diff = totalMinutes - currentTotal;
   if (diff > 0) {
     adjustedW += diff;
@@ -316,7 +320,10 @@ String _goodFlowJson(GenerationRequest request) {
   final compIdxByGrade = <String, int>{};
   for (var i = 0; i < grades.length; i++) {
     final grade = grades[i];
-    final competencies = grade.competency.split('; ').where((s) => s.trim().isNotEmpty).toList();
+    final competencies = grade.competency
+        .split('; ')
+        .where((s) => s.trim().isNotEmpty)
+        .toList();
     if (competencies.isNotEmpty) {
       compIdxByGrade[grade.gradeLabel] = 0;
     }
@@ -348,7 +355,9 @@ String _goodFlowJson(GenerationRequest request) {
         'wholeClass': false,
         'wholeClassActivity': '',
         'activityByGrade': Map.fromEntries(
-          grades.map((g) => MapEntry(g.gradeLabel, 'Gawain para sa bawat klase.')),
+          grades.map(
+            (g) => MapEntry(g.gradeLabel, 'Gawain para sa bawat klase.'),
+          ),
         ),
         'competencyIndexByGrade': compIdxByGrade,
       },

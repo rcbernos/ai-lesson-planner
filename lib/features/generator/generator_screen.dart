@@ -10,6 +10,7 @@ import 'generation_controller.dart';
 import 'package:ai_lesson_planner/core/generation/lesson_generator.dart';
 import 'package:ai_lesson_planner/core/providers.dart';
 import 'package:ai_lesson_planner/features/plan_view/plan_workspace.dart';
+import 'package:ai_lesson_planner/features/debug/llm_debug_screen.dart';
 
 /// Width threshold for switching between desktop and phone layouts.
 const double _phoneBreakpoint = 600.0;
@@ -102,13 +103,27 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
 
     _syncControllers(formState);
 
+    // Check if model is unavailable while not generating
+    if (!genState.isGenerating && genState.errorMessage == null) {
+      final llmStateAsync = ref.watch(llmStateProvider);
+      final llmState = llmStateAsync.maybeWhen(
+        data: (state) => state,
+        orElse: () => LlmState.available,
+      );
+      if (llmState == LlmState.unavailable) {
+        return _buildModelUnavailableView(context);
+      }
+    }
+
     if (generatedPlan != null) {
       return const PlanWorkspace();
     }
-    if (genState.isGenerating)
+    if (genState.isGenerating) {
       return _buildProgressView(context, genState, genController);
-    if (genState.errorMessage != null)
+    }
+    if (genState.errorMessage != null) {
       return _buildErrorView(context, genState.errorMessage!, formNotifier);
+    }
 
     return _buildFormView(context, formState, formNotifier);
   }
@@ -495,6 +510,43 @@ class _GeneratorScreenState extends ConsumerState<GeneratorScreen> {
                 onPressed: () => notifier.reset(),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Try Again'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Shows when no GGUF model is available.
+  Widget _buildModelUnavailableView(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Generator')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                size: 64,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              const Text('No GGUF model found', style: TextStyle(fontSize: 18)),
+              const SizedBox(height: 8),
+              const Text(
+                'Import a model via Settings → LLM Debug',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (c) => const LlmDebugScreen()),
+                ),
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Import Model File'),
               ),
             ],
           ),

@@ -34,9 +34,8 @@ class DownloadProgress {
   final String? error;
 
   /// Percentage of completion (0.0 to 1.0).
-  double get percentage => totalBytes == null
-      ? 0.0
-      : (bytesReceived / totalBytes!).clamp(0.0, 1.0);
+  double get percentage =>
+      totalBytes == null ? 0.0 : (bytesReceived / totalBytes!).clamp(0.0, 1.0);
 
   DownloadProgress copyWith({
     int? bytesReceived,
@@ -231,7 +230,9 @@ class ModelDownloader {
           await manifest.save();
           return DownloadResult.success(bytesReceived: bytesReceived);
         } catch (e) {
-          return DownloadResult.error('Download complete but manifest update failed: $e');
+          return DownloadResult.error(
+            'Download complete but manifest update failed: $e',
+          );
         }
       }
     }
@@ -244,12 +245,10 @@ class ModelDownloader {
 /// Result of a download operation.
 class DownloadResult {
   DownloadResult.success({required this.bytesReceived})
-      : error = null,
-        isSuccess = true;
+    : error = null,
+      isSuccess = true;
 
-  DownloadResult.error(this.error)
-      : bytesReceived = 0,
-        isSuccess = false;
+  DownloadResult.error(this.error) : bytesReceived = 0, isSuccess = false;
 
   final int bytesReceived;
   final String? error;

@@ -27,8 +27,11 @@ class DownloadProgressDialog extends StatefulWidget {
 
 class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
   StreamSubscription<DownloadProgress>? _subscription;
-  DownloadProgress _currentProgress =
-      DownloadProgress(bytesReceived: 0, totalBytes: 0, isComplete: false);
+  DownloadProgress _currentProgress = DownloadProgress(
+    bytesReceived: 0,
+    totalBytes: 0,
+    isComplete: false,
+  );
 
   @override
   void initState() {
@@ -93,7 +96,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             hasError
                 ? 'Error: ${_currentProgress.error}'
                 : '${_formatBytes(_currentProgress.bytesReceived)} / '
-                    '${_currentProgress.totalBytes != null ? _formatBytes(_currentProgress.totalBytes!) : '?'}',
+                      '${_currentProgress.totalBytes != null ? _formatBytes(_currentProgress.totalBytes!) : '?'}',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 8),
@@ -101,18 +104,15 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             (_currentProgress.percentage * 100) < 1
                 ? 'Preparing download...'
                 : hasError
-                    ? 'Download failed'
-                    : 'Downloading model file... This may take several minutes.',
+                ? 'Download failed'
+                : 'Downloading model file... This may take several minutes.',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
       ),
       actions: [
         if (!hasError)
-          TextButton(
-            onPressed: widget.onCancel,
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: widget.onCancel, child: const Text('Cancel')),
         if (hasError)
           TextButton(
             onPressed: () {

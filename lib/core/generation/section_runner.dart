@@ -13,8 +13,8 @@ String buildSystemBlock({
   final labels = gradeLabels.join(', ');
   final lang = language == OutputLanguage.filipino ? 'Filipino' : 'English';
   return 'You write content for a DepEd ILAW Daily Lesson Plan. Output ONLY valid JSON matching the schema. Write in '
-        '$lang. Never invent competency codes, standards, learner names, or URLs. Use the grade labels: $labels. '
-        'Model: $multigradeModel';
+      '$lang. Never invent competency codes, standards, learner names, or URLs. Use the grade labels: $labels. '
+      'Model: $multigradeModel';
 }
 
 /// Builds the Intentions section prompt.
@@ -99,7 +99,7 @@ Map<String, dynamic>? extractJson(String text) {
 }
 
 /// Builds the Assessment section prompt.
-/// 
+///
 /// JSON schema:
 /// {
 ///   "assessments": [
@@ -123,7 +123,10 @@ String buildAssessmentPrompt(GenerationRequest request) {
   // Build competency count map for validation
   final competencyCounts = <String, int>{};
   for (final g in request.grades) {
-    final count = g.competency.split('; ').where((s) => s.trim().isNotEmpty).length;
+    final count = g.competency
+        .split('; ')
+        .where((s) => s.trim().isNotEmpty)
+        .length;
     competencyCounts[g.gradeLabel] = count;
   }
 
@@ -140,7 +143,7 @@ String buildAssessmentPrompt(GenerationRequest request) {
 }
 
 /// Builds the Ways Forward section prompt.
-/// 
+///
 /// JSON schema:
 /// {
 ///   "waysForward": [

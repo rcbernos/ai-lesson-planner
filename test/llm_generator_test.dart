@@ -42,39 +42,53 @@ void main() {
           delayMs: 50, // Controlled delay for testing
         );
       }
-      final cancelEngine = FakeEngine(tokenSequences: delayedSequences, useFullKey: true);
-      await cancelEngine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
-      final cancelGenerator = LlmLessonGenerator(engine: cancelEngine, seed: 42);
+      final cancelEngine = FakeEngine(
+        tokenSequences: delayedSequences,
+        useFullKey: true,
+      );
+      await cancelEngine.load(
+        ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+      );
+      final cancelGenerator = LlmLessonGenerator(
+        engine: cancelEngine,
+        seed: 42,
+      );
 
       final events = <GenerationEvent>[];
       final completer = Completer<void>();
 
-      final sub = cancelGenerator.generate(_validRequest()).listen(
-        (event) {
-          events.add(event);
-          // Cancel after first event is received
-          if (!completer.isCompleted && events.isNotEmpty) {
-            cancelGenerator.cancel();
-          }
-        },
-        onError: (e) {
-          if (!completer.isCompleted) {
-            completer.complete();
-          }
-        },
-        onDone: () {
-          if (!completer.isCompleted) {
-            completer.complete();
-          }
-        },
-      );
+      final sub = cancelGenerator
+          .generate(_validRequest())
+          .listen(
+            (event) {
+              events.add(event);
+              // Cancel after first event is received
+              if (!completer.isCompleted && events.isNotEmpty) {
+                cancelGenerator.cancel();
+              }
+            },
+            onError: (e) {
+              if (!completer.isCompleted) {
+                completer.complete();
+              }
+            },
+            onDone: () {
+              if (!completer.isCompleted) {
+                completer.complete();
+              }
+            },
+          );
 
       await completer.future.timeout(const Duration(seconds: 5));
 
       // Verify that generation was cancelled (either GenerationFailed or partial events)
       final hasFailure = events.any((e) => e is GenerationFailed);
       final hasSomeEvents = events.isNotEmpty;
-      expect(hasFailure || hasSomeEvents, isTrue, reason: 'Generation should have been cancelled');
+      expect(
+        hasFailure || hasSomeEvents,
+        isTrue,
+        reason: 'Generation should have been cancelled',
+      );
 
       await sub.cancel();
       await cancelEngine.dispose();
@@ -117,7 +131,11 @@ void main() {
       );
 
       var completed = false;
-      await for (final event in generator.generateSection(request, PlanSection.header, emptyPlan)) {
+      await for (final event in generator.generateSection(
+        request,
+        PlanSection.header,
+        emptyPlan,
+      )) {
         if (event is GenerationCompleted) {
           completed = true;
         }
@@ -126,33 +144,50 @@ void main() {
       expect(completed, isTrue);
     });
 
-    test('full plan from scripted responses passes PlanValidator with zero errors', () async {
-      final request = _validRequest();
-      final sequences = _buildValidSequenceForRequest(request);
+    test(
+      'full plan from scripted responses passes PlanValidator with zero errors',
+      () async {
+        final request = _validRequest();
+        final sequences = _buildValidSequenceForRequest(request);
 
-      // Create fresh engine with sequences
-      final freshEngine = FakeEngine(tokenSequences: sequences, useFullKey: true);
-      await freshEngine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
+        // Create fresh engine with sequences
+        final freshEngine = FakeEngine(
+          tokenSequences: sequences,
+          useFullKey: true,
+        );
+        await freshEngine.load(
+          ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+        );
 
-      final freshGenerator = LlmLessonGenerator(engine: freshEngine, seed: 42);
+        final freshGenerator = LlmLessonGenerator(
+          engine: freshEngine,
+          seed: 42,
+        );
 
-      final stream = freshGenerator.generate(request);
-      final events = <GenerationEvent>[];
+        final stream = freshGenerator.generate(request);
+        final events = <GenerationEvent>[];
 
-      await for (final event in stream) {
-        events.add(event);
-      }
+        await for (final event in stream) {
+          events.add(event);
+        }
 
-      final completed = events.whereType<GenerationCompleted>().first;
-      final plan = completed.plan;
+        final completed = events.whereType<GenerationCompleted>().first;
+        final plan = completed.plan;
 
-      final issues = validator.validate(plan);
-      final errors = issues.where((i) => i.severity == IssueSeverity.error).toList();
-      expect(errors, isEmpty,
-          reason: 'Validation errors: ${errors.map((e) => e.message).join(', ')}');
+        final issues = validator.validate(plan);
+        final errors = issues
+            .where((i) => i.severity == IssueSeverity.error)
+            .toList();
+        expect(
+          errors,
+          isEmpty,
+          reason:
+              'Validation errors: ${errors.map((e) => e.message).join(', ')}',
+        );
 
-      await freshEngine.dispose();
-    });
+        await freshEngine.dispose();
+      },
+    );
 
     test('per-grade regeneration changes only that grade', () async {
       final request = _validRequest();
@@ -160,7 +195,9 @@ void main() {
 
       // Create fresh engine with sequences for full plan
       var freshEngine = FakeEngine(tokenSequences: sequences, useFullKey: true);
-      await freshEngine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
+      await freshEngine.load(
+        ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+      );
 
       var freshGenerator = LlmLessonGenerator(engine: freshEngine, seed: 42);
 
@@ -179,12 +216,19 @@ void main() {
       // Set up modified assessment response for regeneration
       final assessmentPrompt = buildAssessmentPrompt(request);
       final modifiedSequences = {
-        'system:$assessmentPrompt;': FakeTokenSequence(tokens: [_modifiedAssessmentJson('Grade 3')]),
+        'system:$assessmentPrompt;': FakeTokenSequence(
+          tokens: [_modifiedAssessmentJson('Grade 3')],
+        ),
       };
 
       // Create fresh engine for regeneration
-      freshEngine = FakeEngine(tokenSequences: modifiedSequences, useFullKey: true);
-      await freshEngine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
+      freshEngine = FakeEngine(
+        tokenSequences: modifiedSequences,
+        useFullKey: true,
+      );
+      await freshEngine.load(
+        ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+      );
       freshGenerator = LlmLessonGenerator(engine: freshEngine, seed: 42);
 
       events = <GenerationEvent>[];
@@ -199,15 +243,25 @@ void main() {
 
       await freshEngine.dispose();
 
-      final regeneratedPlan = events.whereType<GenerationCompleted>().first.plan;
-      expect(regeneratedPlan.assessments.length, equals(initialAssessmentCount));
+      final regeneratedPlan = events
+          .whereType<GenerationCompleted>()
+          .first
+          .plan;
+      expect(
+        regeneratedPlan.assessments.length,
+        equals(initialAssessmentCount),
+      );
 
       // Verify only Grade 3 was modified
-      final modifiedGrade = regeneratedPlan.assessments.firstWhere((a) => a.gradeLabel == 'Grade 3');
+      final modifiedGrade = regeneratedPlan.assessments.firstWhere(
+        (a) => a.gradeLabel == 'Grade 3',
+      );
       expect(modifiedGrade.formative, contains('Modified'));
 
       // Verify Grade 4 is unchanged
-      final unchangedGrade = regeneratedPlan.assessments.firstWhere((a) => a.gradeLabel == 'Grade 4');
+      final unchangedGrade = regeneratedPlan.assessments.firstWhere(
+        (a) => a.gradeLabel == 'Grade 4',
+      );
       expect(unchangedGrade.formative, isNotEmpty);
     });
 
@@ -217,8 +271,13 @@ void main() {
       final request = _validRequest();
       final sequences = _buildValidSequenceForRequest(request);
 
-      final freshEngine = FakeEngine(tokenSequences: sequences, useFullKey: true);
-      await freshEngine.load(ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4));
+      final freshEngine = FakeEngine(
+        tokenSequences: sequences,
+        useFullKey: true,
+      );
+      await freshEngine.load(
+        ModelSpec(path: '/fake/model.gguf', contextSize: 2048, threads: 4),
+      );
 
       final freshGenerator = LlmLessonGenerator(engine: freshEngine, seed: 42);
 
@@ -233,13 +292,23 @@ void main() {
 
       // Should have retried and completed successfully
       final completed = events.whereType<GenerationCompleted>().firstOrNull;
-      expect(completed, isNotNull, reason: 'Should have completed after validation retry');
+      expect(
+        completed,
+        isNotNull,
+        reason: 'Should have completed after validation retry',
+      );
 
       // Verify the plan is valid
       final plan = completed!.plan;
       final issues = validator.validate(plan);
-      final errors = issues.where((i) => i.severity == IssueSeverity.error).toList();
-      expect(errors, isEmpty, reason: 'Plan should have zero validation errors after retry');
+      final errors = issues
+          .where((i) => i.severity == IssueSeverity.error)
+          .toList();
+      expect(
+        errors,
+        isEmpty,
+        reason: 'Plan should have zero validation errors after retry',
+      );
     });
   });
 }
@@ -266,7 +335,8 @@ GenerationRequest _validRequest() {
         male: 3,
         female: 3,
         subTheme: 'Pag-iisa-isa at paglalarawan',
-        competency: 'Natutukoy ang mga salitang naglalarawan; Nakapagpapahayag ng ideya gamit paglalarawan',
+        competency:
+            'Natutukoy ang mga salitang naglalarawan; Nakapagpapahayag ng ideya gamit paglalarawan',
       ),
       GradeInput(
         gradeLabel: 'Grade 4',
@@ -282,26 +352,40 @@ GenerationRequest _validRequest() {
 }
 
 /// Builds token sequences for a complete valid plan generation
-Map<String, FakeTokenSequence> _buildValidSequenceForRequest(GenerationRequest request) {
+Map<String, FakeTokenSequence> _buildValidSequenceForRequest(
+  GenerationRequest request,
+) {
   final sequences = <String, FakeTokenSequence>{};
 
   final intentionsPrompt = buildIntentionsPrompt(request);
-  sequences['system:$intentionsPrompt;'] = FakeTokenSequence(tokens: [_goodIntentionsJson()]);
+  sequences['system:$intentionsPrompt;'] = FakeTokenSequence(
+    tokens: [_goodIntentionsJson()],
+  );
 
   final learnerContextPrompt = buildLearnerContextPrompt(request);
-  sequences['system:$learnerContextPrompt;'] = FakeTokenSequence(tokens: [_goodLearnerContextJson()]);
+  sequences['system:$learnerContextPrompt;'] = FakeTokenSequence(
+    tokens: [_goodLearnerContextJson()],
+  );
 
   final materialsPrompt = buildMaterialsPrompt(request);
-  sequences['system:$materialsPrompt;'] = FakeTokenSequence(tokens: [_goodMaterialsJson()]);
+  sequences['system:$materialsPrompt;'] = FakeTokenSequence(
+    tokens: [_goodMaterialsJson()],
+  );
 
   final flowPrompt = buildFlowPrompt(request);
-  sequences['system:$flowPrompt;'] = FakeTokenSequence(tokens: [_goodFlowJson()]);
+  sequences['system:$flowPrompt;'] = FakeTokenSequence(
+    tokens: [_goodFlowJson()],
+  );
 
   final assessmentPrompt = buildAssessmentPrompt(request);
-  sequences['system:$assessmentPrompt;'] = FakeTokenSequence(tokens: [_goodAssessmentJson()]);
+  sequences['system:$assessmentPrompt;'] = FakeTokenSequence(
+    tokens: [_goodAssessmentJson()],
+  );
 
   final waysForwardPrompt = buildWaysForwardPrompt(request);
-  sequences['system:$waysForwardPrompt;'] = FakeTokenSequence(tokens: [_goodWaysForwardJson()]);
+  sequences['system:$waysForwardPrompt;'] = FakeTokenSequence(
+    tokens: [_goodWaysForwardJson()],
+  );
 
   return sequences;
 }

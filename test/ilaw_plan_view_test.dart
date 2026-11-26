@@ -1,6 +1,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'fixtures/sample_plan.dart';
 import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
@@ -10,8 +11,10 @@ void main() {
     testWidgets('renders without overflow errors', (WidgetTester tester) async {
       final plan = createSamplePlan();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: IlawPlanView(plan: plan)),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(body: IlawPlanView(plan: plan)),
+          ),
         ),
       );
       expect(find.byType(IlawPlanView), findsOneWidget);
@@ -21,8 +24,10 @@ void main() {
     ) async {
       final plan = createSamplePlan();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: IlawPlanView(plan: plan)),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(body: IlawPlanView(plan: plan)),
+          ),
         ),
       );
       // New label format: uppercase, two spaces between letter and word
@@ -39,8 +44,10 @@ void main() {
     ) async {
       final plan = createSamplePlan();
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: IlawPlanView(plan: plan)),
+        ProviderScope(
+          child: MaterialApp(
+            home: Scaffold(body: IlawPlanView(plan: plan)),
+          ),
         ),
       );
 

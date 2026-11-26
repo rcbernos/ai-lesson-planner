@@ -229,17 +229,18 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content:
-                Text('File too small. Model file must be at least 100 MB.'),
+            content: Text(
+              'File too small. Model file must be at least 100 MB.',
+            ),
           ),
         );
         return;
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to read file: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to read file: $e')));
       return;
     }
 
@@ -285,9 +286,9 @@ class _LlmDebugScreenState extends State<LlmDebugScreen> {
       if (!mounted) return;
       Navigator.of(context).pop(); // Dismiss loading dialog
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Import failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Import failed: $e')));
     }
   }
 

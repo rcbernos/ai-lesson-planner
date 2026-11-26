@@ -32,7 +32,9 @@ void main() {
         // SHA-256 of empty string
         expect(
           hash,
-          equals('e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'),
+          equals(
+            'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+          ),
         );
 
         downloader.dispose();
@@ -46,7 +48,9 @@ void main() {
 
         expect(
           hash,
-          equals('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824'),
+          equals(
+            '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824',
+          ),
         );
 
         downloader.dispose();
@@ -79,7 +83,10 @@ void main() {
 
       test('returns 1.0 when complete', () {
         final progress = DownloadProgress(
-            bytesReceived: 1000, totalBytes: 1000, isComplete: true);
+          bytesReceived: 1000,
+          totalBytes: 1000,
+          isComplete: true,
+        );
         expect(progress.percentage, equals(1.0));
       });
     });

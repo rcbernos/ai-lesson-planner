@@ -38,10 +38,8 @@ class ModelManifest {
   final String? url;
 
   /// Default manifest for initial deployment.
-  static ModelManifest get defaultManifest => ModelManifest(
-        version: '1',
-        model: 'Gemma-SEA-LION-v4-4B-VL-Q4_K_M.gguf',
-      );
+  static ModelManifest get defaultManifest =>
+      ModelManifest(version: '1', model: 'Gemma-SEA-LION-v4-4B-VL-Q4_K_M.gguf');
 
   /// Current schema version for compatibility tracking.
   static const int currentSchemaVersion = 1;
@@ -62,7 +60,9 @@ class ModelManifest {
       if (!await file.exists()) return null;
 
       final content = await file.readAsString();
-      return ModelManifest.fromJson(jsonDecode(content) as Map<String, dynamic>);
+      return ModelManifest.fromJson(
+        jsonDecode(content) as Map<String, dynamic>,
+      );
     } catch (e) {
       return null;
     }
@@ -114,23 +114,23 @@ class ModelManifest {
 
   /// Serializes to JSON map.
   Map<String, dynamic> toJson() => {
-        'version': version,
-        'model': model,
-        if (fileName != null) 'fileName': fileName,
-        if (size != null) 'size': size,
-        if (checksum != null) 'checksum': checksum,
-        if (url != null) 'url': url,
-      };
+    'version': version,
+    'model': model,
+    if (fileName != null) 'fileName': fileName,
+    if (size != null) 'size': size,
+    if (checksum != null) 'checksum': checksum,
+    if (url != null) 'url': url,
+  };
 
   /// Creates instance from JSON map.
   factory ModelManifest.fromJson(Map<String, dynamic> json) => ModelManifest(
-        version: json['version'] as String? ?? '1',
-        model: json['model'] as String? ?? '',
-        fileName: json['fileName'] as String?,
-        size: json['size'] as int?,
-        checksum: json['checksum'] as String?,
-        url: json['url'] as String?,
-      );
+    version: json['version'] as String? ?? '1',
+    model: json['model'] as String? ?? '',
+    fileName: json['fileName'] as String?,
+    size: json['size'] as int?,
+    checksum: json['checksum'] as String?,
+    url: json['url'] as String?,
+  );
 
   @override
   bool operator ==(Object other) {
@@ -145,7 +145,8 @@ class ModelManifest {
   }
 
   @override
-  int get hashCode => Object.hash(version, model, fileName, size, checksum, url);
+  int get hashCode =>
+      Object.hash(version, model, fileName, size, checksum, url);
 }
 
 /// Helper to get external files directory (Android).

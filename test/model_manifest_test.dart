@@ -8,10 +8,7 @@ void main() {
       test('defaultManifest has correct values', () {
         final manifest = ModelManifest.defaultManifest;
         expect(manifest.version, equals('1'));
-        expect(
-          manifest.model,
-          equals('Gemma-SEA-LION-v4-4B-VL-Q4_K_M.gguf'),
-        );
+        expect(manifest.model, equals('Gemma-SEA-LION-v4-4B-VL-Q4_K_M.gguf'));
       });
     });
 
@@ -37,10 +34,7 @@ void main() {
       });
 
       test('toJson omits null values', () {
-        final manifest = ModelManifest(
-          version: '1',
-          model: 'test-model.gguf',
-        );
+        final manifest = ModelManifest(version: '1', model: 'test-model.gguf');
 
         final json = manifest.toJson();
 
@@ -125,10 +119,7 @@ void main() {
       });
 
       test('returns model when fileName is not set', () {
-        final manifest = ModelManifest(
-          version: '1',
-          model: 'test-model.gguf',
-        );
+        final manifest = ModelManifest(version: '1', model: 'test-model.gguf');
 
         expect(manifest.defaultFileName, equals('test-model.gguf'));
       });

@@ -44,40 +44,88 @@ class GenerationController extends StateNotifier<GenerationState> {
 
   final Ref _ref;
   StreamSubscription<GenerationEvent>? _subscription;
+  LessonGenerator? _generator;
 
   /// Starts generation with the given request.
   void startGeneration(GenerationRequest request) {
+    _startGenerationInternal(request, _handleFullGenerationEvent);
+  }
+
+  /// Regenerates a specific section of the current plan.
+  /// Applies changes directly to the editor with undo capability.
+  void regenerateSection(PlanSection section, {String? gradeLabel}) {
+    // Cancel any existing subscription
+    _cancelSubscription();
+
+    // Get current plan from editor
+    final editorState = _ref.read(planEditorProvider);
+    if (editorState == null) {
+      state = const GenerationState(errorMessage: 'No plan loaded');
+      return;
+    }
+
+    final plan = editorState.plan;
+    final language = _ref.read(currentLanguageProvider);
+
+    // Build request from the current plan
+    final request = GenerationRequest.fromPlan(plan, language);
+
+    _startGenerationInternal(
+      request,
+      (event) => _handleRegenerationEvent(event, plan, section, gradeLabel),
+    );
+  }
+
+  /// Internal method to start generation with a handler.
+  void _startGenerationInternal(
+    GenerationRequest request,
+    void Function(GenerationEvent) eventHandler,
+  ) {
     // Cancel any existing subscription
     _cancelSubscription();
 
     // Reset state
     state = const GenerationState(isGenerating: true);
+
+    // Clear previous result
     _ref.read(generatedPlanProvider.notifier).state = null;
 
-    // Create a new generator instance for each generation
-    final generator = _ref.read(lessonGeneratorProvider);
+    // Get the generator (async)
+    final asyncGenerator = _ref.read(lessonGeneratorProvider.future);
 
-    // Start listening to the stream
-    _subscription = generator
-        .generate(request)
-        .listen(
-          _handleFullGenerationEvent,
-          onError: (error, stackTrace) {
-            state = state.copyWith(
-              isGenerating: false,
-              errorMessage: 'Generation failed: $error',
-            );
-          },
-          onDone: () {
-            if (state.isGenerating && state.errorMessage == null) {
-              // Stream completed without yielding a plan - unexpected
-              state = state.copyWith(
-                isGenerating: false,
-                errorMessage: 'Generation did not complete.',
+    // Listen for generator completion
+    asyncGenerator
+        .then((generator) {
+          _generator = generator;
+
+          // Start listening to the stream
+          _subscription = generator
+              .generate(request)
+              .listen(
+                eventHandler,
+                onError: (error, stackTrace) {
+                  state = state.copyWith(
+                    isGenerating: false,
+                    errorMessage: 'Generation failed: $error',
+                  );
+                },
+                onDone: () {
+                  if (state.isGenerating && state.errorMessage == null) {
+                    // Stream completed without yielding a plan - unexpected
+                    state = state.copyWith(
+                      isGenerating: false,
+                      errorMessage: 'Generation did not complete.',
+                    );
+                  }
+                },
               );
-            }
-          },
-        );
+        })
+        .catchError((e) {
+          state = state.copyWith(
+            isGenerating: false,
+            errorMessage: 'Failed to initialize generator: $e',
+          );
+        });
   }
 
   /// Handles events for full generation (sets generatedPlanProvider).
@@ -94,55 +142,13 @@ class GenerationController extends StateNotifier<GenerationState> {
     }
   }
 
-  /// Regenerates a specific section of the current plan.
-  /// Applies changes directly to the editor with undo capability.
-  void regenerateSection(PlanSection section, {String? gradeLabel}) {
-    // Cancel any existing subscription
-    _cancelSubscription();
-
-    // Reset state
-    state = const GenerationState(isGenerating: true);
-
-    // Get current plan from editor
-    final editorState = _ref.read(planEditorProvider);
-    if (editorState == null) {
-      state = const GenerationState(errorMessage: 'No plan loaded');
-      return;
-    }
-
-    final plan = editorState.plan;
-    final language = _ref.read(currentLanguageProvider);
-
-    // Build request from the current plan
-    final request = GenerationRequest.fromPlan(plan, language);
-
-    // Get generator and start regeneration
-    final generator = _ref.read(lessonGeneratorProvider);
-
-    // Start listening to the stream
-    _subscription = generator
-        .generateSection(request, section, plan, gradeLabel: gradeLabel)
-        .listen(
-          _handleRegenerationEvent,
-          onError: (error, stackTrace) {
-            state = state.copyWith(
-              isGenerating: false,
-              errorMessage: 'Generation failed: $error',
-            );
-          },
-          onDone: () {
-            if (state.isGenerating && state.errorMessage == null) {
-              state = state.copyWith(
-                isGenerating: false,
-                errorMessage: 'Generation did not complete.',
-              );
-            }
-          },
-        );
-  }
-
   /// Handles events for section regeneration (applies to editor).
-  void _handleRegenerationEvent(GenerationEvent event) {
+  void _handleRegenerationEvent(
+    GenerationEvent event,
+    LessonPlan plan,
+    PlanSection section,
+    String? gradeLabel,
+  ) {
     if (event is SectionStarted) {
       state = state.copyWith(currentSection: event.name);
     } else if (event is SectionCompleted) {
@@ -158,8 +164,10 @@ class GenerationController extends StateNotifier<GenerationState> {
 
   /// Cancels any ongoing generation.
   void cancel() {
-    final generator = _ref.read(lessonGeneratorProvider);
-    generator.cancel();
+    final generator = _generator;
+    if (generator != null) {
+      generator.cancel();
+    }
     _cancelSubscription();
     state = const GenerationState();
   }

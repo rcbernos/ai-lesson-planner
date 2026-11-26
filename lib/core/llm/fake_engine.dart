@@ -17,7 +17,11 @@ class FakeTokenSequence {
 /// Fake engine that replays scripted token sequences.
 /// Supports cancellable streaming and failure injection for testing.
 class FakeEngine implements LlmEngine {
-  FakeEngine({this.tokenSequences = const {}, this.failOnLoad = false, this.useFullKey = false});
+  FakeEngine({
+    this.tokenSequences = const {},
+    this.failOnLoad = false,
+    this.useFullKey = false,
+  });
 
   /// Token sequences keyed by a hash of the messages.
   final Map<String, FakeTokenSequence> tokenSequences;
