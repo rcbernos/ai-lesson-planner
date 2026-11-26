@@ -5,15 +5,15 @@ library;
 import 'dart:async';
 import 'dart:math';
 import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
-import 'package:ai_lesson_planner/core/models/plan_section_patch.dart';
+import 'package:ai_lesson_planner/core/validation/plan_validator.dart';
+import 'package:ai_lesson_planner/core/validation/validation_issue.dart';
 import 'lesson_generator.dart';
 
-/// Mock implementation that simulates streaming generation with delays.
 class MockLessonGenerator implements LessonGenerator {
   final Random _random = Random();
   bool _isCancelled = false;
   int _variantCounter = 0;
-
+  final PlanValidator _validator = PlanValidator();
   @override
   Stream<GenerationEvent> generate(GenerationRequest request) async* {
     // Check if already cancelled
@@ -47,10 +47,24 @@ class MockLessonGenerator implements LessonGenerator {
     if (_isCancelled) return;
     yield SectionCompleted('Ways Forward');
 
-    // Final: complete plan (only if not cancelled)
+    // Final: build plan and validate
     if (!_isCancelled) {
+      final plan = _buildPlan(request);
+
+      // Run validation on the complete plan
+      final issues = _validator.validate(plan);
+      final errorIssues = issues
+          .where((i) => i.severity == IssueSeverity.error)
+          .toList();
+
+      if (errorIssues.isNotEmpty) {
+        yield GenerationFailed(errorIssues.map((i) => i.message).join('; '));
+        _isCancelled = false; // Reset for reuse
+        return;
+      }
+
       _isCancelled = false; // Reset for reuse
-      yield GenerationCompleted(_buildPlan(request));
+      yield GenerationCompleted(plan);
     }
   }
 

@@ -33,6 +33,13 @@ void main() {
             subTheme: 'Test',
             competency: 'Test',
           ),
+          GradeInput(
+            gradeLabel: 'Grade 4',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Test',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -117,12 +124,19 @@ void main() {
           date: '2026-01-15',
           term: 'Term 1',
           sessions: 1,
-          sessionMinutes: 120,
+          sessionMinutes: 90,
           multigradeModel: 'STDT',
         ),
         grades: [
           GradeInput(
             gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Test',
+          ),
+          GradeInput(
+            gradeLabel: 'Grade 4',
             male: 3,
             female: 3,
             subTheme: 'Test',
@@ -134,7 +148,7 @@ void main() {
       );
 
       final plan = await _getCompletedPlan(generator.generate(request));
-      expect(plan.totalFlowMinutes, equals(120));
+      expect(plan.totalFlowMinutes, equals(90));
     });
 
     test('cancel() stops the stream', () async {
@@ -303,6 +317,13 @@ void main() {
             subTheme: 'Test',
             competency: 'Comp 3',
           ),
+          GradeInput(
+            gradeLabel: 'Grade 4',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 4',
+          ),
         ],
         sharedSubTheme: 'Theme',
         language: OutputLanguage.filipino,
@@ -361,6 +382,13 @@ void main() {
         grades: [
           GradeInput(
             gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
+          GradeInput(
+            gradeLabel: 'Grade 4',
             male: 3,
             female: 3,
             subTheme: 'Test',
@@ -428,6 +456,13 @@ void main() {
         grades: [
           GradeInput(
             gradeLabel: 'Grade 3',
+            male: 3,
+            female: 3,
+            subTheme: 'Test',
+            competency: 'Comp 1',
+          ),
+          GradeInput(
+            gradeLabel: 'Grade 4',
             male: 3,
             female: 3,
             subTheme: 'Test',

@@ -199,3 +199,7 @@
 - Added 4 new tests for free-form request detection and prompt generation.
 - Tests: 26 tests pass (slot_filler_test.dart), 10 tests pass (assistant_screen_test.dart).
 - Commit: `feat(assistant): free-form chat to lesson plan generation`
+
+## Mock Generator Test Fix
+
+Fixed mock generator tests that failed due to minGrades=2 validation requirement. Added second GradeInput to tests with only 1 grade: "emits all four sections", "flow minutes sum", "competency indices range", "version 1 JSON loads", and "JSON round-trip preserves indexes". Also adjusted sessionMinutes from 120 to 90 in one test to avoid zero-minute flow stages.
