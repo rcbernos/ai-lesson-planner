@@ -51,6 +51,9 @@ final llmStateProvider = FutureProvider<LlmState>((ref) async {
 /// Provides the LessonGenerator implementation.
 /// Returns LocalLlamaEngine-backed LlmLessonGenerator when model is available,
 /// falls back to MockLessonGenerator otherwise.
+///
+/// NOTE: This provider initializes asynchronously. Callers should use
+/// ref.watch(lessonGeneratorProvider) or handle the async nature properly.
 final lessonGeneratorProvider = FutureProvider<LessonGenerator>((ref) async {
   final path = await ModelPaths.getExpectedModelPath();
   final file = File(path);
