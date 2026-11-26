@@ -163,3 +163,19 @@
 - Added `GenerationCompleted` to `_regenerateAssessment` and `_regenerateWaysForward` methods.
 - Fixed cancel test to use controlled token delays instead of racey sleep.
 - All 6 tests in test/llm_generator_test.dart pass: cancel(), per-grade regeneration, full plan generation, validation retry.
+
+## Phase 6 - Chat Session Management (T6.1 Complete)
+
+### T6.1 Chat session model and storage layer (Complete)
+- Created `lib/core/chat/chat_session.dart` with ChatMessage and ChatSession classes.
+- ChatSession includes: id, created, messages, header, grades, sharedSubTheme, multigradeModel, outputLanguage.
+- Added canGenerate getter to check if session has all required fields.
+- Added toGenerationRequest() to build GenerationRequest from session.
+- Added addMessage() with 12-message cap for prompt budget.
+- Added toJson()/fromJson() for JSON serialization.
+- Updated `lib/models/database/tables.dart`: added ChatSessions table with all draft fields.
+- Updated `lib/services/database/app_database.dart`: bumped schemaVersion to 2, added onUpgrade migration.
+- Created `lib/services/database/chat_repository.dart` with CRUD operations: save, getAll, getById, delete, clearAll.
+- Created `test/chat_repository_test.dart` with 6 tests covering model validation, JSON round-trip, and repository CRUD.
+- All tests pass, flutter analyze clean (only pre-existing deprecation warnings).
+- Commit: `feat(chat): chat session model and storage for slot-filling assistant`

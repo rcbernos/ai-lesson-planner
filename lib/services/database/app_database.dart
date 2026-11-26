@@ -10,7 +10,9 @@ import '../../models/database/tables.dart';
 part 'app_database.g.dart';
 
 /// The main Drift database for the AI Lesson Plan Assistant.
-@DriftDatabase(tables: [LessonPlans, ReferenceNotes, Bibliography])
+@DriftDatabase(
+  tables: [LessonPlans, ReferenceNotes, Bibliography, ChatSessions],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -18,7 +20,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(File file) : super(_openConnectionForFile(file));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -26,6 +28,11 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (Migrator m) async {
         await m.createAll();
         await seed();
+      },
+      onUpgrade: (Migrator m, from, to) async {
+        if (from < 2) {
+          await m.createTable(chatSessions);
+        }
       },
       beforeOpen: (details) async {
         // Safety check: if tables exist but are empty (e.g., the db file
@@ -87,6 +94,22 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> deleteBibliographyEntry(int id) =>
       (delete(bibliography)..where((t) => t.id.equals(id))).go();
+
+  // ── Chat Sessions ─────────────────────────────────────────────────────────
+
+  Future<int> insertChatSession(ChatSessionsCompanion entry) =>
+      into(chatSessions).insert(entry);
+
+  Future<List<ChatSession>> getAllChatSessions() => select(chatSessions).get();
+
+  Future<ChatSession?> getChatSessionById(int id) =>
+      (select(chatSessions)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<bool> updateChatSession(ChatSession entry) =>
+      update(chatSessions).replace(entry);
+
+  Future<int> deleteChatSession(int id) =>
+      (delete(chatSessions)..where((t) => t.id.equals(id))).go();
 
   // ── First-Run Seeding Hook ────────────────────────────────────────────────
 

@@ -42,3 +42,16 @@ class Bibliography extends Table {
   TextColumn get url => text().nullable()();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 }
+
+/// Table: chat_sessions
+/// Stores chat conversations for guided slot-filling assistant.
+class ChatSessions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get created => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get messages => text()(); // JSON array of ChatMessage
+  TextColumn get header => text()(); // JSON PlanHeader
+  TextColumn get grades => text()(); // JSON array of GradeInput
+  TextColumn get sharedSubTheme => text()();
+  TextColumn get multigradeModel => text()();
+  TextColumn get outputLanguage => text()(); // 'filipino' or 'english'
+}
