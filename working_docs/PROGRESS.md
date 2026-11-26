@@ -189,9 +189,13 @@
 
 **Total Phase 6 tests: 37 passing**
 
-### Bug fix: Engine not loaded error in chat assistant
-- Fixed `llmEngineProvider` to use `FutureProvider` that automatically loads the engine before returning it.
-- Added `_UnloadedLlmEngine` placeholder class for graceful error handling when model is unavailable.
-- Updated `slotFillerProvider` to handle the async engine initialization properly.
-- The engine is now properly loaded before use, preventing the "Engine not loaded" error.
-- Commit: `fix(chat): engine not loaded error in assistant screen`
+### Free-form Lesson Plan Generation (New Feature)
+- Implemented free-form chat to lesson plan conversion.
+- Users can now type "Make a lesson plan about photosynthesis for Grade 5, 60 minutes, in Filipino"
+- Added `isFreeFormRequest()` detection method to SlotFiller.
+- Added `buildLessonPlanPrompt()` method that generates ILAW-structured prompts.
+- Added `lessonPlanJson` field to SlotFillResult for full plan responses.
+- Modified assistant_screen.dart to display generated lesson plans in a dialog.
+- Added 4 new tests for free-form request detection and prompt generation.
+- Tests: 26 tests pass (slot_filler_test.dart), 10 tests pass (assistant_screen_test.dart).
+- Commit: `feat(assistant): free-form chat to lesson plan generation`

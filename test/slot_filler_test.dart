@@ -371,6 +371,49 @@ void main() {
         expect(slot.SlotSchema.isValidGradeCount(7), isFalse);
       });
     });
+
+    group('isFreeFormRequest detection', () {
+      test('detects "make a lesson plan" request', () {
+        final engine = fake.FakeEngine(tokenSequences: {});
+        final filler = slot_filler.SlotFiller(engine: engine, seed: 42);
+        // This test verifies the method exists and works
+        expect(
+          filler.isFreeFormRequest('make a lesson plan about photosynthesis'),
+          isTrue,
+        );
+      });
+
+      test('detects "generate lesson plan" request', () {
+        final engine = fake.FakeEngine(tokenSequences: {});
+        final filler = slot_filler.SlotFiller(engine: engine, seed: 42);
+        expect(
+          filler.isFreeFormRequest('generate lesson plan for Grade 5'),
+          isTrue,
+        );
+      });
+
+      test('does not detect slot-filling messages', () {
+        final engine = fake.FakeEngine(tokenSequences: {});
+        final filler = slot_filler.SlotFiller(engine: engine, seed: 42);
+        expect(filler.isFreeFormRequest('Science'), isFalse);
+        expect(filler.isFreeFormRequest('Grade 3 and 4, 90 minutes'), isFalse);
+      });
+    });
+
+    group('Full lesson plan generation', () {
+      test('builds correct lesson plan prompt', () {
+        final engine = fake.FakeEngine(tokenSequences: {});
+        final filler = slot_filler.SlotFiller(engine: engine, seed: 42);
+        final prompt = filler.buildLessonPlanPrompt(
+          'Make a lesson plan about photosynthesis for Grade 5, 60 minutes, in Filipino',
+        );
+        expect(prompt, contains('You are an AI lesson plan assistant'));
+        expect(prompt, contains('generate a complete DepEd ILAW lesson plan'));
+        expect(prompt, contains('User Request:'));
+        expect(prompt, contains('photosynthesis'));
+        expect(prompt, contains('Grade 5'));
+      });
+    });
   });
 }
 

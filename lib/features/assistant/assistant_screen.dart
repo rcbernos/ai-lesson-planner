@@ -8,6 +8,10 @@ import 'package:ai_lesson_planner/core/chat/slot_filler.dart' as slot_filler;
 import 'package:ai_lesson_planner/features/assistant/chat_bubble.dart';
 import 'package:ai_lesson_planner/features/generator/generator_form_state.dart';
 import 'package:ai_lesson_planner/features/generator/generator_screen.dart';
+import 'package:ai_lesson_planner/features/plan_view/ilaw_plan_view.dart';
+import 'package:ai_lesson_planner/core/models/lesson_plan.dart';
+import 'package:ai_lesson_planner/core/generation/lesson_generator.dart'
+    show GradeInput, OutputLanguage, GenerationRequest;
 import 'package:ai_lesson_planner/core/providers.dart';
 
 /// Provider for the chat session state.
@@ -24,6 +28,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   late final TextEditingController _controller;
   final ScrollController _scrollController = ScrollController();
   bool _isProcessing = false;
+  LessonPlan? _generatedPlan;
 
   @override
   void initState() {
@@ -82,6 +87,28 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
         updatedSession,
       );
 
+      // Handle free-form lesson plan generation
+      if (result.lessonPlanJson != null) {
+        final plan = LessonPlan.fromJson(result.lessonPlanJson!);
+        setState(() {
+          _generatedPlan = plan;
+        });
+
+        // Add assistant response about the generated plan
+        final assistantSession = updatedSession.addMessage(
+          ChatMessage(role: 'assistant', content: result.assistantResponse),
+        );
+        ref.read(chatSessionProvider.notifier).state = assistantSession;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Lesson plan generated! Tap to view or edit'),
+          ),
+        );
+        _scrollToBottom();
+        return;
+      }
+
       // Apply patch to session
       var newSession = updatedSession;
       if (result.patch.isNotEmpty) {
@@ -116,6 +143,63 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(chatSessionProvider);
+
+    // Show the generated lesson plan in a dialog if available
+    if (_generatedPlan != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Generated Lesson Plan'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: IlawPlanView(plan: _generatedPlan!),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Continue Chat'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Navigate to edit mode with the generated plan
+                  final request = GenerationRequest(
+                    header: _generatedPlan!.header,
+                    grades: _generatedPlan!.grades
+                        .map(
+                          (g) => GradeInput(
+                            gradeLabel: g.gradeLabel,
+                            male: g.learnersMale,
+                            female: g.learnersFemale,
+                            subTheme: g.subTheme,
+                            competency: g.competencies.join('; '),
+                          ),
+                        )
+                        .toList(),
+                    sharedSubTheme: _generatedPlan!.sharedSubTheme,
+                    language: _generatedPlan!.language == 'en'
+                        ? OutputLanguage.english
+                        : OutputLanguage.filipino,
+                  );
+                  final formState = GeneratorFormState.fromGenerationRequest(
+                    request,
+                  );
+                  ref.read(generatorFormProvider.notifier).setState(formState);
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const GeneratorScreen()),
+                  );
+                },
+                child: const Text('Edit in Form'),
+              ),
+            ],
+          ),
+        );
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Assistant')),
       body: Column(
